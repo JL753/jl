@@ -1,0 +1,43 @@
+version: '3.9'
+services:
+  mysql:
+    image: mysql:8.0
+    container_name: smartprep-mysql
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: smartprep
+    ports:
+      - "3306:3306"
+    volumes:
+      - ./sql/init.sql:/docker-entrypoint-initdb.d/init.sql
+
+  redis:
+    image: redis:7
+    container_name: smartprep-redis
+    ports:
+      - "6379:6379"
+
+  backend:
+    image: maven:3.9.6-eclipse-temurin-17
+    container_name: smartprep-backend
+    working_dir: /app
+    command: bash -c "mvn -q spring-boot:run"
+    volumes:
+      - ./backend:/app
+    ports:
+      - "8080:8080"
+    depends_on:
+      - mysql
+      - redis
+
+  frontend:
+    image: node:20
+    container_name: smartprep-frontend
+    working_dir: /app
+    command: bash -c "npm install && npm run dev -- --host"
+    volumes:
+      - ./frontend:/app
+    ports:
+      - "5173:5173"
+    depends_on:
+      - backend

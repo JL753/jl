@@ -1,0 +1,363 @@
+/**
+ * Markdown 渲染样式
+ * 支持代码高亮、表格、LaTeX 公式等
+ */
+
+/* ========== 基础排版 ========== */
+.markdown-content {
+  line-height: 1.8;
+  color: #2c3e50;
+  font-size: 15px;
+}
+
+.markdown-content h1,
+.markdown-content h2,
+.markdown-content h3,
+.markdown-content h4,
+.markdown-content h5,
+.markdown-content h6 {
+  margin: 24px 0 16px;
+  font-weight: 600;
+  line-height: 1.4;
+  color: #1a202c;
+}
+
+.markdown-content h1 {
+  font-size: 28px;
+  border-bottom: 2px solid #e2e8f0;
+  padding-bottom: 12px;
+}
+
+.markdown-content h2 {
+  font-size: 24px;
+  border-bottom: 1px solid #e2e8f0;
+  padding-bottom: 10px;
+}
+
+.markdown-content h3 {
+  font-size: 20px;
+}
+
+.markdown-content h4 {
+  font-size: 18px;
+}
+
+.markdown-content h5 {
+  font-size: 16px;
+}
+
+.markdown-content h6 {
+  font-size: 14px;
+  color: #718096;
+}
+
+.markdown-content p {
+  margin: 12px 0;
+}
+
+.markdown-content strong {
+  font-weight: 600;
+  color: #1a202c;
+}
+
+.markdown-content em {
+  font-style: italic;
+  color: #4a5568;
+}
+
+.markdown-content del {
+  text-decoration: line-through;
+  color: #a0aec0;
+}
+
+/* ========== 链接 ========== */
+.markdown-content a {
+  color: #4c8dff;
+  text-decoration: none;
+  border-bottom: 1px solid transparent;
+  transition: all 0.2s;
+}
+
+.markdown-content a:hover {
+  color: #3b7de8;
+  border-bottom-color: #3b7de8;
+}
+
+/* ========== 列表 ========== */
+.markdown-content ul,
+.markdown-content ol {
+  margin: 12px 0;
+  padding-left: 28px;
+}
+
+.markdown-content li {
+  margin: 6px 0;
+}
+
+.markdown-content ul li {
+  list-style-type: disc;
+}
+
+.markdown-content ol li {
+  list-style-type: decimal;
+}
+
+.markdown-content ul ul,
+.markdown-content ol ul {
+  margin: 4px 0;
+}
+
+.markdown-content ul ul li {
+  list-style-type: circle;
+}
+
+/* ========== 引用块 ========== */
+.markdown-content blockquote {
+  margin: 16px 0;
+  padding: 12px 20px;
+  border-left: 4px solid #4c8dff;
+  background: #f7fafc;
+  color: #4a5568;
+  border-radius: 0 8px 8px 0;
+}
+
+.markdown-content blockquote p {
+  margin: 8px 0;
+}
+
+/* ========== 行内代码 ========== */
+.markdown-content .inline-code {
+  padding: 2px 6px;
+  background: #f1f5f9;
+  color: #e53e3e;
+  border-radius: 4px;
+  font-family: 'Consolas', 'Monaco', 'Courier New', monospace;
+  font-size: 13px;
+  border: 1px solid #e2e8f0;
+}
+
+/* ========== 代码块 ========== */
+.markdown-content .code-block {
+  margin: 16px 0;
+  border-radius: 8px;
+  overflow: hidden;
+  background: #1e293b;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.markdown-content .code-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 8px 16px;
+  background: #0f172a;
+  border-bottom: 1px solid #334155;
+}
+
+.markdown-content .code-lang {
+  font-size: 12px;
+  color: #94a3b8;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.markdown-content .code-copy {
+  padding: 4px 12px;
+  background: #334155;
+  color: #e2e8f0;
+  border: none;
+  border-radius: 4px;
+  font-size: 12px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.markdown-content .code-copy:hover {
+  background: #475569;
+}
+
+.markdown-content .code-copy:active {
+  background: #1e293b;
+}
+
+.markdown-content .code-block pre {
+  margin: 0;
+  padding: 16px;
+  overflow-x: auto;
+  background: #1e293b;
+}
+
+.markdown-content .code-block code {
+  font-family: 'Consolas', 'Monaco', 'Courier New', monospace;
+  font-size: 13px;
+  line-height: 1.6;
+  color: #e2e8f0;
+  display: block;
+}
+
+/* ========== 代码语法高亮 ========== */
+.markdown-content .code-block .keyword {
+  color: #c792ea;
+  font-weight: 600;
+}
+
+.markdown-content .code-block .builtin {
+  color: #82aaff;
+}
+
+.markdown-content .code-block .string {
+  color: #c3e88d;
+}
+
+.markdown-content .code-block .number {
+  color: #f78c6c;
+}
+
+.markdown-content .code-block .comment {
+  color: #697098;
+  font-style: italic;
+}
+
+.markdown-content .code-block .function {
+  color: #82aaff;
+}
+
+.markdown-content .code-block .operator {
+  color: #89ddff;
+}
+
+/* ========== 表格 ========== */
+.markdown-content .table-wrapper {
+  margin: 16px 0;
+  overflow-x: auto;
+  border-radius: 8px;
+  border: 1px solid #e2e8f0;
+}
+
+.markdown-content .markdown-table {
+  width: 100%;
+  border-collapse: collapse;
+  background: white;
+}
+
+.markdown-content .markdown-table th,
+.markdown-content .markdown-table td {
+  padding: 12px 16px;
+  text-align: left;
+  border-bottom: 1px solid #e2e8f0;
+}
+
+.markdown-content .markdown-table th {
+  background: #f8fafc;
+  font-weight: 600;
+  color: #1a202c;
+  border-bottom: 2px solid #cbd5e0;
+}
+
+.markdown-content .markdown-table tr:last-child td {
+  border-bottom: none;
+}
+
+.markdown-content .markdown-table tr:hover {
+  background: #f7fafc;
+}
+
+/* ========== 水平分割线 ========== */
+.markdown-content hr {
+  margin: 24px 0;
+  border: none;
+  border-top: 2px solid #e2e8f0;
+}
+
+/* ========== LaTeX 公式 ========== */
+.markdown-content .latex-block {
+  margin: 20px 0;
+  padding: 16px;
+  background: #f7fafc;
+  border-radius: 8px;
+  border: 1px solid #e2e8f0;
+  overflow-x: auto;
+  text-align: center;
+}
+
+.markdown-content .latex-inline {
+  display: inline-block;
+  padding: 2px 6px;
+  background: #f1f5f9;
+  border-radius: 4px;
+  font-family: 'Times New Roman', serif;
+  font-style: italic;
+  color: #2d3748;
+}
+
+.markdown-content .latex-block .katex,
+.markdown-content .latex-inline .katex {
+  font-size: 1.1em;
+}
+
+/* ========== 图片 ========== */
+.markdown-content img {
+  max-width: 100%;
+  height: auto;
+  border-radius: 8px;
+  margin: 16px 0;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+/* ========== 任务列表 ========== */
+.markdown-content input[type="checkbox"] {
+  margin-right: 8px;
+  cursor: pointer;
+}
+
+/* ========== 滚动条样式 ========== */
+.markdown-content pre::-webkit-scrollbar,
+.markdown-content .table-wrapper::-webkit-scrollbar {
+  height: 8px;
+}
+
+.markdown-content pre::-webkit-scrollbar-track,
+.markdown-content .table-wrapper::-webkit-scrollbar-track {
+  background: #0f172a;
+  border-radius: 4px;
+}
+
+.markdown-content pre::-webkit-scrollbar-thumb,
+.markdown-content .table-wrapper::-webkit-scrollbar-thumb {
+  background: #475569;
+  border-radius: 4px;
+}
+
+.markdown-content pre::-webkit-scrollbar-thumb:hover,
+.markdown-content .table-wrapper::-webkit-scrollbar-thumb:hover {
+  background: #64748b;
+}
+
+/* ========== 响应式 ========== */
+@media (max-width: 768px) {
+  .markdown-content {
+    font-size: 14px;
+  }
+
+  .markdown-content h1 {
+    font-size: 24px;
+  }
+
+  .markdown-content h2 {
+    font-size: 20px;
+  }
+
+  .markdown-content h3 {
+    font-size: 18px;
+  }
+
+  .markdown-content .code-block pre {
+    padding: 12px;
+  }
+
+  .markdown-content .markdown-table th,
+  .markdown-content .markdown-table td {
+    padding: 8px 12px;
+  }
+}
