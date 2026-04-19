@@ -1,0 +1,26 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(npm install katex highlight.js vue-pdf-embed split-pane-vue3 --save)",
+      "Bash(del:*)",
+      "Bash(mvn spring-boot:run)",
+      "Bash(mvn clean:*)",
+      "Bash(dir:*)",
+      "Bash(nul)",
+      "Bash(npm install sass -D)",
+      "Bash(npm run dev)",
+      "Bash(git add:*)",
+      "Bash(git init:*)",
+      "Bash(test:*)",
+      "Bash(cat:*)",
+      "Bash(git commit:*)",
+      "Bash(curl:*)",
+      "Bash(git checkout:*)",
+      "Bash(done)",
+      "Bash(for file in StudentLayout.vue TeacherLayout.vue)",
+      "Bash(do perl:*)"
+    ],
+    "deny": [],
+    "ask": []
+  }
+}

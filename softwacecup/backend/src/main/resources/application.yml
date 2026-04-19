@@ -1,0 +1,39 @@
+server:
+  port: ${SERVER_PORT:8080}
+
+spring:
+  application:
+    name: smartprep-backend
+  datasource:
+    url: ${DB_URL:jdbc:mysql://127.0.0.1:3306/smartprep?useUnicode=true&characterEncoding=utf-8&serverTimezone=Asia/Shanghai}
+    username: ${DB_USERNAME:root}
+    password: ${DB_PASSWORD:root}
+    driver-class-name: com.mysql.cj.jdbc.Driver
+  data:
+    redis:
+      host: ${REDIS_HOST:127.0.0.1}
+      port: ${REDIS_PORT:6379}
+      timeout: ${REDIS_TIMEOUT:3000ms}
+  jackson:
+    date-format: yyyy-MM-dd HH:mm:ss
+    time-zone: Asia/Shanghai
+
+mybatis-plus:
+  configuration:
+    map-underscore-to-camel-case: true
+  global-config:
+    db-config:
+      id-type: assign_id
+
+smartprep:
+  jwt:
+    secret: ${JWT_SECRET:smartprep-super-secret-key-change-in-prod-smartprep}
+    expire-hours: ${JWT_EXPIRE_HOURS:24}
+  safety:
+    blocked-words: ${BLOCKED_WORDS:作弊,违法,恐怖,色情,暴力}
+  llm:
+    api-key: ${LLM_API_KEY:b896a4c26ecb57516c684f3046dbc8ec:MzNhMDk2MjU1ODQ4MTk0ZWIzNTE3YWFl}
+    base-url: ${LLM_BASE_URL:https://maas-coding-api.cn-huabei-1.xf-yun.com/v2}
+    model: ${LLM_MODEL:astron-code-latest}
+    temperature: ${LLM_TEMPERATURE:0.7}
+    max-tokens: ${LLM_MAX_TOKENS:4096}
