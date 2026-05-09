@@ -1,0 +1,14 @@
+.datacenter-shell { color: #eaf4ff; }
+.datacenter-shell .screen-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; }
+.datacenter-shell .screen-title { margin: 0 auto; padding: 8px 30px; border-radius: 12px; border: 1px solid rgba(110,174,255,.2); background: rgba(12,24,48,.7); letter-spacing: 2px; font-weight: 700; font-size: 18px; color: #eaf4ff; }
+.datacenter-shell .screen-actions { display: flex; gap: 8px; align-items: center; }
+.datacenter-shell .search-pill,
+.datacenter-shell .search-pill input { height: 34px; padding: 0 14px; border-radius: 8px; border: none; background: rgba(255,255,255,.9); color: #475875; font-size: 12.5px; outline: none; display: flex; align-items: center; }
+.datacenter-shell .switch-btn { height: 34px; padding: 0 14px; border-radius: 8px; background: rgba(255,255,255,.85); color: #475875; cursor: pointer; font-size: 12.5px; transition: all .15s; display: flex; align-items: center; }
+.datacenter-shell .chart-panel { min-height: 240px; padding: 8px; background: rgba(12,26,52,.6); border: 1px solid rgba(110,174,255,.1); border-radius: 12px; }
+.datacenter-shell .lift-card { transition: transform .25s ease, box-shadow .25s ease; background: rgba(12,26,52,.5); border: 1px solid rgba(110,174,255,.1); }
+.datacenter-shell .lift-card:hover { transform: translateY(-3px); box-shadow: 0 16px 40px rgba(0,0,0,.25); border-color: rgba(110,174,255,.25); }
+.datacenter-shell .fade-up { animation: fadeUp .5s ease both; }
+.datacenter-shell .delay-1{animation-delay:.05s}
+.datacenter-shell .delay-2{animation-delay:.1s}
+@keyframes fadeUp{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}}

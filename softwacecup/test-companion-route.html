@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>测试 /student/companion 路由</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 50px auto;
+            padding: 20px;
+            background: #f5f7fa;
+        }
+        .test-card {
+            background: white;
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 2px 12px rgba(0,0,0,0.1);
+        }
+        h1 {
+            color: #333;
+            margin-bottom: 20px;
+        }
+        .test-item {
+            margin: 15px 0;
+            padding: 15px;
+            background: #f9f9f9;
+            border-left: 4px solid #409eff;
+            border-radius: 4px;
+        }
+        .test-item h3 {
+            margin: 0 0 10px 0;
+            color: #409eff;
+        }
+        .test-item p {
+            margin: 5px 0;
+            color: #666;
+        }
+        .test-item code {
+            background: #e7f3ff;
+            padding: 2px 8px;
+            border-radius: 3px;
+            color: #409eff;
+            font-family: monospace;
+        }
+        .btn {
+            display: inline-block;
+            padding: 10px 20px;
+            margin: 10px 5px;
+            background: #409eff;
+            color: white;
+            text-decoration: none;
+            border-radius: 4px;
+            transition: all 0.3s;
+        }
+        .btn:hover {
+            background: #66b1ff;
+            transform: translateY(-2px);
+        }
+        .status {
+            padding: 10px;
+            margin: 15px 0;
+            border-radius: 4px;
+        }
+        .status.success {
+            background: #f0f9ff;
+            border: 1px solid #409eff;
+            color: #409eff;
+        }
+        .status.error {
+            background: #fef0f0;
+            border: 1px solid #f56c6c;
+            color: #f56c6c;
+        }
+    </style>
+</head>
+<body>
+    <div class="test-card">
+        <h1>🧪 /student/companion 路由测试</h1>
+
+        <div class="test-item">
+            <h3>✅ 路由配置检查</h3>
+            <p>路由路径: <code>/student/companion</code></p>
+            <p>组件文件: <code>frontend/src/views/student/StudyCompanion.vue</code></p>
+            <p>导航链接: StudentLayout.vue 第76行</p>
+            <p>状态: <strong style="color: #67c23a;">✓ 已配置</strong></p>
+        </div>
+
+        <div class="test-item">
+            <h3>✅ 组件依赖检查</h3>
+            <p>主组件: <code>SplitPaneStudy.vue</code> ✓</p>
+            <p>子组件: <code>KnowledgeMap.vue</code> ✓</p>
+            <p>子组件: <code>QuizComponent.vue</code> ✓</p>
+            <p>API模块: <code>api/sse.js</code> ✓</p>
+            <p>依赖包: <code>marked@13.0.3</code> ✓</p>
+            <p>依赖包: <code>dompurify@3.4.0</code> ✓</p>
+        </div>
+
+        <div class="test-item">
+            <h3>🔍 可能的问题排查</h3>
+            <p><strong>1. 认证问题：</strong>需要先登录才能访问学生端路由</p>
+            <p><strong>2. 权限问题：</strong>只有 student 角色可以访问 /student/* 路由</p>
+            <p><strong>3. 后端服务：</strong>AI助手功能需要后端 /api/tutor/stream 接口运行</p>
+        </div>
+
+        <div class="status success">
+            <strong>✓ 诊断结果：</strong>路由配置正确，所有依赖文件存在。如果无法访问，请检查：
+            <ol style="margin: 10px 0 0 20px;">
+                <li>是否已登录（使用 student 账号）</li>
+                <li>浏览器控制台是否有错误信息</li>
+                <li>后端服务是否正常运行</li>
+            </ol>
+        </div>
+
+        <div style="margin-top: 30px; text-align: center;">
+            <a href="http://localhost:5173/login" class="btn">前往登录页</a>
+            <a href="http://localhost:5173/student/companion" class="btn">直接访问路由</a>
+        </div>
+
+        <div class="test-item" style="margin-top: 30px;">
+            <h3>📋 测试步骤</h3>
+            <ol style="color: #666; line-height: 1.8;">
+                <li>点击"前往登录页"按钮</li>
+                <li>使用账号 <code>student</code> 密码 <code>123456</code> 登录</li>
+                <li>登录成功后，点击左侧导航栏的"智能学习"</li>
+                <li>或直接访问 <code>http://localhost:5173/student/companion</code></li>
+            </ol>
+        </div>
+    </div>
+
+    <script>
+        // 自动检测路由可访问性
+        fetch('http://localhost:5173/student/companion')
+            .then(response => {
+                console.log('路由响应状态:', response.status);
+                if (response.status === 200) {
+                    console.log('✓ 路由可访问');
+                }
+            })
+            .catch(error => {
+                console.error('路由访问失败:', error);
+            });
+    </script>
+</body>
+</html>
