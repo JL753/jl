@@ -124,6 +124,33 @@
           </div>
         </article>
 
+        <!-- Group 04: Course Schedule (仅学生端显示) -->
+        <article v-if="role === 'student'" class="panel form-panel">
+          <div class="panel-head">
+            <div><span class="group-tag group-4">GROUP 04</span><h3>我的课表</h3></div>
+            <span class="soft-tag schedule-tag">课程安排</span>
+          </div>
+          <div class="schedule-actions">
+            <el-button type="primary" size="small" @click="showAddScheduleDialog = true">➕ 添加课程</el-button>
+            <el-button size="small" @click="loadSchedule">🔄 刷新</el-button>
+            <el-button size="small" type="danger" plain @click="clearSchedule">🗑️ 清空课表</el-button>
+          </div>
+          <div class="schedule-grid">
+            <div v-for="day in 7" :key="day" class="day-column">
+              <div class="day-header">{{ ['周一', '周二', '周三', '周四', '周五', '周六', '周日'][day - 1] }}</div>
+              <div class="course-list">
+                <div v-for="course in getCoursesForDay(day)" :key="course.id" class="course-item" @click="editCourse(course)">
+                  <div class="course-time">{{ course.startTime }}-{{ course.endTime }}</div>
+                  <div class="course-name">{{ course.courseName }}</div>
+                  <div class="course-location">{{ course.location }}</div>
+                  <div class="course-teacher">{{ course.teacher }}</div>
+                </div>
+                <div v-if="getCoursesForDay(day).length === 0" class="empty-day">无课</div>
+              </div>
+            </div>
+          </div>
+        </article>
+
         <!-- Sticky Action Bar -->
         <div class="action-bar">
           <div class="action-info">
@@ -137,14 +164,49 @@
         </div>
       </main>
     </section>
+
+    <!-- 添加/编辑课程对话框 -->
+    <el-dialog v-model="showAddScheduleDialog" :title="editingCourse ? '编辑课程' : '添加课程'" width="500px">
+      <el-form :model="scheduleForm" label-width="80px">
+        <el-form-item label="星期">
+          <el-select v-model="scheduleForm.dayOfWeek" placeholder="请选择">
+            <el-option v-for="(day, idx) in ['周一', '周二', '周三', '周四', '周五', '周六', '周日']" :key="idx + 1" :label="day" :value="idx + 1" />
+          </el-select>
+        </el-form-item>
+        <el-form-item label="开始时间">
+          <el-time-picker v-model="scheduleForm.startTime" format="HH:mm" value-format="HH:mm" placeholder="选择时间" />
+        </el-form-item>
+        <el-form-item label="结束时间">
+          <el-time-picker v-model="scheduleForm.endTime" format="HH:mm" value-format="HH:mm" placeholder="选择时间" />
+        </el-form-item>
+        <el-form-item label="课程名称">
+          <el-input v-model="scheduleForm.courseName" placeholder="请输入课程名称" />
+        </el-form-item>
+        <el-form-item label="上课地点">
+          <el-input v-model="scheduleForm.location" placeholder="请输入上课地点" />
+        </el-form-item>
+        <el-form-item label="授课教师">
+          <el-input v-model="scheduleForm.teacher" placeholder="请输入教师姓名" />
+        </el-form-item>
+        <el-form-item label="上课周次">
+          <el-input v-model="scheduleForm.weeks" placeholder="如: 1-16" />
+        </el-form-item>
+      </el-form>
+      <template #footer>
+        <el-button @click="showAddScheduleDialog = false">取消</el-button>
+        <el-button v-if="editingCourse" type="danger" @click="deleteCourse">删除</el-button>
+        <el-button type="primary" @click="saveCourse">保存</el-button>
+      </template>
+    </el-dialog>
   </div>
 </template>
 
 <script setup>
 import { computed, onMounted, reactive, ref } from 'vue'
-import { ElMessage } from 'element-plus'
+import { ElMessage, ElMessageBox } from 'element-plus'
 import { apiProfileCard } from '../../api'
 import { useAuthStore } from '../../stores/auth'
+import axios from 'axios'
 
 const auth = useAuthStore()
 const profile = ref({ summary: [] })
@@ -154,6 +216,20 @@ const form = reactive({
   major: '', course: '', knowledgeBase: '',
   cognitiveStyle: '', weakPoints: '', interestPreference: '',
   pacePreference: '', examGoal: ''
+})
+
+// 课表相关状态
+const scheduleList = ref([])
+const showAddScheduleDialog = ref(false)
+const editingCourse = ref(null)
+const scheduleForm = reactive({
+  dayOfWeek: 1,
+  startTime: '08:00',
+  endTime: '09:40',
+  courseName: '',
+  location: '',
+  teacher: '',
+  weeks: '1-16'
 })
 
 const role = computed(() => auth.user?.role || 'student')
@@ -281,6 +357,126 @@ const load = async () => {
 
 const resetForm = () => fillForm()
 
+// 课表管理方法
+const loadSchedule = async () => {
+  try {
+    const token = localStorage.getItem('sp_token')
+    const response = await axios.get('/api/schedule/my', {
+      headers: { Authorization: `Bearer ${token}` }
+    })
+    if (response.data.success) {
+      scheduleList.value = response.data.data || []
+    }
+  } catch (e) {
+    console.warn('Failed to load schedule:', e)
+  }
+}
+
+const getCoursesForDay = (day) => {
+  return scheduleList.value.filter(c => c.dayOfWeek === day)
+}
+
+const editCourse = (course) => {
+  editingCourse.value = course
+  Object.assign(scheduleForm, {
+    dayOfWeek: course.dayOfWeek,
+    startTime: course.startTime,
+    endTime: course.endTime,
+    courseName: course.courseName,
+    location: course.location,
+    teacher: course.teacher,
+    weeks: course.weeks
+  })
+  showAddScheduleDialog.value = true
+}
+
+const saveCourse = async () => {
+  if (!scheduleForm.courseName) {
+    ElMessage.warning('请输入课程名称')
+    return
+  }
+  try {
+    const token = localStorage.getItem('sp_token')
+    if (editingCourse.value) {
+      // 更新
+      await axios.put('/api/schedule/update', {
+        id: editingCourse.value.id,
+        ...scheduleForm
+      }, {
+        headers: { Authorization: `Bearer ${token}` }
+      })
+      ElMessage.success('课程更新成功')
+    } else {
+      // 新增
+      await axios.post('/api/schedule/add', scheduleForm, {
+        headers: { Authorization: `Bearer ${token}` }
+      })
+      ElMessage.success('课程添加成功')
+    }
+    showAddScheduleDialog.value = false
+    editingCourse.value = null
+    resetScheduleForm()
+    await loadSchedule()
+  } catch (e) {
+    ElMessage.error('保存失败：' + (e.response?.data?.message || e.message))
+  }
+}
+
+const deleteCourse = async () => {
+  try {
+    await ElMessageBox.confirm('确定要删除这门课程吗？', '提示', {
+      confirmButtonText: '确定',
+      cancelButtonText: '取消',
+      type: 'warning'
+    })
+    const token = localStorage.getItem('sp_token')
+    await axios.delete(`/api/schedule/${editingCourse.value.id}`, {
+      headers: { Authorization: `Bearer ${token}` }
+    })
+    ElMessage.success('删除成功')
+    showAddScheduleDialog.value = false
+    editingCourse.value = null
+    resetScheduleForm()
+    await loadSchedule()
+  } catch (e) {
+    if (e !== 'cancel') {
+      ElMessage.error('删除失败：' + (e.response?.data?.message || e.message))
+    }
+  }
+}
+
+const clearSchedule = async () => {
+  try {
+    await ElMessageBox.confirm('确定要清空所有课程吗？此操作不可恢复！', '警告', {
+      confirmButtonText: '确定',
+      cancelButtonText: '取消',
+      type: 'warning'
+    })
+    const token = localStorage.getItem('sp_token')
+    await axios.delete('/api/schedule/clear', {
+      headers: { Authorization: `Bearer ${token}` }
+    })
+    ElMessage.success('课表已清空')
+    await loadSchedule()
+  } catch (e) {
+    if (e !== 'cancel') {
+      ElMessage.error('清空失败：' + (e.response?.data?.message || e.message))
+    }
+  }
+}
+
+const resetScheduleForm = () => {
+  Object.assign(scheduleForm, {
+    dayOfWeek: 1,
+    startTime: '08:00',
+    endTime: '09:40',
+    courseName: '',
+    location: '',
+    teacher: '',
+    weeks: '1-16'
+  })
+}
+
 const save = async () => {
   try {
     await auth.updateMe({ ...form })
@@ -291,7 +487,12 @@ const save = async () => {
   } catch (e) { ElMessage.error('保存失败：' + e.message) }
 }
 
-onMounted(load)
+onMounted(async () => {
+  await load()
+  if (role.value === 'student') {
+    await loadSchedule()
+  }
+})
 </script>
 
 <style scoped>
@@ -464,6 +665,22 @@ onMounted(load)
 .save-pop-enter-active, .save-pop-leave-active { transition: all .35s ease; }
 .save-pop-enter-from, .save-pop-leave-to { opacity: 0; transform: translateY(-8px); }
 
-@media(max-width:1200px){.profile-layout,.form-grid,.summary-cards{grid-template-columns:1fr}.sidebar{position:static}.span-full{grid-column-span:1}.action-bar{position:static;flex-direction:column;align-items:stretch;}.action-buttons{justify-content:flex-end}}
+/* 课表样式 */
+.schedule-actions { display: flex; gap: 10px; margin-bottom: 16px; }
+.schedule-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 10px; }
+.day-column { border: 1px solid #e6edf6; border-radius: 12px; overflow: hidden; background: white; }
+.day-header { padding: 10px; background: linear-gradient(135deg, #eff6ff, #dbeafe); color: #2563eb; font-weight: 600; text-align: center; font-size: 13px; }
+.course-list { padding: 8px; display: grid; gap: 8px; min-height: 100px; }
+.course-item { padding: 8px 10px; border-radius: 8px; background: linear-gradient(135deg, #fef3c7, #fef9c3); border: 1px solid #fde047; cursor: pointer; transition: all .2s; }
+.course-item:hover { transform: translateY(-2px); box-shadow: 0 4px 12px rgba(250, 204, 21, 0.3); }
+.course-time { font-size: 11px; color: #92400e; font-weight: 600; margin-bottom: 4px; }
+.course-name { font-size: 13px; color: #78350f; font-weight: 600; margin-bottom: 3px; }
+.course-location { font-size: 11px; color: #a16207; }
+.course-teacher { font-size: 11px; color: #a16207; margin-top: 2px; }
+.empty-day { padding: 20px; text-align: center; color: #cbd5e1; font-size: 12px; }
+.group-4 { background: linear-gradient(135deg, #fef3c7, #fde047); color: #78350f; }
+.schedule-tag { background: #fef9c3; color: #a16207; }
+
+@media(max-width:1200px){.profile-layout,.form-grid,.summary-cards{grid-template-columns:1fr}.sidebar{position:static}.span-full{grid-column-span:1}.action-bar{position:static;flex-direction:column;align-items:stretch;}.action-buttons{justify-content:flex-end}.schedule-grid{grid-template-columns:1fr}}
 @media(max-width:760px){.preset-grid{grid-template-columns:repeat(2,1fr)}.action-buttons{flex-direction:column}}
 </style>

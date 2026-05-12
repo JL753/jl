@@ -40,17 +40,20 @@
           <p>2025年04月10日 | 星期四</p>
         </div>
 
-        <!-- Today's Schedule -->
-        <div class="schedule-section">
+        <!-- QA History Section -->
+        <div class="qa-history-section">
           <div class="sched-header">
-            <strong>今日课表</strong>
-            <span style="color:#3b82f6;cursor:pointer">明日课表</span>
+            <strong>AI问答记录</strong>
+            <span style="color:#3b82f6;cursor:pointer" @click="router.push('/student/companion')">查看全部</span>
           </div>
-          <div class="sched-list">
-            <div v-for="(item, idx) in defaultSchedule" :key="'s'+idx" class="sched-item">
-              <span class="sched-time">{{ item.time }}</span>
-              <span class="sched-name">{{ item.name }}</span>
-              <el-tag size="small" type="primary">{{ idx === 0 ? '进行中' : '未开始' }}</el-tag>
+          <div class="qa-list">
+            <div v-for="(item, idx) in qaHistory" :key="'qa'+idx" class="qa-item" @click="jumpToCompanion(item.question)">
+              <div class="qa-summary">{{ item.summary || item.question.substring(0, 30) + '...' }}</div>
+              <div class="qa-time">{{ formatTime(item.createdAt) }}</div>
+            </div>
+            <div v-if="qaHistory.length === 0" class="empty-qa">
+              <p>暂无问答记录</p>
+              <el-button type="primary" size="small" @click="router.push('/student/companion')">开始提问</el-button>
             </div>
           </div>
         </div>
@@ -106,21 +109,24 @@
       <div class="panel side-summary lift-card fade-up delay-3">
         <!-- Course info tabs -->
         <div class="course-tabs">
-          <span :class="{ active: courseTab === 'today' }" @click="courseTab = 'today'" style="color:#2563eb;text-decoration:underline;">今日课表</span>
-          <span :class="{ active: courseTab === 'tmr' }" @click="courseTab = 'tmr'">明日课表</span>
+          <span :class="{ active: courseTab === 'today' }" @click="switchCourseTab('today')" style="cursor:pointer;">今日课表</span>
+          <span :class="{ active: courseTab === 'tmr' }" @click="switchCourseTab('tmr')" style="cursor:pointer;">明日课表</span>
         </div>
 
         <div class="today-progress-card">
-          <span>今日课表完成度</span>
+          <span>{{ courseTab === 'today' ? '今日' : '明日' }}课表完成度</span>
           <strong>{{ data.summary.todayGoal || '3/4' }}</strong>
           <small>{{ data.summary.riskLevel || '低风险' }}</small>
         </div>
 
         <!-- Timeline -->
         <div class="timeline-small">
-          <div v-for="(item, idx) in defaultSchedule" :key="'t'+idx" class="tl-item">
-            <span class="tl-dot"></span>
-            <div><strong>{{ item.time }}</strong><p>{{ item.name }}</p></div>
+          <div v-for="(item, idx) in displaySchedule" :key="'t'+idx" class="tl-item">
+            <span class="tl-dot" :class="{ active: courseTab === 'today' && idx === 0 }"></span>
+            <div><strong>{{ item.startTime }}-{{ item.endTime }}</strong><p>{{ item.courseName }}</p></div>
+          </div>
+          <div v-if="displaySchedule.length === 0" class="empty-schedule">
+            <p>{{ courseTab === 'today' ? '今日' : '明日' }}无课程安排</p>
           </div>
         </div>
 
@@ -155,15 +161,25 @@
 <script setup>
 import * as echarts from 'echarts'
 import { computed, nextTick, onMounted, ref } from 'vue'
+import { useRouter } from 'vue-router'
 import { useAuthStore } from '../../stores/auth'
 import { apiStudentDashboard, apiStudentWorkspace } from '../../api'
+import axios from 'axios'
 
 const auth = useAuthStore()
+const router = useRouter()
 const data = ref({ summary: {}, pie: [], line: [], bar: [], radar: [] })
 const workspace = ref({ courseSchedule: [] })
+const qaHistory = ref([])
+const todaySchedule = ref([])
+const tomorrowSchedule = ref([])
 const radarRef = ref(), lineRef = ref(), barRef = ref()
 const todayText = computed(() => new Date().toLocaleDateString('zh-CN'))
 const courseTab = ref('today')
+
+const displaySchedule = computed(() => {
+  return courseTab.value === 'today' ? todaySchedule.value : tomorrowSchedule.value
+})
 
 // Default schedule - compact
 const defaultSchedule = [
@@ -188,13 +204,110 @@ const behaviorRows = [
 // Exam stats
 const examStats = ref({ passCount: 6, passRate: '25.57%', totalRate: '28.57%', cet6: '36/1049', cet6Rate: '3.43%', aiScore: '2.49', aiRate: '4.08%' })
 
+const formatTime = (dateStr) => {
+  if (!dateStr) return ''
+  const date = new Date(dateStr)
+  const now = new Date()
+  const diff = now - date
+  const minutes = Math.floor(diff / 60000)
+  const hours = Math.floor(diff / 3600000)
+  const days = Math.floor(diff / 86400000)
+
+  if (minutes < 60) return `${minutes}分钟前`
+  if (hours < 24) return `${hours}小时前`
+  if (days < 7) return `${days}天前`
+  return date.toLocaleDateString('zh-CN')
+}
+
+const jumpToCompanion = (question) => {
+  router.push({ path: '/student/companion', query: { q: question } })
+}
+
+const loadQaHistory = async () => {
+  try {
+    const token = localStorage.getItem('sp_token')
+    const response = await axios.get('/api/qa/recent?limit=5', {
+      headers: { Authorization: `Bearer ${token}` }
+    })
+    if (response.data.success) {
+      qaHistory.value = response.data.data || []
+    }
+  } catch (e) {
+    console.warn('Failed to load QA history:', e)
+  }
+}
+
+const loadTodaySchedule = async () => {
+  try {
+    const token = localStorage.getItem('sp_token')
+    const today = new Date().getDay() || 7  // 0-6 转为 1-7，周日为7
+    const response = await axios.get(`/api/schedule/day/${today}`, {
+      headers: { Authorization: `Bearer ${token}` }
+    })
+    if (response.data.success) {
+      todaySchedule.value = response.data.data || []
+    }
+  } catch (e) {
+    console.warn('Failed to load today schedule:', e)
+    todaySchedule.value = []
+  }
+}
+
+const loadTomorrowSchedule = async () => {
+  try {
+    const token = localStorage.getItem('sp_token')
+    const tomorrow = (new Date().getDay() + 1) % 7 || 7  // 明天的星期
+    const response = await axios.get(`/api/schedule/day/${tomorrow}`, {
+      headers: { Authorization: `Bearer ${token}` }
+    })
+    if (response.data.success) {
+      tomorrowSchedule.value = response.data.data || []
+    }
+  } catch (e) {
+    console.warn('Failed to load tomorrow schedule:', e)
+    tomorrowSchedule.value = []
+  }
+}
+
+const switchCourseTab = async (tab) => {
+  courseTab.value = tab
+  if (tab === 'tmr' && tomorrowSchedule.value.length === 0) {
+    await loadTomorrowSchedule()
+  }
+}
+
 const axisStyle = {
   axisLine: { lineStyle: { color: '#d9e3f0' } },
   axisLabel: { color: '#7588a3', fontSize: 11 },
   splitLine: { lineStyle: { color: '#edf2f8' } }
 }
 
-const renderCharts = () => {
+const renderCharts = async () => {
+  // Fetch real data for line and bar charts
+  let lineData = []
+  let barData = []
+
+  try {
+    const token = localStorage.getItem('sp_token')
+    const [activityRes, taskRes] = await Promise.all([
+      axios.get('/api/dashboard/learning-activity-trend', {
+        headers: { Authorization: `Bearer ${token}` }
+      }),
+      axios.get('/api/dashboard/weekly-task-completion', {
+        headers: { Authorization: `Bearer ${token}` }
+      })
+    ])
+
+    if (activityRes.data.success) {
+      lineData = activityRes.data.data || []
+    }
+    if (taskRes.data.success) {
+      barData = taskRes.data.data || []
+    }
+  } catch (e) {
+    console.warn('Failed to load chart data:', e)
+  }
+
   // Six-dimension radar chart (replaces the original donut)
   const radarData = data.value.radar && data.value.radar.length > 0 ? data.value.radar : [
     { name: '知识掌握度', value: 82, max: 100 },
@@ -235,30 +348,41 @@ const renderCharts = () => {
     }]
   })
 
-  // Line: 近7日活跃趋势
+  // Line: 近7日活跃趋势 - use real data
+  const lineLabels = lineData.length > 0 ? lineData.map(i => {
+    const date = new Date(i.date)
+    const weekdays = ['周日','周一','周二','周三','周四','周五','周六']
+    return weekdays[date.getDay()]
+  }) : ['周一','周二','周三','周四','周五','周六','周日']
+
+  const lineValues = lineData.length > 0 ? lineData.map(i => i.score) : [23,38,31,45,29,18,12]
+
   echarts.init(lineRef.value).setOption({
     title: { text: '近 7 日学习活跃趋势', textStyle: { color: '#4c5f79', fontSize: 15, fontWeight: 600 } },
     grid: { left: 44, right: 18, top: 50, bottom: 26 },
-    xAxis: { type: 'category', data: data.value.line.map(i => i.name) || ['周一','周二','周三','周四','周五','周六','周日'], ...axisStyle },
+    xAxis: { type: 'category', data: lineLabels, ...axisStyle },
     yAxis: { type: 'value', name: '活跃值', ...axisStyle },
     series: [{
       type: 'line', smooth: true,
-      data: data.value.line.map(i => i.value) || [23,38,31,45,29,18,12],
+      data: lineValues,
       lineStyle: { color: '#10b981', width: 2.5 },
       areaStyle: { color: new echarts.graphic.LinearGradient(0, 0, 0, 1, [{ offset: 0, color: 'rgba(16,185,129,.22)' }, { offset: 1, color: 'rgba(16,185,129,.02)' }]) },
       itemStyle: { color: '#10b981' }
     }]
   })
 
-  // Bar: 周任务完成度
+  // Bar: 周任务完成度 - use real data
+  const barLabels = barData.length > 0 ? barData.map(i => i.taskType) : ['阅读','练习','视频','测验','项目','讨论']
+  const barValues = barData.length > 0 ? barData.map(i => i.completionRate) : [85,72,90,68,78,82]
+
   echarts.init(barRef.value).setOption({
     title: { text: '周学习任务完成度', textStyle: { color: '#4c5f79', fontSize: 15, fontWeight: 600 } },
     grid: { left: 44, right: 18, top: 50, bottom: 26 },
-    xAxis: { type: 'category', data: data.value.bar.map(i => i.name) || ['阅读','练习','视频','测验','项目','讨论'], ...axisStyle },
+    xAxis: { type: 'category', data: barLabels, ...axisStyle },
     yAxis: { type: 'value', name: '完成率 %', min: 0, max: 100, ...axisStyle },
     series: [{
       type: 'bar',
-      data: data.value.bar.map(i => i.value) || [85,72,90,68,78,82],
+      data: barValues,
       itemStyle: {
         color: function(params) {
           const colors = ['#3b82f6','#10b981','#f59e0b','#ef4444','#8b5cf6','#ec4899']
@@ -276,8 +400,11 @@ onMounted(async () => {
     data.value = dashRes.data || {}
     workspace.value = wsRes.data || {}
   } catch(e) { console.warn('Student dashboard API unavailable') }
+
+  await Promise.all([loadQaHistory(), loadTodaySchedule()])
+
   await nextTick()
-  renderCharts()
+  await renderCharts()
 
   window.addEventListener('resize', () => {
     ;[radarRef, lineRef, barRef].forEach(ref => {
@@ -298,8 +425,8 @@ onMounted(async () => {
 
 /* Profile card - compact */
 .profile-card, .study-board, .side-summary { padding: 14px 16px; background: white; border-radius: 14px; box-shadow: 0 2px 10px rgba(33,65,108,.05); }
-.tab-bar { display: flex; gap: 14px; margin-bottom: 12px; font-size: 13px; color: #94a3b8; }
-.tab-bar .tab-active { color: #166534; font-weight: 700; border-bottom: 2px solid #22c55e; padding-bottom: 2px; }
+.tab-bar, .tab-row { display: flex; gap: 14px; margin-bottom: 12px; font-size: 13px; color: #94a3b8; }
+.tab-bar .tab-active, .tab-row .tab-active { color: #166534; font-weight: 700; border-bottom: 2px solid #22c55e; padding-bottom: 2px; }
 .student-info { display: flex; gap: 12px; align-items: center; margin-bottom: 10px; }
 .avatar-circle { width: 52px; height: 52px; border-radius: 50%; display: grid; place-items: center; background: linear-gradient(135deg,#ffca85,#ff8e6f); font-size: 26px; box-shadow: 0 4px 14px rgba(255,140,112,.2); }
 .info-text strong { display: block; font-size: 15px; color: #1e293b; font-weight: 600; }
@@ -313,6 +440,17 @@ onMounted(async () => {
 .teacher-info-box p { margin: 2px 0 0; font-size: 11.5px; color: #059669; }
 
 .schedule-section { } .sched-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; font-size: 13px; font-weight: 600; color: #1e293b; } .sched-header strong { color: #1e293b; } .sched-list { display: grid; gap: 6px; } .sched-item { padding: 8px 12px; border-radius: 10px; background: linear-gradient(135deg,#f8fbff,#fff); border: 1px solid #edf2f8; display: grid; grid-template-columns: auto 1fr auto; gap: 6px; align-items: center; transition: all .18s ease; font-size: 12.5px; } .sched-item:hover { transform: translateX(3px); border-color: #dbeafe; } .sched-time { color: #2563eb; font-weight: 600; white-space: nowrap; } .sched-name { color: #64748b; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+
+/* QA History Section */
+.qa-history-section { margin-top: 10px; }
+.qa-list { display: grid; gap: 6px; max-height: 240px; overflow-y: auto; }
+.qa-item { padding: 10px 12px; border-radius: 10px; background: linear-gradient(135deg,#fefce8,#fff); border: 1px solid #fef3c7; cursor: pointer; transition: all .18s ease; }
+.qa-item:hover { transform: translateX(3px); border-color: #fde047; background: linear-gradient(135deg,#fef9c3,#fffbeb); }
+.qa-summary { font-size: 12.5px; color: #854d0e; font-weight: 500; margin-bottom: 4px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.qa-time { font-size: 11px; color: #a16207; }
+.empty-qa { padding: 20px; text-align: center; color: #94a3b8; }
+.empty-qa p { margin-bottom: 10px; }
+.empty-schedule { padding: 20px; text-align: center; color: #94a3b8; font-size: 12px; }
 
 /* Study board */
 .board-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; } .board-header h3 { margin: 0; font-size: 17px; color: #1e293b; font-weight: 700; } .board-header span.active { color: #2563eb; font-weight: 600; }
@@ -335,9 +473,11 @@ onMounted(async () => {
 /* Side summary */
 .side-summary { padding: 14px 16px; }
 .course-tabs { display: flex; gap: 16px; margin-bottom: 12px; font-size: 13px; cursor: pointer; color: #94a3b8; }
+.course-tabs span { transition: all .2s; }
+.course-tabs span:hover { color: #2563eb; }
 .course-tabs .active { color: #2563eb; font-weight: 700; text-decoration: underline; }
 .today-progress-card { padding: 12px 14px; border-radius: 12px; background: linear-gradient(135deg,#eff5ff,#fbfdff); border: 1px solid #e0edfa; display: grid; gap: 3px; margin-bottom: 12px; } .today-progress-card strong { font-size: 28px; color: #1e293b; font-weight: 700; }
-.timeline-small { display: grid; gap: 6px; margin-bottom: 12px; } .tl-item { display: flex; gap: 8px; padding: 4px 0; } .tl-dot { width: 8px; height: 8px; border-radius: 50%; margin-top: 8px; background: #f97316; flex-shrink: 0; } .tl-item p { margin: 3px 0 0; color: #94a3b8; font-size: 12px; } .tl-item strong { color: #2563eb; font-size: 12.5px; font-weight: 600; }
+.timeline-small { display: grid; gap: 6px; margin-bottom: 12px; } .tl-item { display: flex; gap: 8px; padding: 4px 0; } .tl-dot { width: 8px; height: 8px; border-radius: 50%; margin-top: 8px; background: #cbd5e1; flex-shrink: 0; } .tl-dot.active { background: #f97316; box-shadow: 0 0 8px rgba(249, 115, 22, 0.5); } .tl-item p { margin: 3px 0 0; color: #94a3b8; font-size: 12px; } .tl-item strong { color: #2563eb; font-size: 12.5px; font-weight: 600; }
 .bottom-stats-grid { display: flex; gap: 6px; margin-bottom: 10px; }
 .mini-stat { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 3px; padding: 8px; border-radius: 8px; background: #f8fafc; border: 1px solid #edf2f8; font-size: 11px; color: #64748b; } .ms-icon { font-size: 16px; }
 .exam-info-bar { border-top: 1px solid #edf2f8; padding-top: 10px; } .exam-info-bar > span { display: block; font-size: 12px; font-weight: 600; color: #475569; margin-bottom: 6px; }

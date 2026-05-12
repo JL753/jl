@@ -249,7 +249,7 @@ const generateQuiz = async () => {
       difficulty: settings.value.difficulty
     })
 
-    if (response.data.code === 200) {
+    if (response.data.success) {
       quizId.value = response.data.data.quizId
       questions.value = response.data.data.questions
       totalScore.value = response.data.data.totalScore
@@ -301,7 +301,7 @@ const submitQuiz = async () => {
       answers: answers.value
     })
 
-    if (response.data.code === 200) {
+    if (response.data.success) {
       result.value = response.data.data
       quizState.value = 'graded'
       ElMessage.success('批改完成！')

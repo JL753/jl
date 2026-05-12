@@ -26,10 +26,10 @@
         </el-table-column>
         <el-table-column prop="score" label="考试满分" width="90" align="center" />
         <el-table-column prop="submitted" label="及格线" width="80" align="center" />
-        <el-table-column label="操作" width="140" align="center" fixed="right">
+        <el-table-column label="操作" width="160" align="center" fixed="right">
           <template #default="{ row }">
-            <el-button link type="primary" size="small" :disabled="row.status !== 'active'" @click.stop="startExam(row)">开始考试</el-button>
-            <el-button link type="primary" size="small" @click.stop="viewExamResult(row)">查看成绩</el-button>
+            <el-button class="exam-btn" size="small" :disabled="row.status !== 'active'" @click.stop="startExam(row)">开始考试</el-button>
+            <el-button class="exam-btn" size="small" @click.stop="viewExamResult(row)">查看成绩</el-button>
           </template>
         </el-table-column>
       </el-table>
@@ -118,13 +118,29 @@
       </div>
     </transition>
     </Teleport>
+
+    <!-- Score Modal -->
+    <el-dialog v-model="showScoreModal" :title="`${scoreModalTitle} - 成绩记录`" width="600px">
+      <div v-if="scoreLoading" style="text-align:center;padding:20px">加载中...</div>
+      <div v-else-if="scoreRecords.length === 0" style="text-align:center;padding:20px;color:#94a3b8">暂无成绩记录</div>
+      <el-table v-else :data="scoreRecords" stripe>
+        <el-table-column prop="recordId" label="记录ID" width="80" />
+        <el-table-column prop="score" label="得分" width="80" align="center">
+          <template #default="{ row }"><strong style="color:#3b82f6">{{ row.score }}</strong></template>
+        </el-table-column>
+        <el-table-column prop="review" label="评语" min-width="160" />
+        <el-table-column prop="submittedAt" label="提交时间" width="160">
+          <template #default="{ row }">{{ row.submittedAt?.slice(0,16) }}</template>
+        </el-table-column>
+      </el-table>
+    </el-dialog>
   </div>
 </template>
 
 <script setup>
-import { ref, computed, reactive, onBeforeUnmount, watch, nextTick } from 'vue'
+import { ref, computed, reactive, onBeforeUnmount, onMounted, watch } from 'vue'
 import { ElMessage, ElMessageBox } from 'element-plus'
-import { apiExamList, apiSubmitExam } from '../../api'
+import { apiExamList, apiSubmitExam, apiExamRecords } from '../../api'
 
 const filterStatus = ref('')
 const searchKeyword = ref('')
@@ -142,7 +158,7 @@ const timeLeft = ref(3600) // 1 hour in seconds
 const elapsedTime = ref(0)
 let timerInterval = null
 
-// Mock exams
+// Mock exams - will be replaced by real data when API returns
 const allExams = ref([
   { id: 1, category: '', name: '预习练习', type: '练习', status: 'active', score: 36, submitted: 24 },
   { id: 2, category: '', name: '课堂练习', type: '考试', status: 'pending', score: 36, submitted: 21 },
@@ -281,8 +297,29 @@ function saveDraft() {
 }
 
 function viewExamResult(row) {
-  ElMessage.info(`查看 ${row.name} 的成绩详情`)
-  // Could navigate to a result page or show modal
+  showScoreModal.value = true
+  scoreModalTitle.value = row.name
+  scoreRecords.value = []
+  loadScoreRecords(row.id)
+}
+
+const showScoreModal = ref(false)
+const scoreModalTitle = ref('')
+const scoreRecords = ref([])
+const scoreLoading = ref(false)
+
+async function loadScoreRecords(examId) {
+  scoreLoading.value = true
+  try {
+    const res = await apiExamRecords()
+    if (res.data.success) {
+      scoreRecords.value = (res.data.data || []).filter(r => r.examId === examId)
+    }
+  } catch(e) {
+    ElMessage.warning('暂无成绩记录')
+  } finally {
+    scoreLoading.value = false
+  }
 }
 
 function formatTime(seconds) {
@@ -292,6 +329,25 @@ function formatTime(seconds) {
 }
 
 onBeforeUnmount(() => { stopTimer() })
+
+onMounted(async () => {
+  try {
+    const res = await apiExamList('student')
+    if (res.data.success && res.data.data?.length > 0) {
+      allExams.value = res.data.data.map(e => ({
+        id: e.examId,
+        category: e.course || '',
+        name: e.examName,
+        type: e.topic || '考试',
+        status: e.status === '已发布' ? 'active' : 'pending',
+        score: e.questionCount || 0,
+        submitted: 0
+      }))
+    }
+  } catch(e) {
+    console.warn('Failed to load exam list, using mock data')
+  }
+})
 
 watch(showExamModal, (val) => {
   if (!val) { stopTimer(); resetExam() }
@@ -379,6 +435,23 @@ watch(showExamModal, (val) => {
 .status-dot.active { background: #22c55e; box-shadow: 0 0 0 3px rgba(34,197,94,.25); }
 .status-dot.pending { background: #94a3b8; }
 .status-dot.finished { background: #059669; }
+
+.exam-btn {
+  background: #fff;
+  color: #3b82f6;
+  border: 1px solid #3b82f6;
+  border-radius: 6px;
+  transition: all .15s ease;
+  margin: 2px;
+}
+.exam-btn:hover:not(:disabled) {
+  background: #3b82f6;
+  color: #fff;
+}
+.exam-btn:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
 
 @media(max-width:600px){ .exam-header-bar{flex-direction:column;gap:8px;} .exam-timer strong{font-size:22px;} }
 </style>

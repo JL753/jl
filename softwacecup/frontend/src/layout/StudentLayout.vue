@@ -59,24 +59,39 @@
         <router-view />
       </main>
     </div>
+
+    <!-- AI 智能学习浮窗锚点（仅在非 companion 页面显示） -->
+    <Transition name="float-btn">
+      <button
+        v-if="!isCompanionPage"
+        class="companion-fab"
+        @click="router.push('/student/companion')"
+        title="打开 AI 智能学习"
+      >
+        <span class="fab-icon">✎</span>
+        <span class="fab-ripple"></span>
+      </button>
+    </Transition>
   </div>
 </template>
 
 <script setup>
-import { onMounted, ref } from 'vue'
-import { useRouter } from 'vue-router'
+import { computed, onMounted, ref } from 'vue'
+import { useRouter, useRoute } from 'vue-router'
 import { useAuthStore } from '../stores/auth'
 
 const auth = useAuthStore()
 const router = useRouter()
+const route = useRoute()
 const collapsed = ref(false)
+
+const isCompanionPage = computed(() => route.path === '/student/companion')
 
 const navItems = [
   { to: '/student/dashboard', label: '首页', icon: '⌂' },
   { to: '/student/companion', label: '智能学习', icon: '✎' },
   { to: '/student/courses', label: '课程平台', icon: '📚' },
   { to: '/student/exam', label: '开始考试', icon: '➤' },
-  { to: '/student/report', label: '学习报告', icon: '▣' },
   { to: '/student/profile', label: '个人信息', icon: '◪' }
 ]
 
@@ -281,6 +296,69 @@ const logout = () => {
 
 .fade-slide-enter-active, .fade-slide-leave-active { transition: all .2s ease; }
 .fade-slide-enter-from, .fade-slide-leave-to { opacity: 0; transform: translateX(-6px); }
+
+/* ==================== AI 智能学习浮窗锚点 ==================== */
+.companion-fab {
+  position: fixed;
+  right: 28px;
+  bottom: 36px;
+  z-index: 999;
+  width: 60px;
+  height: 60px;
+  border-radius: 50%;
+  border: none;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(135deg, #18b48f 0%, #6fd8b9 100%);
+  box-shadow: 0 8px 24px rgba(24, 180, 143, 0.45), 0 2px 8px rgba(0,0,0,0.12);
+  transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+  overflow: hidden;
+
+  &:hover {
+    transform: scale(1.13) translateY(-3px);
+    box-shadow: 0 14px 32px rgba(24, 180, 143, 0.55), 0 4px 12px rgba(0,0,0,0.15);
+  }
+
+  &:active {
+    transform: scale(0.96);
+  }
+}
+
+.fab-icon {
+  font-size: 26px;
+  color: white;
+  line-height: 1;
+  position: relative;
+  z-index: 1;
+}
+
+.fab-ripple {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.18);
+  animation: fab-pulse 2.4s ease-in-out infinite;
+}
+
+@keyframes fab-pulse {
+  0%, 100% { transform: scale(1); opacity: 0.5; }
+  50% { transform: scale(1.18); opacity: 0; }
+}
+
+.float-btn-enter-active {
+  transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+.float-btn-leave-active {
+  transition: all 0.25s ease-in;
+}
+.float-btn-enter-from,
+.float-btn-leave-to {
+  opacity: 0;
+  transform: scale(0.4) translateY(20px);
+}
 
 @media (max-width: 1280px) {
   .layout-shell { grid-template-columns: 1fr; }

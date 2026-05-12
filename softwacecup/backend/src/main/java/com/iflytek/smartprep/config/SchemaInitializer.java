@@ -12,7 +12,6 @@ import com.iflytek.smartprep.service.AssessmentService;
 import com.iflytek.smartprep.service.ProfileService;
 import com.iflytek.smartprep.service.ResourceService;
 import com.iflytek.smartprep.service.StudyPathService;
-import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Component;
@@ -45,7 +44,8 @@ public class SchemaInitializer {
     private final AssessmentService assessmentService;
     private final ObjectMapper objectMapper;
 
-    @PostConstruct
+    // 已禁用自动初始化 - 数据库结构和数据由 SQL 文件管理
+    // @PostConstruct
     public void init() {
         jdbcTemplate.execute("CREATE TABLE IF NOT EXISTS sp_user (id BIGINT PRIMARY KEY, username VARCHAR(128), password VARCHAR(255), role VARCHAR(32), display_name VARCHAR(255), avatar_url VARCHAR(512))");
         ensureColumnExists("sp_user", "display_name", "ALTER TABLE sp_user ADD COLUMN display_name VARCHAR(255)");

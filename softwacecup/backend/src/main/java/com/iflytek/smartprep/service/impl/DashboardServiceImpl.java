@@ -27,6 +27,8 @@ public class DashboardServiceImpl implements DashboardService {
   private final ExamQuestionMapper examQuestionMapper;
   private final ExamRecordMapper examRecordMapper;
   private final WrongQuestionMapper wrongQuestionMapper;
+  private final LearningActivityMapper learningActivityMapper;
+  private final TaskCompletionMapper taskCompletionMapper;
   private final ObjectMapper objectMapper;
 
   @Override public DashboardStats teacherDashboard() { return stats("教师端总览", countUsers("teacher"), countUsers("student")); }
@@ -216,5 +218,42 @@ public class DashboardServiceImpl implements DashboardService {
   private String toJson(Object value) {
     try { return objectMapper.writeValueAsString(value); }
     catch (Exception e) { return "{}"; }
+  }
+
+  @Override
+  public List<Map<String, Object>> learningActivityTrend(Long userId) {
+    LocalDate endDate = LocalDate.now();
+    LocalDate startDate = endDate.minusDays(6);
+    List<LearningActivity> activities = learningActivityMapper.selectList(
+      new LambdaQueryWrapper<LearningActivity>()
+        .eq(LearningActivity::getUserId, userId)
+        .between(LearningActivity::getActivityDate, startDate, endDate)
+        .orderByAsc(LearningActivity::getActivityDate)
+    );
+    Map<LocalDate, Integer> activityMap = activities.stream()
+      .collect(Collectors.toMap(LearningActivity::getActivityDate, LearningActivity::getActivityScore));
+    List<Map<String, Object>> result = new ArrayList<>();
+    for (int i = 0; i < 7; i++) {
+      LocalDate date = startDate.plusDays(i);
+      result.add(row("date", date.toString(), "score", activityMap.getOrDefault(date, 0)));
+    }
+    return result;
+  }
+
+  @Override
+  public List<Map<String, Object>> weeklyTaskCompletion(Long userId) {
+    LocalDate today = LocalDate.now();
+    LocalDate weekStart = today.minusDays(today.getDayOfWeek().getValue() - 1);
+    return taskCompletionMapper.selectList(
+      new LambdaQueryWrapper<TaskCompletion>()
+        .eq(TaskCompletion::getUserId, userId)
+        .eq(TaskCompletion::getWeekStartDate, weekStart)
+        .orderByAsc(TaskCompletion::getTaskType)
+    ).stream().map(t -> row(
+      "taskType", txt(t.getTaskType()),
+      "completionRate", nz(t.getCompletionRate()),
+      "totalCount", nz(t.getTotalCount()),
+      "completedCount", nz(t.getCompletedCount())
+    )).toList();
   }
 }

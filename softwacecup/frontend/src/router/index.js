@@ -26,7 +26,7 @@ const routes = [
       { path: 'dashboard', component: () => import('../views/student/StudentDashboard.vue') },
       { path: 'assistant', redirect: '/student/companion' },
       { path: 'companion', component: () => import('../views/student/StudyCompanion.vue') },
-      { path: 'report', component: () => import('../views/student/StudentReport.vue') },
+      { path: 'report', redirect: '/student/dashboard' },
       { path: 'profile', component: () => import('../views/common/ProfileView.vue') },
       { path: 'exam', component: () => import('../views/student/StudentExam.vue') },
       { path: 'courses', component: () => import('../views/student/CoursePlatform.vue') }
