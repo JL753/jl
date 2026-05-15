@@ -2,52 +2,59 @@ import { createRouter, createWebHistory } from 'vue-router'
 import { useAuthStore } from '../stores/auth'
 
 const routes = [
-  { path: '/portal', component: () => import('../views/common/PortalHome.vue') },
-  { path: '/login', component: () => import('../views/auth/LoginView.vue') },
-  {
-    path: '/teacher',
-    component: () => import('../layout/TeacherLayout.vue'),
-    children: [
-      { path: '', redirect: '/teacher/dashboard' },
-      { path: 'dashboard', component: () => import('../views/teacher/TeacherDashboard.vue') },
-      { path: 'assistant', component: () => import('../views/teacher/TeacherAssistant.vue') },
-      { path: 'manage', component: () => import('../views/teacher/TeacherManage.vue') },
-      { path: 'resources', component: () => import('../views/teacher/ResourceManage.vue') },
-      { path: 'profile', component: () => import('../views/common/ProfileView.vue') },
-      { path: 'exam', component: () => import('../views/teacher/TeacherExam.vue') },
-      { path: 'center', component: () => import('../views/common/DataCenter.vue') }
-    ]
-  },
+  // 门户首页
+  { path: '/', name: 'portal', component: () => import('../views/PortalHome.vue') },
+
+  // AI 初始问卷（新用户引导）
+  { path: '/questionnaire', name: 'questionnaire', component: () => import('../views/common/AIQuestionnaire.vue'), meta: { requiresAuth: true } },
+
+  // 学科目录（登录前可浏览）
+  { path: '/subjects', name: 'subjects', component: () => import('../views/common/SubjectCatalog.vue') },
+  { path: '/subjects/:id', name: 'subject-detail', component: () => import('../views/common/CourseDetail.vue') },
+  { path: '/lessons/:id', name: 'lesson-view', component: () => import('../views/common/LessonView.vue') },
+
+  // 学生端
   {
     path: '/student',
     component: () => import('../layout/StudentLayout.vue'),
+    meta: { requiresAuth: true, role: 'student' },
     children: [
       { path: '', redirect: '/student/dashboard' },
-      { path: 'dashboard', component: () => import('../views/student/StudentDashboard.vue') },
-      { path: 'assistant', redirect: '/student/companion' },
-      { path: 'companion', component: () => import('../views/student/StudyCompanion.vue') },
-      { path: 'report', component: () => import('../views/student/StudentReport.vue') },
-      { path: 'profile', component: () => import('../views/common/ProfileView.vue') },
-      { path: 'exam', component: () => import('../views/student/StudentExam.vue') },
-      { path: 'courses', component: () => import('../views/student/CoursePlatform.vue') }
+      { path: 'dashboard', name: 'student-dashboard', component: () => import('../views/student/StudentDashboard.vue') },
+      { path: 'knowledge-map', name: 'student-knowledge-map', component: () => import('../views/student/KnowledgeStarMap.vue') },
+      { path: 'workspace', name: 'workspace', component: () => import('../views/student/AIWorkspace.vue') },
+      { path: 'courses', name: 'courses', component: () => import('../views/student/CoursePlatform.vue') },
+      { path: 'subjects', name: 'student-subjects', component: () => import('../views/common/SubjectCatalog.vue') },
+      { path: 'subjects/:id', name: 'student-subject-detail', component: () => import('../views/common/CourseDetail.vue') },
+      { path: 'lessons/:id', name: 'student-lesson', component: () => import('../views/common/LessonView.vue') },
+      { path: 'companion', name: 'companion', component: () => import('../views/student/AICompanionView.vue') },
+      { path: 'quiz', name: 'quiz', component: () => import('../views/student/AdaptiveQuizView.vue') },
+      { path: 'achievements', name: 'achievements', component: () => import('../views/student/AchievementCenter.vue') },
+      { path: 'exam', name: 'student-exam', component: () => import('../views/student/StudentExam.vue') },
+      { path: 'profile', name: 'student-profile', component: () => import('../views/common/ProfileView.vue') },
     ]
   },
+
+  // 教师端（兼管理员，原 admin 合并至此）
   {
-    path: '/admin',
-    component: () => import('../layout/AdminLayout.vue'),
+    path: '/teacher',
+    component: () => import('../layout/TeacherLayout.vue'),
+    meta: { requiresAuth: true, role: 'teacher' },
     children: [
-      { path: '', redirect: '/admin/dashboard' },
-      { path: 'dashboard', component: () => import('../views/admin/AdminDashboard.vue') },
-      { path: 'users', component: () => import('../views/admin/UserManagement.vue') },
-      { path: 'courses', component: () => import('../views/admin/CourseManagement.vue') },
-      { path: 'resources', component: () => import('../views/admin/ResourceManagement.vue') },
-      { path: 'exams', component: () => import('../views/admin/ExamManagement.vue') },
-      { path: 'logs', component: () => import('../views/admin/LogManagement.vue') },
-      { path: 'settings', component: () => import('../views/admin/SystemSettings.vue') },
-      { path: 'profile', component: () => import('../views/common/ProfileView.vue') }
+      { path: '', redirect: '/teacher/dashboard' },
+      { path: 'dashboard', name: 'teacher-dashboard', component: () => import('../views/teacher/TeacherDashboard.vue') },
+      { path: 'assistant', name: 'teacher-assistant', component: () => import('../views/teacher/TeacherAssistant.vue') },
+      { path: 'manage', name: 'teacher-manage', component: () => import('../views/teacher/TeacherManage.vue') },
+      { path: 'classes', name: 'teacher-classes', component: () => import('../views/teacher/ClassManagement.vue') },
+      { path: 'content', name: 'teacher-content', component: () => import('../views/teacher/ContentManagement.vue') },
+      { path: 'review', name: 'teacher-review', component: () => import('../views/teacher/AIContentReview.vue') },
+      { path: 'assignments', name: 'teacher-assignments', component: () => import('../views/teacher/AssignmentManagement.vue') },
+      { path: 'profile', name: 'teacher-profile', component: () => import('../views/common/ProfileView.vue') },
     ]
   },
-  { path: '/', redirect: '/portal' }
+
+  // 兜底
+  { path: '/:pathMatch(.*)*', redirect: '/' }
 ]
 
 const router = createRouter({
@@ -55,26 +62,29 @@ const router = createRouter({
   routes
 })
 
+// 导航守卫
 router.beforeEach(async (to, from, next) => {
-  const store = useAuthStore()
-  if (to.path === '/login' || to.path === '/portal') return next()
-  if (!store.token) return next('/login')
-  if (!store.user) {
-    try {
-      await store.fetchMe()
-    } catch {
-      store.logout()
-      return next('/login')
-    }
+  if (!to.meta.requiresAuth) return next()
+
+  const auth = useAuthStore()
+
+  // 有 token 但没有用户信息，尝试获取
+  if (auth.token && !auth.user) {
+    try { await auth.fetchMe() } catch (e) { auth.logout() }
   }
-  // Role-based route guard
-  const user = store.user
-  if (to.path.startsWith('/admin') && user?.role !== 'admin' && user?.role !== 'teacher') {
-    // Allow teachers to access admin for demo purposes
+
+  if (!auth.isLoggedIn) {
+    // 弹出登录 Modal，记录目标路由
+    auth.openLoginModal(to.fullPath)
+    return next('/')
   }
-  if (to.path.startsWith('/teacher') && user?.role !== 'teacher' && user?.role !== 'admin') {
-    // Only teachers and admins can access teacher routes
+
+  // 角色检查（admin 兼容旧 token，直接放行）
+  const role = auth.userRole
+  if (to.meta.role && to.meta.role !== role && role !== 'admin') {
+    return next(`/${role}/dashboard`)
   }
+
   next()
 })
 

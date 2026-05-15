@@ -1,0 +1,266 @@
+/* ============================================
+ * 统一设计令牌 — 知域暗色海洋毛玻璃主题
+ * ============================================ */
+
+:root {
+  /* ===== 品牌主色 ===== */
+  --primary: #3b82f6;
+  --primary-deep: #2563eb;
+  --primary-light: #60a5fa;
+  --primary-soft: rgba(59, 130, 246, 0.15);
+  --accent-cyan: #06b6d4;
+
+  /* ===== 功能色 ===== */
+  --success: #10b981;
+  --warning: #f59e0b;
+  --danger: #ef4444;
+  --info: #8b5cf6;
+
+  /* ===== 渐变色 ===== */
+  --gradient-primary: linear-gradient(135deg, #3b82f6, #06b6d4);
+  --gradient-success: linear-gradient(135deg, #10b981, #34d399);
+  --gradient-warning: linear-gradient(135deg, #f59e0b, #fbbf24);
+  --gradient-danger: linear-gradient(135deg, #ef4444, #f87171);
+  --gradient-brand: linear-gradient(135deg, #3b82f6, #06b6d4);
+
+  /* ===== 星图宇宙主题新增 ===== */
+  --purple: #a855f7;
+  --purple-deep: #7c3aed;
+  --purple-light: #c084fc;
+  --cyan: #60d9fa;
+  --cyan-deep: #0bc5ea;
+  --gradient-purple: linear-gradient(135deg, #a855f7, #7c3aed);
+  --gradient-blue-purple: linear-gradient(135deg, #3b82f6, #a855f7);
+  --gradient-card-blue: linear-gradient(135deg, #3b82f6, #60a5fa);
+  --gradient-card-cyan: linear-gradient(135deg, #06b6d4, #22d3ee);
+  --gradient-card-violet: linear-gradient(135deg, #8b5cf6, #a78bfa);
+  --gradient-card-green: linear-gradient(135deg, #10b981, #34d399);
+
+  /* ===== 暗色背景 ===== */
+  --bg-main: #080d1f;
+  --bg-alt: #161b22;
+  --bg-soft: rgba(22, 27, 34, 0.92);
+  --bg-card: linear-gradient(180deg, rgba(22,27,34,0.95), rgba(13,17,23,0.92));
+  --bg-body: transparent;
+
+  /* ===== 文字色 ===== */
+  --text-main: #e6edf3;
+  --text-sub: #8b949e;
+  --text-faint: #6e7681;
+  --text-on-dark: #e7f1ff;
+
+  /* ===== 边框色 ===== */
+  --border-light: rgba(255, 255, 255, 0.06);
+  --border-base: rgba(255, 255, 255, 0.1);
+  --border-strong: rgba(255, 255, 255, 0.18);
+
+  /* ===== 圆角 ===== */
+  --radius-xs: 8px;
+  --radius-sm: 12px;
+  --radius-md: 16px;
+  --radius-lg: 20px;
+  --radius-xl: 24px;
+  --radius-2xl: 28px;
+  --radius-round: 999px;
+
+  /* ===== 阴影 ===== */
+  --shadow-soft: 0 8px 24px rgba(0, 0, 0, 0.3);
+  --shadow-card: 0 18px 48px rgba(0, 0, 0, 0.4);
+  --shadow-elevated: 0 24px 64px rgba(0, 0, 0, 0.5);
+  --shadow-glow-primary: 0 0 20px rgba(76, 141, 255, 0.4);
+  --shadow-glow-success: 0 0 20px rgba(24, 180, 143, 0.4);
+
+  /* ===== 毛玻璃 ===== */
+  --glass-blur: 16px;
+  --glass-bg: rgba(255, 255, 255, 0.06);
+  --glass-border: rgba(255, 255, 255, 0.1);
+  --glass-shadow: 0 8px 32px rgba(0, 0, 0, 0.35);
+  --sidebar-blur-bg: rgba(15, 23, 42, 0.72);
+  --topbar-blur-bg: rgba(15, 23, 42, 0.72);
+
+  /* ===== 侧边栏 ===== */
+  --sidebar-grad: linear-gradient(180deg, rgba(15,23,42,0.72) 0%, rgba(15,23,42,0.78) 100%);
+  --sidebar-active: linear-gradient(90deg, rgba(59,130,246,0.15), rgba(255,255,255,0.02) 88%);
+  --header-grad: linear-gradient(180deg, rgba(15,23,42,0.72), rgba(15,23,42,0.68));
+
+  /* ===== 间距 ===== */
+  --space-xs: 8px;
+  --space-sm: 12px;
+  --space-md: 16px;
+  --space-lg: 20px;
+  --space-xl: 24px;
+  --space-2xl: 32px;
+  --space-3xl: 48px;
+
+  /* ===== 字体 ===== */
+  --font-family: 'Microsoft YaHei', 'PingFang SC', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  --font-family-code: 'Fira Code', 'Consolas', 'Monaco', monospace;
+  --font-xs: 12px; --font-sm: 13px; --font-base: 14px; --font-md: 15px;
+  --font-lg: 16px; --font-xl: 18px; --font-2xl: 20px; --font-3xl: 24px; --font-4xl: 28px;
+
+  /* ===== 过渡 ===== */
+  --transition-fast: 0.15s ease;
+  --transition-base: 0.22s ease;
+  --transition-slow: 0.3s ease;
+  --transition-spring: 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+
+  /* ===== Z-index ===== */
+  --z-sidebar: 100; --z-topbar: 120; --z-dropdown: 1000;
+  --z-sticky: 1020; --z-fixed: 1030; --z-modal-backdrop: 1040;
+  --z-modal: 1050; --z-popover: 1060; --z-tooltip: 1070; --z-fab: 999;
+
+  /* ===== 布局 ===== */
+  --sidebar-width: 260px;
+  --sidebar-collapsed: 72px;
+  --topbar-height: 64px;
+
+  /* ===== 暗色数据面板 ===== */
+  --dark-bg-deep: #071225;
+  --dark-bg-mid: #0c1f3f;
+  --dark-card: rgba(14, 34, 68, 0.76);
+  --dark-line: rgba(120, 168, 255, 0.28);
+  --dark-cyan: #46c2ff;
+  --dark-mint: #63e6be;
+  --dark-gold: #ffd166;
+
+  /* ===== Element Plus 覆盖 ===== */
+  --el-color-primary: #3b82f6;
+  --el-color-success: #10b981;
+  --el-color-warning: #f59e0b;
+  --el-color-danger: #ef4444;
+  --el-border-radius-base: 12px;
+  --el-border-radius-small: 8px;
+  --el-border-radius-round: 999px;
+  --el-box-shadow: 0 18px 48px rgba(0, 0, 0, 0.4);
+  --el-box-shadow-light: 0 8px 24px rgba(0, 0, 0, 0.25);
+  --el-fill-color-light: rgba(22, 27, 34, 0.8);
+  --el-bg-color: rgba(22, 27, 34, 0.95);
+  --el-text-color-primary: #e6edf3;
+  --el-text-color-regular: #c9d1d9;
+  --el-text-color-secondary: #8b949e;
+  --el-border-color: rgba(255, 255, 255, 0.1);
+  --el-border-color-light: rgba(255, 255, 255, 0.06);
+}
+
+/* ===== 全局重置 ===== */
+*, *::before, *::after { box-sizing: border-box; }
+html, body, #app {
+  width: 100%; min-height: 100%; margin: 0;
+  font-family: var(--font-family);
+  font-size: var(--font-base);
+  color: var(--text-main);
+  -webkit-font-smoothing: antialiased;
+}
+body { background: #080d1f; overflow-x: hidden; }
+a { color: inherit; text-decoration: none; }
+img { max-width: 100%; display: block; }
+button, input, textarea, select { font: inherit; }
+
+/* ===== 滚动条 ===== */
+::-webkit-scrollbar { width: 4px; height: 4px; }
+::-webkit-scrollbar-thumb { background: rgba(76, 141, 255, 0.35); border-radius: 999px; }
+::-webkit-scrollbar-track { background: transparent; }
+
+/* ===== 毛玻璃工具类 ===== */
+.glass-card {
+  backdrop-filter: blur(var(--glass-blur));
+  -webkit-backdrop-filter: blur(var(--glass-blur));
+  background: var(--glass-bg);
+  border: 1px solid var(--glass-border);
+  box-shadow: var(--glass-shadow);
+  border-radius: var(--radius-lg);
+}
+.panel {
+  background: var(--glass-bg);
+  border: 1px solid var(--glass-border);
+  border-radius: var(--radius-xl);
+  box-shadow: var(--glass-shadow);
+  backdrop-filter: blur(var(--glass-blur));
+  -webkit-backdrop-filter: blur(var(--glass-blur));
+}
+
+/* ===== 网格工具类 ===== */
+.grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: var(--space-md); }
+.grid-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: var(--space-md); }
+.grid-4 { display: grid; grid-template-columns: repeat(4, 1fr); gap: var(--space-sm); }
+
+/* ===== 指标卡片 ===== */
+.metric-card {
+  padding: var(--space-md); border-radius: var(--radius-md);
+  color: #fff; display: grid; gap: var(--space-xs);
+  box-shadow: inset 0 1px 0 rgba(255,255,255,.15);
+}
+.metric-card.primary { background: var(--gradient-card-blue); }
+.metric-card.cyan { background: var(--gradient-card-cyan); }
+.metric-card.violet { background: var(--gradient-card-violet); }
+.metric-card.green { background: var(--gradient-card-green); }
+.metric-card strong { font-size: 34px; line-height: 1; }
+
+/* ===== 渐变按钮 ===== */
+.gradient-btn {
+  background: linear-gradient(135deg, #3b82f6, #06b6d4) !important;
+  border: none !important;
+  color: #fff !important;
+  transition: all 0.2s ease !important;
+}
+.gradient-btn:hover {
+  opacity: 0.9;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 20px rgba(59, 130, 246, 0.4) !important;
+}
+
+/* ===== 动画 ===== */
+@keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+@keyframes float { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-8px); } }
+@keyframes glow-pulse {
+  0%, 100% { box-shadow: 0 0 8px rgba(76, 141, 255, 0.3); }
+  50% { box-shadow: 0 0 24px rgba(76, 141, 255, 0.6); }
+}
+.fade-in { animation: fadeIn var(--transition-base); }
+
+/* ===== Element Plus 覆盖 ===== */
+.el-button { border-radius: var(--radius-sm); font-weight: 600; }
+.el-button--primary {
+  --el-button-bg-color: var(--primary);
+  --el-button-border-color: var(--primary);
+  --el-button-hover-bg-color: var(--primary-light);
+}
+.el-input__wrapper, .el-textarea__inner, .el-select__wrapper {
+  box-shadow: 0 0 0 1px rgba(255,255,255,0.1) inset !important;
+  background: rgba(255,255,255,0.06) !important;
+  border-radius: var(--radius-sm);
+  color: var(--text-main) !important;
+}
+.el-input__inner, .el-textarea__inner { color: var(--text-main) !important; }
+.el-dialog {
+  --el-dialog-bg-color: rgba(13, 17, 23, 0.95);
+  border-radius: var(--radius-xl);
+  border: 1px solid var(--glass-border);
+  backdrop-filter: blur(20px);
+}
+.el-dialog__header { margin-right: 0; padding: 22px 24px 10px; }
+.el-dialog__body { padding: 12px 24px 20px; }
+.el-dialog__footer { padding: 0 24px 22px; }
+.el-table, .el-table tr, .el-table th.el-table__cell, .el-table td.el-table__cell {
+  --el-table-tr-bg-color: transparent;
+  --el-table-header-bg-color: rgba(255,255,255,0.04);
+  --el-table-row-hover-bg-color: rgba(255,255,255,0.07);
+  background: transparent;
+  color: var(--text-main);
+}
+.el-table {
+  --el-table-border-color: rgba(255,255,255,0.08);
+  --el-table-header-text-color: rgba(255,255,255,0.6);
+  --el-table-text-color: var(--text-main);
+}
+.el-form-item__label { color: var(--text-sub); }
+.el-card { background: var(--glass-bg) !important; border: 1px solid var(--glass-border) !important; }
+
+/* ===== 响应式 ===== */
+@media (max-width: 1280px) {
+  .grid-2, .grid-3 { grid-template-columns: 1fr; }
+  .grid-4 { grid-template-columns: 1fr 1fr; }
+}
+@media (max-width: 780px) {
+  .grid-2, .grid-3, .grid-4 { grid-template-columns: 1fr; }
+}
