@@ -15,7 +15,7 @@
           class="subject-icon"
           :style="{ background: subjectColor + '22', color: subjectColor }"
         >
-          {{ subject?.icon || '📚' }}
+          {{ subject?.icon || (subject?.name ? subject.name.charAt(0) : 'S') }}
         </div>
       </div>
       <div class="subject-text">
@@ -70,7 +70,7 @@
                   <ProgressDot :status="getLessonDotStatus(lesson.id)" />
                   <span class="lesson-name">{{ lesson.name }}</span>
                   <span v-if="lesson.type" class="lesson-type-badge">
-                    {{ lesson.type === 'video' ? '🎬' : '📝' }}
+                    {{ lesson.type === 'video' ? '视频' : '练习' }}
                   </span>
                 </div>
                 <div class="lesson-right">
@@ -90,11 +90,9 @@
 
     <!-- Empty state -->
     <div v-if="loading && units.length === 0" class="empty-state">
-      <div class="empty-icon">📖</div>
       <p>加载中...</p>
     </div>
     <div v-if="!loading && units.length === 0" class="empty-state">
-      <div class="empty-icon">📖</div>
       <p>暂无课程内容</p>
     </div>
   </div>
@@ -173,8 +171,11 @@ function handleBack() {
 }
 
 function goToLesson(lessonId) {
-  const basePath = route.path.startsWith('/student') ? '/student' : ''
-  router.push(basePath + '/lessons/' + lessonId)
+  if (route.path.startsWith('/student')) {
+    router.push(`/student/courses/${subjectId.value}?lesson=${lessonId}`)
+  } else {
+    router.push('/lessons/' + lessonId)
+  }
 }
 
 onMounted(async () => {
@@ -525,12 +526,6 @@ onMounted(async () => {
 .empty-state {
   text-align: center;
   padding: 60px 20px;
-}
-
-.empty-icon {
-  font-size: 48px;
-  margin-bottom: 16px;
-  opacity: 0.5;
 }
 
 .empty-state p {
