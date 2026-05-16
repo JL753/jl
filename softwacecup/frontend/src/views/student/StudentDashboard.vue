@@ -95,7 +95,7 @@
 <script setup>
 import { ref, reactive, computed, onMounted, nextTick } from 'vue'
 import { useRouter } from 'vue-router'
-import { apiStudentDashboard, apiAbilityLatest, apiGamificationStreak } from '../../api'
+import { apiStudentDashboard, apiAbilityLatest, apiAbilityEvaluate, apiGamificationStreak } from '../../api'
 
 const router = useRouter()
 const radarRef = ref(null)
@@ -120,6 +120,8 @@ const dimValues = computed(() => dimensions.map(d => d.value))
 
 onMounted(async () => {
   try {
+    // 先触发评估，确保用最新真实数据生成六维图
+    await apiAbilityEvaluate().catch(() => {})
     const [dashRes, abilityRes, streakRes] = await Promise.all([
       apiStudentDashboard(),
       apiAbilityLatest().catch(() => ({ data: null })),

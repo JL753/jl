@@ -43,13 +43,16 @@ public class StudentAbilityController {
         int depth = masteries.isEmpty() ? 0 :
                 (int) (masteries.stream().mapToDouble(UserKpMastery::getMastery).average().orElse(0) * 100);
 
-        int problem = 50;
+        int problem = totalLessons > 0
+                ? Math.min(95, 20 + (int) (completedLessons * 75.0 / totalLessons))
+                : 20;
 
         UserStreak streak = streakMapper.selectOne(
                 new LambdaQueryWrapper<UserStreak>().eq(UserStreak::getUserId, userId));
         int activity = streak != null ? Math.min(streak.getCurrentStreak() * 10, 100) : 0;
 
-        int transfer = (int) (problem * 0.8);
+        int transfer = masteries.size() > 2
+                ? Math.min(90, 30 + masteries.size() * 6) : 30;
 
         long wrongCount = wrongQuestionMapper.selectCount(
                 new LambdaQueryWrapper<WrongQuestion>().eq(WrongQuestion::getUserId, userId));
