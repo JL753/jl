@@ -18,7 +18,6 @@
             :src="lesson.videoUrl"
             controls
             class="lesson-video"
-            @play="handleVideoPlay"
           ></video>
         </div>
 
@@ -31,10 +30,9 @@
         <div class="lesson-nav">
           <button
             class="nav-btn prev-btn"
-            :disabled="!prevLessonId"
-            @click="navigateToLesson(prevLessonId)"
+            @click="handleBackToCourse"
           >
-            ← 上一个课时
+            ← 返回课程
           </button>
           <button
             class="nav-btn complete-btn"
@@ -157,8 +155,6 @@ const aiInput = ref('')
 const aiLoading = ref(false)
 const activeTab = ref('exercise')
 const completing = ref(false)
-const prevLessonId = ref(null)
-
 const aiMessagesRef = ref(null)
 
 // Scroll AI messages to bottom
@@ -225,9 +221,13 @@ function handleBack() {
   router.back()
 }
 
-function handleVideoPlay() {
-  // Auto-mark as in progress when video starts playing
-  // (no-op for now, progress is tracked on complete)
+function handleBackToCourse() {
+  const courseId = lesson.value?.subjectId
+  if (courseId) {
+    router.push('/student/subjects/' + courseId)
+  } else {
+    router.back()
+  }
 }
 
 async function completeLesson() {

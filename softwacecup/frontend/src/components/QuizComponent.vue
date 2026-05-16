@@ -1,16 +1,16 @@
 <template>
   <div class="quiz-container">
     <!-- ===== EXERCISE MODE: exercises passed as prop ===== -->
-    <div v-if="exercises && exercises.length > 0" class="exercise-mode">
+    <div v-if="parsedExercises && parsedExercises.length > 0" class="exercise-mode">
       <!-- Exercise header -->
       <div class="exercise-header">
         <h3 class="exercise-title">📝 随堂练习</h3>
-        <span class="exercise-count">{{ exercises.length }} 题</span>
+        <span class="exercise-count">{{ parsedExercises.length }} 题</span>
       </div>
 
       <!-- Exercise list -->
       <div class="exercise-list">
-        <div v-for="(ex, i) in exercises" :key="ex.id" class="ex-card">
+        <div v-for="(ex, i) in parsedExercises" :key="ex.id" class="ex-card">
           <div class="ex-card-header">
             <span class="ex-number">第 {{ i + 1 }} 题</span>
             <span v-if="showResult" class="ex-result-badge" :class="getExerciseResult(ex.id) ? 'correct' : 'wrong'">
@@ -18,11 +18,11 @@
             </span>
           </div>
 
-          <div class="ex-question">{{ ex.contentJson ? JSON.parse(ex.contentJson).question || ex.questionText : ex.questionText }}</div>
+          <div class="ex-question">{{ ex.parsedContent?.question || ex.questionText }}</div>
 
-          <div v-if="ex.optionsJson" class="ex-options">
+          <div v-if="ex.parsedOptions" class="ex-options">
             <div
-              v-for="(opt, oi) in ex.optionsJson"
+              v-for="(opt, oi) in ex.parsedOptions"
               :key="oi"
               class="ex-option"
               :class="{
@@ -261,6 +261,18 @@ import { ref, computed } from 'vue'
 import { ElMessage } from 'element-plus'
 import axios from 'axios'
 import AbilityChangeDialog from './AbilityChangeDialog.vue'
+
+const parsedExercises = computed(() => {
+  return (props.exercises || []).map(ex => ({
+    ...ex,
+    parsedContent: ex.contentJson
+      ? (typeof ex.contentJson === 'string' ? JSON.parse(ex.contentJson) : ex.contentJson)
+      : null,
+    parsedOptions: ex.optionsJson
+      ? (typeof ex.optionsJson === 'string' ? JSON.parse(ex.optionsJson) : ex.optionsJson)
+      : null,
+  }))
+})
 
 const props = defineProps({
   // Exercise mode props
