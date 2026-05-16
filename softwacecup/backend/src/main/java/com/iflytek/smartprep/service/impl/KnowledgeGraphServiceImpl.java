@@ -40,9 +40,9 @@ public class KnowledgeGraphServiceImpl implements KnowledgeGraphService {
 
         List<Map<String, Object>> edges = allDeps.stream().map(dep -> {
             Map<String, Object> edge = new HashMap<>();
-            edge.put("from", dep.getPrerequisiteId());
-            edge.put("to", dep.getSuccessorId());
-            edge.put("relationType", dep.getRelationType());
+            edge.put("from", dep.getDependsOnKpId());
+            edge.put("to", dep.getKpId());
+            edge.put("relationType", "depends_on");
             return edge;
         }).collect(Collectors.toList());
 
@@ -89,8 +89,8 @@ public class KnowledgeGraphServiceImpl implements KnowledgeGraphService {
         List<KpDependency> allDeps = depMapper.selectList(null);
         Map<Long, List<Long>> prereqMap = new HashMap<>(); // successor -> [prerequisites]
         for (KpDependency dep : allDeps) {
-            prereqMap.computeIfAbsent(dep.getSuccessorId(), k -> new ArrayList<>())
-                    .add(dep.getPrerequisiteId());
+            prereqMap.computeIfAbsent(dep.getKpId(), k -> new ArrayList<>())
+                    .add(dep.getDependsOnKpId());
         }
 
         List<KnowledgePoint> allKps = kpMapper.selectList(null);
@@ -168,7 +168,7 @@ public class KnowledgeGraphServiceImpl implements KnowledgeGraphService {
         List<KpDependency> allDeps = depMapper.selectList(null);
         Map<Long, Long> prereqMap = new HashMap<>(); // successor -> prerequisite (single parent for chain)
         for (KpDependency dep : allDeps) {
-            prereqMap.putIfAbsent(dep.getSuccessorId(), dep.getPrerequisiteId());
+            prereqMap.putIfAbsent(dep.getKpId(), dep.getDependsOnKpId());
         }
 
         List<KnowledgePoint> allKps = kpMapper.selectList(null);

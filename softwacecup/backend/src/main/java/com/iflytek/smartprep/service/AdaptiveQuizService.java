@@ -194,8 +194,8 @@ public class AdaptiveQuizService {
     private List<Map<String, Object>> findWeakPrerequisites(Long userId, Long kpId) {
         List<KpDependency> allDeps = depMapper.selectList(null);
         Set<Long> prereqIds = allDeps.stream()
-                .filter(d -> d.getSuccessorId().equals(kpId))
-                .map(KpDependency::getPrerequisiteId)
+                .filter(d -> d.getKpId().equals(kpId))
+                .map(KpDependency::getDependsOnKpId)
                 .collect(Collectors.toSet());
 
         List<Map<String, Object>> weakPrereqs = new ArrayList<>();
