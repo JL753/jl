@@ -14,6 +14,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/api")
@@ -232,10 +233,12 @@ public class SubjectCourseController {
                         .inSql(Lesson::getUnitId,
                                 "SELECT id FROM sp_unit WHERE subject_id = " + subjectId));
         long total = allLessons.size();
-        long completed = lessonProgressMapper.selectCount(
+        long completed = total > 0 ? lessonProgressMapper.selectCount(
                 new LambdaQueryWrapper<LessonProgress>()
                         .eq(LessonProgress::getUserId, userId)
-                        .eq(LessonProgress::getStatus, "completed"));
+                        .eq(LessonProgress::getStatus, "completed")
+                        .in(LessonProgress::getLessonId,
+                                allLessons.stream().map(Lesson::getId).collect(Collectors.toList()))) : 0;
         Map<String, Object> result = new HashMap<>();
         result.put("total", total);
         result.put("completed", completed);
