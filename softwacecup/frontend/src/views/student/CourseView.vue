@@ -81,6 +81,12 @@
           <button class="submit-btn" @click="submitExercises" :disabled="submitted || Object.keys(selectedAnswers).length < exercises.length">提交答案</button>
         </div>
 
+        <div class="practice-area">
+          <button class="practice-btn" @click="generatePractice" :disabled="practiceLoading">
+            {{ practiceLoading ? 'AI 出题中...' : '练一练' }}
+          </button>
+        </div>
+
         <div class="lesson-nav">
           <button v-if="prevLessonId" class="nav-btn" @click="goToLesson(prevLessonId)">上一个</button>
           <span v-else></span>
@@ -95,29 +101,12 @@
         <button class="panel-tab" :class="{ active: panelTab === 'ai' }" @click="panelTab = 'ai'">AI 辅导</button>
         <button class="panel-tab" :class="{ active: panelTab === 'notes' }" @click="panelTab = 'notes'">笔记</button>
         <button class="panel-tab" :class="{ active: panelTab === 'discuss' }" @click="panelTab = 'discuss'">讨论</button>
-        <button class="panel-tab xiaohui-tab" :class="{ active: showXiaohui }" @click="showXiaohui = !showXiaohui">小慧</button>
-        <button class="panel-toggle" @click="panelCollapsed = !panelCollapsed">
+<button class="panel-toggle" @click="panelCollapsed = !panelCollapsed">
           <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline :points="panelCollapsed ? '15 18 9 12 15 6' : '9 18 15 12 9 6'"/></svg>
         </button>
       </div>
       <div class="panel-body" v-show="!panelCollapsed">
-        <!-- Virtual Character 小慧 -->
-        <div v-if="showXiaohui" class="xiaohui-area">
-          <div class="xiaohui-container">
-            <div class="xiaohui-avatar">
-              <div class="xiaohui-face">
-                <div class="xiaohui-eyes">
-                  <div class="xiaohui-eye left"></div>
-                  <div class="xiaohui-eye right"></div>
-                </div>
-                <div class="xiaohui-mouth"></div>
-              </div>
-            </div>
-            <div class="xiaohui-name">小慧</div>
-            <div class="xiaohui-status">AI 学习助手在线</div>
-          </div>
-        </div>
-        <!-- AI Chat tab -->
+<!-- AI Chat tab -->
         <div v-if="panelTab === 'ai'" class="ai-chat">
           <div class="chat-messages">
             <div v-for="(msg, i) in chatHistory" :key="i" class="chat-msg" :class="msg.role">
@@ -160,6 +149,38 @@
       <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 2a14.5 14.5 0 0 0 0 20 14.5 14.5 0 0 0 0-20"/><path d="M2 12h20"/></svg>
     </button>
 
+    <!-- Practice Modal -->
+    <div v-if="showPractice" class="modal-overlay" @click.self="showPractice = false">
+      <div class="glass-card practice-modal">
+        <div class="practice-modal-header">
+          <h3>练一练</h3>
+          <button @click="showPractice = false" class="deep-close-btn">&times;</button>
+        </div>
+        <div class="practice-modal-body">
+          <div v-if="practiceLoading" class="loading-state">AI 正在出题...</div>
+          <div v-else-if="practiceQuestions.length > 0">
+            <div v-for="(q, qi) in practiceQuestions" :key="qi" class="practice-q">
+              <div class="pq-question">{{ qi + 1 }}. {{ q.question }}</div>
+              <div class="pq-options" v-if="q.options">
+                <label v-for="(opt, oi) in q.options" :key="oi" class="pq-option"
+                  :class="{ selected: practiceAnswers[qi] === oi, correct: practiceSubmitted && oi === q.answer, wrong: practiceSubmitted && practiceAnswers[qi] === oi && oi !== q.answer }">
+                  <input type="radio" :name="'pq-'+qi" :value="oi" v-model="practiceAnswers[qi]" :disabled="practiceSubmitted" />
+                  <span>{{ opt }}</span>
+                </label>
+              </div>
+              <div v-if="practiceSubmitted" class="ex-feedback" :class="{ correct: practiceAnswers[qi] === q.answer, wrong: practiceAnswers[qi] !== q.answer }">
+                {{ practiceAnswers[qi] === q.answer ? '正确！' : '错误' }}
+                <span v-if="q.explanation" class="pq-explain"> — {{ q.explanation }}</span>
+              </div>
+            </div>
+            <button v-if="!practiceSubmitted" class="submit-btn" @click="practiceSubmitted = true" :disabled="Object.keys(practiceAnswers).length < practiceQuestions.length">提交</button>
+            <button v-else class="practice-btn" @click="showPractice = false">关闭</button>
+          </div>
+          <div v-else class="empty-state">暂无练习题</div>
+        </div>
+      </div>
+    </div>
+
     <!-- Deep Explore Modal -->
     <div v-if="showDeepExplore" class="deep-explore-overlay" @click.self="showDeepExplore = false">
       <div class="deep-explore-modal glass-card">
@@ -190,7 +211,11 @@ const treeCollapsed = ref(false)
 const panelCollapsed = ref(false)
 const panelTab = ref('ai')
 const showDeepExplore = ref(false)
-const showXiaohui = ref(false)
+const showPractice = ref(false)
+const practiceLoading = ref(false)
+const practiceQuestions = ref([])
+const practiceAnswers = ref({})
+const practiceSubmitted = ref(false)
 
 const courseName = ref('')
 const subjectTree = ref([])
@@ -401,6 +426,36 @@ function isBilibiliUrl(url) {
   return url && (url.includes('bilibili.com') || url.includes('BV'))
 }
 
+async function generatePractice() {
+  showPractice.value = true
+  practiceLoading.value = true
+  practiceQuestions.value = []
+  practiceAnswers.value = {}
+  practiceSubmitted.value = false
+
+  try {
+    const lessonName = currentLesson.value?.name || ''
+    const content = currentLesson.value?.content || ''
+    const prompt = `根据以下课程内容，生成5道选择题（每题4个选项，含正确答案索引和解析）：\n课时：${lessonName}\n内容摘要：${content.substring(0, 1000)}`
+    const res = await apiAskTutor({ question: prompt })
+    const text = res.data?.answer || res.data || ''
+
+    // Parse JSON from response
+    const jsonMatch = text.match(/\{[\s\S]*\}/) || text.match(/\[[\s\S]*\]/)
+    if (jsonMatch) {
+      const parsed = JSON.parse(jsonMatch[0])
+      practiceQuestions.value = Array.isArray(parsed) ? parsed : (parsed.questions || parsed.exercises || [])
+    }
+  } catch (e) {
+    // Fallback questions
+    practiceQuestions.value = [
+      { question: '请回顾课程内容后作答', options: ['选项A', '选项B', '选项C', '选项D'], answer: 0, explanation: '请查看课程讲义' }
+    ]
+  } finally {
+    practiceLoading.value = false
+  }
+}
+
 function bilibiliEmbedUrl(url) {
   if (!url) return ''
   const match = url.match(/BV[a-zA-Z0-9]{10}/)
@@ -558,39 +613,38 @@ function bilibiliEmbedUrl(url) {
 .discuss-panel { padding: 12px; }
 .discuss-placeholder { font-size: 12px; color: rgba(255,255,255,0.3); text-align: center; padding: 40px 0; }
 
-/* 小慧 Virtual Character */
-.xiaohui-tab { color: #f9a8d4 !important; }
-.xiaohui-tab.active { color: #f472b6 !important; border-bottom-color: #f472b6 !important; }
-.xiaohui-area { padding: 12px; border-bottom: 1px solid rgba(255,255,255,0.06); background: rgba(168,85,247,0.04); }
-.xiaohui-container { text-align: center; }
-.xiaohui-avatar {
-  width: 80px; height: 80px; border-radius: 50%; margin: 0 auto 8px;
-  background: linear-gradient(135deg, #a855f7, #ec4899);
-  display: flex; align-items: center; justify-content: center;
-  box-shadow: 0 0 20px rgba(168,85,247,0.3);
-  animation: xiaohui-pulse 3s ease-in-out infinite;
+/* Practice */
+.practice-area { margin-top: 16px; text-align: center; }
+.practice-btn {
+  padding: 10px 32px; border-radius: 10px; border: 1px solid rgba(34,197,94,0.3);
+  background: linear-gradient(135deg, rgba(34,197,94,0.12), rgba(16,185,129,0.08));
+  color: #4ade80; font-size: 14px; font-weight: 600; cursor: pointer; font-family: inherit;
+  transition: all 0.2s;
 }
-.xiaohui-face { position: relative; width: 50px; height: 50px; }
-.xiaohui-eyes { display: flex; justify-content: center; gap: 12px; padding-top: 14px; }
-.xiaohui-eye {
-  width: 8px; height: 10px; border-radius: 50%; background: #fff;
-  animation: xiaohui-blink 4s infinite;
+.practice-btn:hover { background: linear-gradient(135deg, rgba(34,197,94,0.2), rgba(16,185,129,0.12)); }
+.practice-btn:disabled { opacity: 0.4; cursor: not-allowed; }
+.practice-modal {
+  width: 600px; max-height: 80vh; overflow-y: auto; padding: 0; border-radius: 14px;
 }
-.xiaohui-eye.right { animation-delay: 0.2s; }
-.xiaohui-mouth {
-  width: 12px; height: 6px; border-radius: 0 0 12px 12px; background: #fff;
-  margin: 8px auto 0; opacity: 0.8;
+.practice-modal-header {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 16px 20px; border-bottom: 1px solid rgba(255,255,255,0.06);
 }
-.xiaohui-name { font-size: 14px; font-weight: 700; color: #f9a8d4; margin-bottom: 2px; }
-.xiaohui-status { font-size: 10px; color: rgba(255,255,255,0.4); }
-@keyframes xiaohui-pulse {
-  0%, 100% { box-shadow: 0 0 20px rgba(168,85,247,0.3); }
-  50% { box-shadow: 0 0 30px rgba(168,85,247,0.5); }
+.practice-modal-header h3 { font-size: 16px; font-weight: 600; color: #f1f5f9; margin: 0; }
+.practice-modal-body { padding: 20px; }
+.practice-q { margin-bottom: 16px; padding-bottom: 14px; border-bottom: 1px solid rgba(255,255,255,0.04); }
+.pq-question { font-size: 13px; font-weight: 600; margin-bottom: 8px; color: #f1f5f9; }
+.pq-options { display: flex; flex-direction: column; gap: 4px; }
+.pq-option {
+  display: flex; align-items: center; gap: 8px; font-size: 12px; color: rgba(255,255,255,0.5);
+  padding: 6px 10px; border-radius: 6px; cursor: pointer;
 }
-@keyframes xiaohui-blink {
-  0%, 96%, 100% { transform: scaleY(1); }
-  98% { transform: scaleY(0.1); }
-}
+.pq-option:hover { background: rgba(255,255,255,0.03); }
+.pq-option.selected { background: rgba(59,130,246,0.1); color: rgba(255,255,255,0.8); }
+.pq-option.correct { background: rgba(34,197,94,0.1); color: #22c55e; }
+.pq-option.wrong { background: rgba(239,68,68,0.1); color: #ef4444; }
+.pq-option input[type="radio"] { accent-color: #3b82f6; }
+.pq-explain { color: rgba(255,255,255,0.5); font-size: 11px; }
 
 /* Deep Explore */
 .deep-fab {
