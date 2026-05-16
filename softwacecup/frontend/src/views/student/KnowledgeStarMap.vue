@@ -11,50 +11,57 @@
       </div>
     </div>
 
-    <!-- Chart Container -->
-    <div ref="chartRef" class="chart-container"></div>
-
-    <!-- Node Detail Popup -->
-    <transition name="popup-fade">
-      <div v-if="showDetail && selectedNode" class="detail-popup">
-        <button class="popup-close" @click="showDetail = false">&times;</button>
-        <div class="popup-content">
-          <h3 class="popup-title">{{ selectedNode.name || selectedNode.label || '知识点' }}</h3>
-
-          <div class="popup-section">
-            <span class="popup-label">掌握度</span>
-            <div class="mastery-bar-wrap">
-              <div class="mastery-bar">
-                <div
-                  class="mastery-fill"
-                  :style="{ width: (selectedNode.mastery || 0) + '%', background: masteryColor(selectedNode.mastery) }"
-                ></div>
-              </div>
-              <span class="mastery-text">{{ selectedNode.mastery || 0 }}%</span>
-            </div>
-          </div>
-
-          <div class="popup-section" v-if="selectedNode.练习记录 || selectedNode.practiceCount">
-            <span class="popup-label">练习记录</span>
-            <span class="popup-value">{{ selectedNode.练习记录 || selectedNode.practiceCount || 0 }} 次练习</span>
-          </div>
-
-          <button
-            class="popup-btn"
-            @click="goToLesson(selectedNode)"
-          >
-            去学习
-          </button>
-        </div>
-      </div>
-    </transition>
-
-    <!-- Empty State -->
-    <div v-if="!loading && nodes.length === 0" class="empty-state">
-      <div class="empty-icon">🗺️</div>
-      <p class="empty-text">暂无知识图谱数据</p>
-      <p class="empty-hint">开始学习课程后，知识星图将自动生成</p>
+    <!-- Loading State -->
+    <div v-if="loading" class="loading-state">
+      <p class="loading-text">加载中...</p>
     </div>
+
+    <template v-else>
+      <!-- Chart Container -->
+      <div ref="chartRef" class="chart-container"></div>
+
+      <!-- Node Detail Popup -->
+      <transition name="popup-fade">
+        <div v-if="showDetail && selectedNode" class="detail-popup">
+          <button class="popup-close" @click="showDetail = false">&times;</button>
+          <div class="popup-content">
+            <h3 class="popup-title">{{ selectedNode.name || selectedNode.label || '知识点' }}</h3>
+
+            <div class="popup-section">
+              <span class="popup-label">掌握度</span>
+              <div class="mastery-bar-wrap">
+                <div class="mastery-bar">
+                  <div
+                    class="mastery-fill"
+                    :style="{ width: (selectedNode.mastery || 0) + '%', background: masteryColor(selectedNode.mastery) }"
+                  ></div>
+                </div>
+                <span class="mastery-text">{{ selectedNode.mastery || 0 }}%</span>
+              </div>
+            </div>
+
+            <div class="popup-section" v-if="selectedNode.练习记录 || selectedNode.practiceCount">
+              <span class="popup-label">练习记录</span>
+              <span class="popup-value">{{ selectedNode.练习记录 || selectedNode.practiceCount || 0 }} 次练习</span>
+            </div>
+
+            <button
+              class="popup-btn"
+              @click="goToLesson(selectedNode)"
+            >
+              去学习
+            </button>
+          </div>
+        </div>
+      </transition>
+
+      <!-- Empty State -->
+      <div v-if="nodes.length === 0" class="empty-state">
+        <div class="empty-icon">🗺️</div>
+        <p class="empty-text">暂无知识图谱数据</p>
+        <p class="empty-hint">开始学习课程后，知识星图将自动生成</p>
+      </div>
+    </template>
   </div>
 </template>
 
@@ -66,7 +73,6 @@ import { apiKnowledgeGraphFull, apiKnowledgeGraphProgress } from '../../api/inde
 
 const router = useRouter()
 const chartRef = ref(null)
-const chartRefs = chartRef
 let chartInstance = null
 const selectedNode = ref(null)
 const showDetail = ref(false)
@@ -82,6 +88,7 @@ function masteryColor(mastery) {
 
 onMounted(async () => {
   try {
+    loading.value = true
     const [graphRes, progressRes] = await Promise.all([
       apiKnowledgeGraphFull(),
       apiKnowledgeGraphProgress(),
@@ -424,6 +431,21 @@ function goToLesson(node) {
 .empty-hint {
   color: rgba(255, 255, 255, 0.3);
   font-size: 13px;
+  margin: 0;
+}
+
+/* Loading State */
+.loading-state {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  text-align: center;
+}
+
+.loading-text {
+  color: rgba(255, 255, 255, 0.5);
+  font-size: 16px;
   margin: 0;
 }
 </style>

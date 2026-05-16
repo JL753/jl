@@ -1,68 +1,75 @@
 <template>
   <div class="achievement-center">
-    <!-- XP 等级进度条 -->
-    <div class="glass-card xp-card">
-      <div class="xp-header">
-        <div class="level-circle">Lv.{{ xp.level }}</div>
-        <div class="xp-info">
-          <div class="xp-title">
-            <span class="xp-level-label">等级 {{ xp.level }}</span>
-            <span class="xp-amount">{{ xp.currentXp }} / {{ xp.xpToNext }} XP</span>
-          </div>
-          <div class="xp-bar">
-            <div class="xp-fill" :style="{ width: xpPercent + '%' }"></div>
+    <!-- Loading State -->
+    <div v-if="loading" class="loading-state">
+      <p class="loading-text">加载中...</p>
+    </div>
+
+    <template v-else>
+      <!-- XP 等级进度条 -->
+      <div class="glass-card xp-card">
+        <div class="xp-header">
+          <div class="level-circle">Lv.{{ xp.level }}</div>
+          <div class="xp-info">
+            <div class="xp-title">
+              <span class="xp-level-label">等级 {{ xp.level }}</span>
+              <span class="xp-amount">{{ xp.currentXp }} / {{ xp.xpToNext }} XP</span>
+            </div>
+            <div class="xp-bar">
+              <div class="xp-fill" :style="{ width: xpPercent + '%' }"></div>
+            </div>
           </div>
         </div>
       </div>
-    </div>
 
-    <!-- 徽章网格 -->
-    <div class="badges-section">
-      <h3 class="section-title">成就徽章</h3>
-      <div v-if="badges.length > 0" class="badges-grid">
-        <div
-          v-for="badge in badges"
-          :key="badge.id || badge.name"
-          class="badge-card"
-          :class="{ 'badge-locked': !badge.achieved && !badge.unlocked }"
+      <!-- 徽章网格 -->
+      <div class="badges-section">
+        <h3 class="section-title">成就徽章</h3>
+        <div v-if="badges.length > 0" class="badges-grid">
+          <div
+            v-for="badge in badges"
+            :key="badge.id || badge.name"
+            class="badge-card"
+            :class="{ 'badge-locked': !badge.achieved && !badge.unlocked }"
+          >
+            <div class="badge-icon-wrap">
+              <span class="badge-icon">{{ badge.icon || '🏅' }}</span>
+            </div>
+            <span class="badge-name">{{ badge.name }}</span>
+          </div>
+        </div>
+        <div v-else class="empty-badges">
+          <p>暂无成就徽章，继续学习获取吧！</p>
+        </div>
+      </div>
+
+      <!-- 连续学习 -->
+      <div class="glass-card streak-card">
+        <h3 class="section-title">连续学习</h3>
+        <div class="streak-stats">
+          <div class="streak-item">
+            <span class="streak-value" :class="{ active: streak.checkinToday }">{{ streak.checkinToday ? '已学' : '未学' }}</span>
+            <span class="streak-label">今日</span>
+          </div>
+          <div class="streak-item">
+            <span class="streak-value">{{ streak.currentStreak }}</span>
+            <span class="streak-label">连续天数</span>
+          </div>
+          <div class="streak-item">
+            <span class="streak-value">{{ streak.longestStreak }}</span>
+            <span class="streak-label">最长连续</span>
+          </div>
+        </div>
+        <button
+          class="checkin-btn"
+          :class="{ done: streak.checkinToday }"
+          :disabled="streak.checkinToday || checkingIn"
+          @click="handleCheckin"
         >
-          <div class="badge-icon-wrap">
-            <span class="badge-icon">{{ badge.icon || '🏅' }}</span>
-          </div>
-          <span class="badge-name">{{ badge.name }}</span>
-        </div>
+          {{ checkingIn ? '签到中...' : streak.checkinToday ? '已签到' : '今日签到' }}
+        </button>
       </div>
-      <div v-else class="empty-badges">
-        <p>暂无成就徽章，继续学习获取吧！</p>
-      </div>
-    </div>
-
-    <!-- 连续学习 -->
-    <div class="glass-card streak-card">
-      <h3 class="section-title">连续学习</h3>
-      <div class="streak-stats">
-        <div class="streak-item">
-          <span class="streak-value" :class="{ active: streak.checkinToday }">{{ streak.checkinToday ? '已学' : '未学' }}</span>
-          <span class="streak-label">今日</span>
-        </div>
-        <div class="streak-item">
-          <span class="streak-value">{{ streak.currentStreak }}</span>
-          <span class="streak-label">连续天数</span>
-        </div>
-        <div class="streak-item">
-          <span class="streak-value">{{ streak.longestStreak }}</span>
-          <span class="streak-label">最长连续</span>
-        </div>
-      </div>
-      <button
-        class="checkin-btn"
-        :class="{ done: streak.checkinToday }"
-        :disabled="streak.checkinToday || checkingIn"
-        @click="handleCheckin"
-      >
-        {{ checkingIn ? '签到中...' : streak.checkinToday ? '已签到' : '今日签到' }}
-      </button>
-    </div>
+    </template>
   </div>
 </template>
 
@@ -79,6 +86,7 @@ const xp = ref({ level: 1, currentXp: 0, xpToNext: 100 })
 const badges = ref([])
 const streak = ref({ checkinToday: false, currentStreak: 0, longestStreak: 0 })
 const checkingIn = ref(false)
+const loading = ref(true)
 
 const xpPercent = computed(() => {
   if (!xp.value.xpToNext || xp.value.xpToNext <= 0) return 0
@@ -87,6 +95,7 @@ const xpPercent = computed(() => {
 
 onMounted(async () => {
   try {
+    loading.value = true
     const [xpRes, badgesRes, streakRes] = await Promise.all([
       apiGamificationProgress(),
       apiGamificationBadges(),
@@ -110,6 +119,8 @@ onMounted(async () => {
     }
   } catch (e) {
     console.warn('Failed to load gamification data', e)
+  } finally {
+    loading.value = false
   }
 })
 
@@ -351,6 +362,18 @@ async function handleCheckin() {
 
 .checkin-btn:disabled {
   cursor: not-allowed;
+}
+
+/* Loading State */
+.loading-state {
+  text-align: center;
+  padding: 48px 0;
+}
+
+.loading-text {
+  color: rgba(255, 255, 255, 0.5);
+  font-size: 16px;
+  margin: 0;
 }
 
 /* Responsive */
