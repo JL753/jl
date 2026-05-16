@@ -26,7 +26,7 @@
           <!-- 已登录 -->
           <template v-else>
             <div class="hero-left">
-              <h1 class="hero-greet">欢迎回来，{{ auth.user?.username }}<span class="wave">👋</span></h1>
+              <h1 class="hero-greet">欢迎回来，{{ auth.user?.username }}</h1>
               <p class="hero-stat">
                 已连续学习 <strong>{{ streakDays }}</strong> 天 · 掌握 <strong>{{ masteredKps }}</strong> 个知识点
               </p>
@@ -88,12 +88,12 @@
         <h2 class="section-title" ref="subjectsAnchor">探索学科</h2>
         <div class="subject-grid" v-if="subjects.length">
           <div
-            v-for="s in displaySubjects"
+            v-for="(s, idx) in displaySubjects"
             :key="s.id"
             class="glass-card subject-card"
             @click="handleSubjectClick(s)"
           >
-            <div class="subject-icon">{{ subjectIcons[s.id % subjectIcons.length] }}</div>
+            <div class="subject-accent" :style="{ background: accentGradients[idx % accentGradients.length] }"></div>
             <div class="subject-info">
               <span class="subject-name">{{ s.name }}</span>
               <span class="subject-count">{{ s.courseCount || 0 }} 门课程</span>
@@ -132,7 +132,16 @@ const streakDays = ref(0)
 const masteredKps = ref(0)
 const subjectsAnchor = ref(null)
 
-const subjectIcons = ['💻', '📐', '🤖', '📊', '🎨', '🌐', '🔬', '📖']
+const accentGradients = [
+  'linear-gradient(135deg, #3b82f6, #60a5fa)',
+  'linear-gradient(135deg, #a855f7, #7c3aed)',
+  'linear-gradient(135deg, #06b6d4, #22d3ee)',
+  'linear-gradient(135deg, #10b981, #34d399)',
+  'linear-gradient(135deg, #f59e0b, #fbbf24)',
+  'linear-gradient(135deg, #ef4444, #f87171)',
+  'linear-gradient(135deg, #8b5cf6, #a78bfa)',
+  'linear-gradient(135deg, #3b82f6, #06b6d4)',
+]
 
 const displaySubjects = computed(() => subjects.value.slice(0, 8))
 
@@ -226,7 +235,7 @@ onMounted(() => {
   margin: 0 auto;
   display: flex;
   flex-direction: column;
-  gap: 20px;
+  gap: 32px;
 }
 
 /* ═══ Glass card base ═══ */
@@ -242,9 +251,9 @@ onMounted(() => {
 /* ═══ ① Hero Row ═══ */
 .hero-row {
   display: flex;
-  gap: 16px;
+  gap: 20px;
   align-items: stretch;
-  min-height: 180px;
+  min-height: 220px;
 }
 
 .hero-card {
@@ -252,8 +261,8 @@ onMounted(() => {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 28px 32px;
-  gap: 32px;
+  padding: 40px 44px;
+  gap: 40px;
   transition: flex var(--transition-slow);
 }
 .hero-card.hero-full {
@@ -265,9 +274,9 @@ onMounted(() => {
 }
 
 .hero-title {
-  font-size: 38px;
+  font-size: 42px;
   font-weight: 800;
-  margin: 0 0 6px;
+  margin: 0 0 8px;
   line-height: 1.15;
   background: linear-gradient(135deg, #e6edf3, #60a5fa, #06b6d4);
   -webkit-background-clip: text;
@@ -275,23 +284,22 @@ onMounted(() => {
   background-clip: text;
 }
 .hero-greet {
-  font-size: 28px;
+  font-size: 30px;
   font-weight: 700;
   color: #e6edf3;
-  margin: 0 0 6px;
+  margin: 0 0 8px;
   line-height: 1.3;
 }
-.wave { display: inline-block; margin-left: 4px; }
 .hero-sub {
-  font-size: 14px;
+  font-size: 15px;
   color: rgba(255,255,255,0.45);
-  margin: 0 0 18px;
+  margin: 0 0 24px;
   letter-spacing: 2px;
 }
 .hero-stat {
-  font-size: 13px;
+  font-size: 14px;
   color: rgba(255,255,255,0.45);
-  margin: 0 0 18px;
+  margin: 0 0 24px;
 }
 .hero-stat strong {
   color: #60a5fa;
@@ -338,8 +346,8 @@ onMounted(() => {
 
 /* ═══ Orbit animation ═══ */
 .hero-visual {
-  width: 160px;
-  height: 150px;
+  width: 180px;
+  height: 170px;
   position: relative;
   flex-shrink: 0;
 }
@@ -352,9 +360,9 @@ onMounted(() => {
   border: 1px solid rgba(255,255,255,0.06);
   pointer-events: none;
 }
-.ring-1 { width: 140px; height: 140px; animation: spin 20s linear infinite; }
-.ring-2 { width: 100px; height: 100px; animation: spin 14s linear infinite reverse; }
-.ring-3 { width: 60px; height: 60px; animation: spin 10s linear infinite; }
+.ring-1 { width: 160px; height: 160px; animation: spin 20s linear infinite; }
+.ring-2 { width: 115px; height: 115px; animation: spin 14s linear infinite reverse; }
+.ring-3 { width: 68px; height: 68px; animation: spin 10s linear infinite; }
 @keyframes spin {
   from { transform: translate(-50%, -50%) rotate(0deg); }
   to { transform: translate(-50%, -50%) rotate(360deg); }
@@ -423,17 +431,17 @@ onMounted(() => {
 .core-section {
   display: flex;
   flex-direction: column;
-  gap: 14px;
+  gap: 20px;
 }
 
 .dashboard-row {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  gap: 14px;
+  gap: 20px;
 }
 
 .continue-card, .ai-rec-card {
-  padding: 16px 20px;
+  padding: 24px 28px;
   cursor: default;
 }
 .continue-card {
@@ -511,23 +519,23 @@ onMounted(() => {
 }
 
 .section-title {
-  font-size: 18px;
+  font-size: 20px;
   font-weight: 700;
   color: #e6edf3;
-  margin: 4px 0 0;
+  margin: 8px 0 4px;
 }
 
 .subject-grid {
   display: grid;
   grid-template-columns: repeat(4, 1fr);
-  gap: 10px;
+  gap: 14px;
 }
 
 .subject-card {
   display: flex;
   align-items: center;
-  gap: 10px;
-  padding: 12px 14px;
+  gap: 12px;
+  padding: 14px 18px;
   cursor: pointer;
 }
 .subject-card:hover {
@@ -536,15 +544,10 @@ onMounted(() => {
   background: rgba(255,255,255,0.06);
 }
 
-.subject-icon {
-  font-size: 20px;
-  width: 36px;
+.subject-accent {
+  width: 6px;
   height: 36px;
-  border-radius: 8px;
-  background: rgba(255,255,255,0.05);
-  display: flex;
-  align-items: center;
-  justify-content: center;
+  border-radius: 3px;
   flex-shrink: 0;
 }
 
@@ -584,23 +587,23 @@ onMounted(() => {
 /* ═══ ④ Bottom CTA ═══ */
 .bottom-cta {
   text-align: center;
-  padding: 8px 0 0;
+  padding: 16px 0 20px;
 }
 .cta-heading {
-  font-size: 20px;
+  font-size: 22px;
   font-weight: 700;
   color: #e6edf3;
-  margin: 0 0 6px;
+  margin: 0 0 10px;
 }
 .cta-desc {
-  font-size: 13px;
+  font-size: 14px;
   color: rgba(255,255,255,0.4);
-  margin: 0 0 18px;
+  margin: 0 0 24px;
 }
 .cta-login-link {
-  font-size: 12px;
+  font-size: 13px;
   color: rgba(255,255,255,0.35);
-  margin: 12px 0 0;
+  margin: 16px 0 0;
 }
 .cta-login-link span {
   color: #60a5fa;
