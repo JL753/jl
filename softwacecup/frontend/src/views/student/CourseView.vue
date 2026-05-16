@@ -179,7 +179,7 @@
                 <span v-if="q.explanation" class="pq-explain"> — {{ q.explanation }}</span>
               </div>
             </div>
-            <button v-if="!practiceSubmitted" class="submit-btn" @click="practiceSubmitted = true" :disabled="Object.keys(practiceAnswers).length < practiceQuestions.length">提交</button>
+            <button v-if="!practiceSubmitted" class="submit-btn" @click="submitPractice" :disabled="Object.keys(practiceAnswers).length < practiceQuestions.length">提交</button>
             <button v-else class="practice-btn" @click="showPractice = false">关闭</button>
           </div>
           <div v-else class="empty-state">暂无练习题</div>
@@ -203,11 +203,11 @@
 </template>
 
 <script setup>
-import { ref, computed, watch, onMounted, nextTick } from 'vue'
+import { ref, computed, watch, onMounted, onUnmounted, nextTick } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { marked } from 'marked'
 import DOMPurify from 'dompurify'
-import { apiLessonDetail, apiKpExercises, apiSubmitAnswer, apiAskTutor, apiSubjectTree, apiCompleteLesson, apiAbilityEvaluate } from '../../api'
+import { apiLessonDetail, apiKpExercises, apiSubmitAnswer, apiAskTutor, apiSubjectTree, apiCompleteLesson, apiAbilityEvaluate, apiExerciseSubmit, apiStudyHeartbeat } from '../../api'
 
 const route = useRoute()
 const router = useRouter()
@@ -248,8 +248,20 @@ const notesContent = ref('')
 const prevLessonId = ref(null)
 const nextLessonId = ref(null)
 
+let heartbeatTimer = null
+
 onMounted(() => {
   loadCourse()
+  // 每30秒发送学习时长心跳
+  heartbeatTimer = setInterval(() => {
+    if (currentLessonId.value) {
+      apiStudyHeartbeat(currentLessonId.value, 30).catch(() => {})
+    }
+  }, 30000)
+})
+
+onUnmounted(() => {
+  if (heartbeatTimer) clearInterval(heartbeatTimer)
 })
 
 async function loadCourse() {
@@ -489,6 +501,24 @@ async function generatePractice() {
     ]
   } finally {
     practiceLoading.value = false
+  }
+}
+
+async function submitPractice() {
+  practiceSubmitted.value = true
+  // 记录每道题的作答数据
+  for (let i = 0; i < practiceQuestions.value.length; i++) {
+    const q = practiceQuestions.value[i]
+    const userAnswer = practiceAnswers.value[i]
+    const correct = userAnswer === q.answer ? 1 : 0
+    try {
+      await apiExerciseSubmit({
+        lessonId: currentLessonId.value,
+        exerciseId: q.id || (i + 1),
+        difficulty: q.difficulty || 2,
+        correct
+      })
+    } catch {}
   }
 }
 
