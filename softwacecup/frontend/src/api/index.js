@@ -95,3 +95,9 @@ export const apiGenerateAdaptiveQuiz = (payload) => http.post('/adaptive-quiz/ge
 export const apiSubmitAdaptiveQuiz = (payload) => http.post('/adaptive-quiz/submit', payload)
 export const apiAnalyzeMistake = (payload) => http.post('/adaptive-quiz/analyze-mistake', payload)
 export const apiPrerequisiteChain = (kpId) => http.get(`/knowledge-graph/prerequisite-chain/${kpId}`)
+
+// ==================== B站视频导入 ====================
+export const apiBilibiliParse = (url) => http.post('/bilibili/parse', { url })
+export const apiBilibiliSearch = (keyword, page = 1, pageSize = 10) => http.post('/bilibili/search', { keyword, page, pageSize })
+export const apiBilibiliPlaylist = (url) => http.post('/bilibili/playlist', { url })
+export const apiBilibiliImport = (bvids, autoGenerate = true) => http.post('/bilibili/import', { bvids, autoGenerate })
