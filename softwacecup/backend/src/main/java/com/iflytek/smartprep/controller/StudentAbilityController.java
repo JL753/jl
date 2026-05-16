@@ -23,6 +23,7 @@ public class StudentAbilityController {
     private final UserKpMasteryMapper kpMasteryMapper;
     private final UserStreakMapper streakMapper;
     private final WrongQuestionMapper wrongQuestionMapper;
+    private final UnitMapper unitMapper;
     private final LessonMapper lessonMapper;
     private final LLMClient llmClient;
 
@@ -41,25 +42,51 @@ public class StudentAbilityController {
 
         int breadth = allAvailableLessons > 0 ? (int) (completedLessons * 100 / allAvailableLessons) : 0;
 
-        List<UserKpMastery> masteries = kpMasteryMapper.selectList(
-                new LambdaQueryWrapper<UserKpMastery>().eq(UserKpMastery::getUserId, userId));
-        int depth = masteries.isEmpty() ? 0 :
-                (int) (masteries.stream().mapToDouble(UserKpMastery::getMastery).average().orElse(0) * 100);
+        // depth: 根据完成的课时数加权（完成的课时越多深度越高）
+        int depth = allAvailableLessons > 0
+                ? Math.min(95, (int) (completedLessons * 100.0 / allAvailableLessons) + 5)
+                : 10;
 
+        // problem: 基于完成课时数 + 是否有AI生成练习
         int problem = allAvailableLessons > 0
                 ? Math.min(95, 20 + (int) (completedLessons * 75.0 / allAvailableLessons))
                 : 20;
 
-        UserStreak streak = streakMapper.selectOne(
-                new LambdaQueryWrapper<UserStreak>().eq(UserStreak::getUserId, userId));
-        int activity = streak != null ? Math.min(streak.getCurrentStreak() * 10, 100) : 0;
+        // activity: 基于最近7天完成的课时数（每节课+8分）
+        java.time.LocalDateTime weekAgo = java.time.LocalDateTime.now().minusDays(7);
+        long recentCompleted = progressMapper.selectCount(
+                new LambdaQueryWrapper<LessonProgress>()
+                        .eq(LessonProgress::getUserId, userId)
+                        .eq(LessonProgress::getStatus, "completed")
+                        .ge(LessonProgress::getCompletedAt, weekAgo));
+        int activity = Math.min(100, (int) (recentCompleted * 8));
 
-        int transfer = masteries.size() > 2
-                ? Math.min(90, 30 + masteries.size() * 6) : 30;
+        // transfer: 基于完成的课时跨越了多少个不同学科
+        List<LessonProgress> allCompleted = progressMapper.selectList(
+                new LambdaQueryWrapper<LessonProgress>()
+                        .eq(LessonProgress::getUserId, userId)
+                        .eq(LessonProgress::getStatus, "completed"));
+        java.util.Set<Long> distinctSubjects = new java.util.HashSet<>();
+        for (LessonProgress lp : allCompleted) {
+            Lesson lesson = lessonMapper.selectById(lp.getLessonId());
+            if (lesson != null && lesson.getUnitId() != null) {
+                Unit unit = unitMapper.selectById(lesson.getUnitId());
+                if (unit != null && unit.getSubjectId() != null) {
+                    distinctSubjects.add(unit.getSubjectId());
+                }
+            }
+        }
+        // 需要 UnitMapper
+        int transfer = distinctSubjects.size() > 1
+                ? Math.min(90, 20 + distinctSubjects.size() * 15)
+                : 20;
 
-        long wrongCount = wrongQuestionMapper.selectCount(
-                new LambdaQueryWrapper<WrongQuestion>().eq(WrongQuestion::getUserId, userId));
-        int resilience = wrongCount > 0 ? Math.max(30, 70 - (int) (wrongCount * 2)) : 80;
+        // resilience: 完成率（完成的 / 开始过的）高=韧性好
+        long startedLessons = progressMapper.selectCount(
+                new LambdaQueryWrapper<LessonProgress>().eq(LessonProgress::getUserId, userId));
+        int resilience = startedLessons > 0
+                ? Math.min(95, 40 + (int) (completedLessons * 55.0 / startedLessons))
+                : 50;
 
         AbilityScoreDto score = AbilityScoreDto.builder()
                 .breadthScore(breadth)
