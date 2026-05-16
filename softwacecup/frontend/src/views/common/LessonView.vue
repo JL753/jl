@@ -14,11 +14,14 @@
 
         <!-- Video player -->
         <div v-if="lesson?.videoUrl" class="video-section glass-card">
-          <video
-            :src="lesson.videoUrl"
-            controls
+          <iframe
+            v-if="isBilibiliUrl(lesson.videoUrl)"
+            :src="bilibiliEmbedUrl(lesson.videoUrl)"
             class="lesson-video"
-          ></video>
+            frameborder="0"
+            allowfullscreen
+          ></iframe>
+          <video v-else :src="lesson.videoUrl" controls class="lesson-video"></video>
         </div>
 
         <!-- Markdown content -->
@@ -243,6 +246,17 @@ async function completeLesson() {
   } finally {
     completing.value = false
   }
+}
+
+function isBilibiliUrl(url) {
+  return url && (url.includes('bilibili.com') || url.includes('BV'))
+}
+
+function bilibiliEmbedUrl(url) {
+  if (!url) return ''
+  const match = url.match(/BV[a-zA-Z0-9]{10}/)
+  const bvid = match ? match[0] : ''
+  return `//player.bilibili.com/player.html?bvid=${bvid}&page=1&high_quality=1`
 }
 
 function navigateToLesson(id) {

@@ -42,7 +42,14 @@
 
       <template v-else-if="currentLesson">
         <div v-if="currentLesson.videoUrl" class="video-section">
-          <video :src="currentLesson.videoUrl" controls class="lesson-video"></video>
+          <iframe
+            v-if="isBilibiliUrl(currentLesson.videoUrl)"
+            :src="bilibiliEmbedUrl(currentLesson.videoUrl)"
+            class="lesson-video"
+            frameborder="0"
+            allowfullscreen
+          ></iframe>
+          <video v-else :src="currentLesson.videoUrl" controls class="lesson-video"></video>
         </div>
 
         <div class="content-section glass-card">
@@ -345,6 +352,17 @@ function saveNotes() {
     notesContent.value = el.innerHTML
     // Future: save to backend
   }
+}
+
+function isBilibiliUrl(url) {
+  return url && (url.includes('bilibili.com') || url.includes('BV'))
+}
+
+function bilibiliEmbedUrl(url) {
+  if (!url) return ''
+  const match = url.match(/BV[a-zA-Z0-9]{10}/)
+  const bvid = match ? match[0] : ''
+  return `//player.bilibili.com/player.html?bvid=${bvid}&page=1&high_quality=1`
 }
 </script>
 
