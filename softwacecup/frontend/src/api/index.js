@@ -1,4 +1,5 @@
 import http from './http'
+import axios from 'axios'
 
 export const apiTeacherQuestionBank = () => http.get('/teacher-tools/questions')
 export const apiAddTeacherQuestion = (payload) => http.post('/teacher-tools/questions', payload)
@@ -101,4 +102,39 @@ export const apiBilibiliParse = (url) => http.post('/bilibili/parse', { url })
 export const apiBilibiliSearch = (keyword, page = 1, pageSize = 10) => http.post('/bilibili/search', { keyword, page, pageSize })
 export const apiBilibiliPlaylist = (url) => http.post('/bilibili/playlist', { url })
 export const apiBilibiliImport = (bvids, autoGenerate = true) => http.post('/bilibili/import', { bvids, autoGenerate })
-export const apiMyImports = () => http.get('/lessons/my-imports')
+
+// ==================== AI 虚拟人伴学 ====================
+/** 流式 AI 对话（Unity 虚拟人专用，SSE） */
+export const apiAgentChatStream = ({ question, history }) => {
+  const token = localStorage.getItem('sp_token') || ''
+  return fetch('/api/agent/chat-stream', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      Authorization: `Bearer ${token}`
+    },
+    body: JSON.stringify({ question, history: history || [] })
+  })
+}
+
+/** 语音识别 */
+export const apiSTT = (audioBlob) => {
+  const formData = new FormData()
+  formData.append('file', audioBlob, 'recording.wav')
+  return axios.post('/api/agent/stt', formData, {
+    headers: { 'Content-Type': 'multipart/form-data' }
+  })
+}
+
+/** 语音合成 */
+export const apiTTS = (text) => {
+  const token = localStorage.getItem('sp_token') || ''
+  return fetch('/api/agent/tts', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      Authorization: `Bearer ${token}`
+    },
+    body: JSON.stringify({ text })
+  })
+}

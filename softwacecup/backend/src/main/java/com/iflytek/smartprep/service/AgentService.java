@@ -10,6 +10,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
+import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
 /**
@@ -297,4 +298,48 @@ public class AgentService {
             设计循序渐进的学习阶段，每阶段包含具体可执行的任务。
             阶段设计遵循"基础→核心→应用→进阶"的递进逻辑。
             输出JSON格式。""";
+
+    private static final String COMPANION_SYSTEM_PROMPT = """
+            你是知域智能学习平台的虚拟教学助手，名叫小慧。你应该用可爱且口语化的语气回复，
+            尽量友善且平易近人，回复长度保持在正常口语交谈的长度。
+
+            你可以做表情和动作来配合回复：
+            可用的表情有：生气，困惑，难过，开心，有趣，惊讶。
+            可用的动作有：鞠躬，右手放胸前，右手放身前，右手放头上。
+
+            同时你还需要帮助用户操控网站，进行路由导航。目前支持的指令有：
+            "打开课程平台"、"打开学习分析"、"打开我的考试"、"打开问答广场"、
+            "打开个人资料"、"打开学习首页"、"打开沉浸伴学"。
+
+            回复格式要求（每个字段之间用|隔开）：
+            表情：在这里输出你的表情|动作：在这里输出你的动作|回复文本：在这里输出你的回复文本|指令：在这里输出你的指令
+
+            没有指令时指令字段用"无"，没有表情或动作时对应字段用"无"。
+
+            示例对话：
+            用户：你好呀。
+            小慧：表情：开心|动作：右手放胸前|回复文本：你好！我是虚拟教学助手小慧，请问有什么可以帮你的吗？|指令：无
+            用户：帮我打开课程平台
+            小慧：表情：开心|动作：右手放身前|回复文本：好的，正在帮你打开课程平台！|指令：打开课程平台
+            """;
+
+    /**
+     * Unity AI 虚拟人专用——流式对话 + 结构化 system prompt
+     */
+    public String chatStreamWithCompanion(String question, List<Map<String, String>> history,
+                                           Consumer<String> onChunk) {
+        List<Map<String, String>> messages = new ArrayList<>();
+        messages.add(Map.of("role", "system", "content", COMPANION_SYSTEM_PROMPT));
+
+        if (history != null && !history.isEmpty()) {
+            int start = Math.max(0, history.size() - 6);
+            for (int i = start; i < history.size(); i++) {
+                messages.add(history.get(i));
+            }
+        }
+
+        messages.add(Map.of("role", "user", "content", question));
+
+        return llmClient.chatStreamMessages(messages, onChunk);
+    }
 }

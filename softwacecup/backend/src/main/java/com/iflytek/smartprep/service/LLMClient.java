@@ -275,4 +275,84 @@ public class LLMClient {
         }
         return trimmed;
     }
+
+    /**
+     * 流式多轮对话
+     */
+    public String chatStreamMessages(List<Map<String, String>> messages, Consumer<String> onChunk) {
+        return chatStreamMessages(messages, defaultModel, defaultTemperature, defaultMaxTokens, onChunk);
+    }
+
+    /**
+     * 流式多轮对话 + 完整参数
+     */
+    public String chatStreamMessages(List<Map<String, String>> messages, String model,
+                                      double temperature, int maxTokens,
+                                      Consumer<String> onChunk) {
+        if (apiKey == null || apiKey.isBlank() || baseUrl == null || baseUrl.isBlank()) {
+            log.warn("LLM API 未配置，无法流式调用");
+            return fallbackCompanionReply();
+        }
+
+        try {
+            Map<String, Object> body = new HashMap<>();
+            body.put("model", model);
+            body.put("messages", messages);
+            body.put("temperature", temperature);
+            body.put("max_tokens", maxTokens);
+            body.put("stream", true);
+
+            String json = objectMapper.writeValueAsString(body);
+            Request request = new Request.Builder()
+                    .url(buildUrl())
+                    .addHeader("Authorization", "Bearer " + apiKey)
+                    .addHeader("Content-Type", "application/json")
+                    .post(RequestBody.create(json, MediaType.parse("application/json; charset=utf-8")))
+                    .build();
+
+            StringBuilder fullText = new StringBuilder();
+            try (Response response = httpClient.newCall(request).execute()) {
+                if (!response.isSuccessful()) {
+                    log.error("LLM 流式调用返回错误 {}", response.code());
+                    return fallbackCompanionReply();
+                }
+
+                ResponseBody responseBody = response.body();
+                if (responseBody == null) return fallbackCompanionReply();
+
+                try (BufferedReader reader = new BufferedReader(
+                        new InputStreamReader(responseBody.byteStream(), StandardCharsets.UTF_8))) {
+                    String line;
+                    while ((line = reader.readLine()) != null) {
+                        if (line.startsWith("data: ")) {
+                            String data = line.substring(6).trim();
+                            if ("[DONE]".equals(data)) break;
+
+                            try {
+                                JsonNode root = objectMapper.readTree(data);
+                                JsonNode delta = root.path("choices").path(0).path("delta").path("content");
+                                if (!delta.isMissingNode()) {
+                                    String chunk = delta.asText();
+                                    fullText.append(chunk);
+                                    if (onChunk != null) onChunk.accept(chunk);
+                                }
+                            } catch (Exception ignored) {}
+                        }
+                    }
+                }
+            }
+            String result = fullText.toString();
+            return result != null && !result.isBlank() ? result : fallbackCompanionReply();
+        } catch (Exception e) {
+            log.error("LLM 流式调用失败: {}", e.getMessage());
+            return fallbackCompanionReply();
+        }
+    }
+
+    /**
+     * LLM 不可用时的兜底回复
+     */
+    private String fallbackCompanionReply() {
+        return "表情：开心|动作：右手放胸前|回复文本：你好！我是小慧，当前服务繁忙，请稍后再试。你仍然可以使用文字对话功能。|指令：无";
+    }
 }

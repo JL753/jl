@@ -60,6 +60,11 @@ const navItems = [
     label: 'AI',
     path: '/student/companion',
     iconSvg: '<path d="M12 2a10 10 0 1 0 10 10A10 10 0 0 0 12 2z"/><path d="M9 12a3 3 0 1 0 6 0 3 3 0 1 0-6 0z"/><path d="M7 17c.94.94 2.59 1.53 5 1.53s4.06-.59 5-1.53"/>'
+  },
+  {
+    label: '沉浸',
+    path: '/student/companion-immersive',
+    iconSvg: '<circle cx="12" cy="12" r="10"/><circle cx="12" cy="10" r="4"/><path d="M8 14s1.5 2 4 2 4-2 4-2"/><path d="M12 2v2"/><path d="M12 20v2"/><path d="M4.93 4.93l1.41 1.41"/><path d="M17.66 17.66l1.41 1.41"/><path d="M2 12h2"/><path d="M20 12h2"/>'
   }
 ]
 

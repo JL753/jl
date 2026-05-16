@@ -73,8 +73,8 @@ const messagesEl = ref(null)
 const messages = ref([
   {
     role: 'assistant',
-    content: '你好！我是知域 AI 智能助手\n\n我可以回答学习问题，也可以帮你导航到对应页面。\n\n试试说：「跳转到课程平台」或直接提问！',
-    html: '你好！我是知域 AI 智能助手<br><br>我可以回答学习问题，也可以帮你导航到对应页面。<br><br>试试说：「跳转到课程平台」或直接提问！'
+    content: '你好！我是知域 AI 智能助手\n\n我可以回答学习问题，也可以帮你导航到对应页面。\n\n试试说：「跳转到课程平台」、「沉浸伴学」或直接提问！',
+    html: '你好！我是知域 AI 智能助手<br><br>我可以回答学习问题，也可以帮你导航到对应页面。<br><br>试试说：「跳转到课程平台」、「沉浸伴学」或直接提问！'
   }
 ])
 
@@ -93,6 +93,7 @@ const navMap = [
   { keywords: ['用户管理', '账号管理'], path: '/admin/users' },
   { keywords: ['系统设置', '设置'], path: '/admin/settings' },
   { keywords: ['个人信息', '个人资料', '个人中心'], student: '/student/profile', teacher: '/teacher/profile', admin: '/admin/profile' },
+  { keywords: ['沉浸伴学', '3d伴学', '虚拟人', '虚拟教师'], path: '/student/companion-immersive' },
 ]
 
 const tryNavigate = (text) => {
