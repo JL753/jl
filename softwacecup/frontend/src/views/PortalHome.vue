@@ -228,14 +228,13 @@ onMounted(() => {
 .portal-root {
   min-height: 100vh;
   color: #e6edf3;
-  padding: 80px 24px 40px;
+  padding: 76px 0 0;
 }
 .portal-inner {
-  max-width: 1100px;
-  margin: 0 auto;
   display: flex;
   flex-direction: column;
   gap: 32px;
+  padding: 20px 32px 40px;
 }
 
 /* ═══ Glass card base ═══ */
@@ -263,6 +262,9 @@ onMounted(() => {
   justify-content: space-between;
   padding: 40px 44px;
   gap: 40px;
+  background: transparent;
+  backdrop-filter: none;
+  border: none;
   transition: flex var(--transition-slow);
 }
 .hero-card.hero-full {
@@ -622,7 +624,7 @@ onMounted(() => {
   .hero-visual { display: none; }
 }
 @media (max-width: 768px) {
-  .portal-root { padding: 72px 14px 32px; }
+  .portal-inner { padding: 16px 14px 32px; }
   .hero-row { flex-direction: column; min-height: auto; }
   .role-cards { width: 100%; flex-direction: row; gap: 10px; }
   .role-card { padding: 14px; }
