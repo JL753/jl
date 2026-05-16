@@ -4,56 +4,71 @@
     <div class="portal-inner">
       <!-- ═══ ① Hero + ② 角色分流 ═══ -->
       <div class="hero-row">
-        <!-- Hero 卡片 -->
-        <div class="hero-card glass-card" :class="{ 'hero-full': auth.isLoggedIn }">
+        <!-- Hero 透明区 -->
+        <div class="hero-area" :class="{ full: auth.isLoggedIn }">
           <!-- 未登录 -->
           <template v-if="!auth.isLoggedIn">
             <div class="hero-left">
-              <h1 class="hero-title">探索知识宇宙</h1>
-              <p class="hero-sub">AI驱动的个性化学习平台</p>
+              <p class="hero-tagline">自适应学习路径 · 实时学情追踪</p>
+              <h1 class="hero-brand">知域</h1>
+              <p class="hero-subtitle">标记你的知识版图</p>
+              <p class="hero-desc">
+                基于人工智能与大语言模型，构建个性化学习路径，追踪学情数据，<br/>
+                为每一位学习者提供精准的学习支持与知识导航。
+              </p>
               <div class="hero-actions">
-                <button class="cta-btn" @click="handleEnter">开始学习</button>
-                <button class="cta-btn secondary" @click="scrollToSubjects">了解知域</button>
+                <button class="cta-btn primary" @click="handleEnter">进入知域</button>
+                <button class="cta-btn ghost" @click="scrollToSubjects">了解功能</button>
               </div>
             </div>
-            <div class="hero-visual">
-              <div class="orbit-ring ring-1"></div>
-              <div class="orbit-ring ring-2"></div>
-              <div class="orbit-ring ring-3"></div>
-              <div class="center-orb">知</div>
+            <!-- 3D 轨道 -->
+            <div class="orbit-3d" @mouseenter="orbitTilted = false" @mouseleave="orbitTilted = true">
+              <div class="orbit-scene" :class="{ tilted: orbitTilted }">
+                <div class="ring r1"></div>
+                <div class="ring r2"></div>
+                <div class="ring r3"></div>
+                <div class="ring r4"></div>
+                <div class="ring r5"></div>
+                <div class="core"></div>
+              </div>
             </div>
           </template>
           <!-- 已登录 -->
           <template v-else>
             <div class="hero-left">
+              <p class="hero-tagline">自适应学习路径 · 实时学情追踪</p>
               <h1 class="hero-greet">欢迎回来，{{ auth.user?.username }}</h1>
               <p class="hero-stat">
                 已连续学习 <strong>{{ streakDays }}</strong> 天 · 掌握 <strong>{{ masteredKps }}</strong> 个知识点
               </p>
               <div class="hero-actions">
-                <button class="cta-btn" @click="goContinue">继续上次学习</button>
-                <button class="cta-btn secondary" @click="goSubjects">浏览课程</button>
-                <button class="cta-btn secondary" @click="goKnowledgeMap">知识星图</button>
+                <button class="cta-btn primary" @click="goContinue">继续上次学习</button>
+                <button class="cta-btn ghost" @click="goSubjects">浏览课程</button>
+                <button class="cta-btn ghost" @click="goKnowledgeMap">知识星图</button>
               </div>
             </div>
-            <div class="hero-visual">
-              <div class="orbit-ring ring-1"></div>
-              <div class="orbit-ring ring-2"></div>
-              <div class="orbit-ring ring-3"></div>
-              <div class="center-orb">知</div>
+            <div class="orbit-3d" @mouseenter="orbitTilted = false" @mouseleave="orbitTilted = true">
+              <div class="orbit-scene" :class="{ tilted: orbitTilted }">
+                <div class="ring r1"></div>
+                <div class="ring r2"></div>
+                <div class="ring r3"></div>
+                <div class="ring r4"></div>
+                <div class="ring r5"></div>
+                <div class="core"></div>
+              </div>
             </div>
           </template>
         </div>
 
         <!-- ② 角色分流卡（仅未登录） -->
         <div v-if="!auth.isLoggedIn" class="role-cards">
-          <div class="role-card glass-card student" @click="quickEnter('student')">
+          <div class="role-card student" @click="quickEnter('student')">
             <span class="role-label">我是学生</span>
-            <span class="role-link">进入学习 →</span>
+            <span class="role-arrow">进入学习 →</span>
           </div>
-          <div class="role-card glass-card teacher" @click="quickEnter('teacher')">
+          <div class="role-card teacher" @click="quickEnter('teacher')">
             <span class="role-label">我是教师</span>
-            <span class="role-link">进入教学 →</span>
+            <span class="role-arrow">进入教学 →</span>
           </div>
         </div>
       </div>
@@ -62,7 +77,7 @@
       <div class="core-section">
         <!-- 已登录：继续学习 + AI推荐 -->
         <div v-if="auth.isLoggedIn" class="dashboard-row">
-          <div class="glass-card continue-card" @click="goContinue">
+          <div class="continue-card" @click="goContinue">
             <p class="card-overline">继续上次学习</p>
             <h3 class="card-main" v-if="lastLesson">{{ lastLesson.courseName }}</h3>
             <p class="card-sub" v-if="lastLesson">{{ lastLesson.lessonName }} · 第 {{ lastLesson.orderIndex }} 课时</p>
@@ -72,12 +87,12 @@
             <p class="progress-text" v-if="lastLesson">{{ lastLesson.progress || 0 }}%</p>
             <p class="card-empty" v-if="!lastLesson">暂无学习记录</p>
           </div>
-          <div class="glass-card ai-rec-card">
+          <div class="ai-rec-card">
             <p class="card-overline">AI 为你推荐</p>
             <ul class="rec-list" v-if="recommendations.length">
               <li v-for="(r, i) in recommendations" :key="i" class="rec-item">
                 <span class="rec-title">{{ r.title }}</span>
-                <span class="rec-source">{{ r.source }} {{ r.duration ? '丨 ' + r.duration : '' }}</span>
+                <span class="rec-source">{{ r.source }}{{ r.duration ? ' 丨 ' + r.duration : '' }}</span>
               </li>
             </ul>
             <p class="card-empty" v-else>完成学习后获取个性化推荐</p>
@@ -90,7 +105,7 @@
           <div
             v-for="(s, idx) in displaySubjects"
             :key="s.id"
-            class="glass-card subject-card"
+            class="subject-card"
             @click="handleSubjectClick(s)"
           >
             <div class="subject-accent" :style="{ background: accentGradients[idx % accentGradients.length] }"></div>
@@ -108,7 +123,7 @@
       <div v-if="!auth.isLoggedIn" class="bottom-cta">
         <h2 class="cta-heading">准备好开始了吗？</h2>
         <p class="cta-desc">加入知域，开启你的个性化学习之旅</p>
-        <button class="cta-btn large" @click="handleEnter">免费注册</button>
+        <button class="cta-btn primary large" @click="handleEnter">免费注册</button>
         <p class="cta-login-link">已有账号？<span @click="auth.openLoginModal()">登录</span></p>
       </div>
     </div>
@@ -131,6 +146,7 @@ const recommendations = ref([])
 const streakDays = ref(0)
 const masteredKps = ref(0)
 const subjectsAnchor = ref(null)
+const orbitTilted = ref(true)
 
 const accentGradients = [
   'linear-gradient(135deg, #3b82f6, #60a5fa)',
@@ -150,17 +166,14 @@ async function loadSubjects() {
     const res = await apiSubjects()
     const data = res.data?.data
     subjects.value = Array.isArray(data) ? data : (data?.subjects || data?.list || [])
-  } catch {
-    subjects.value = []
-  }
+  } catch { subjects.value = [] }
 }
 
 async function loadAuthData() {
   if (!auth.isLoggedIn) return
   try {
     const [abilityRes, streakRes] = await Promise.allSettled([
-      apiAbilityLatest(),
-      apiGamificationStreak(),
+      apiAbilityLatest(), apiGamificationStreak(),
     ])
     if (abilityRes.status === 'fulfilled') {
       const d = abilityRes.value.data?.data || abilityRes.value.data || {}
@@ -189,39 +202,26 @@ async function loadRecommendations(lessonId) {
     const data = res.data?.data || res.data || {}
     const list = data.resources || data.recommendations || data.list || []
     recommendations.value = list.slice(0, 4)
-  } catch {
-    recommendations.value = []
-  }
+  } catch { recommendations.value = [] }
 }
 
 function handleEnter() {
-  if (auth.isLoggedIn) {
-    router.push('/student/dashboard')
-  } else {
-    auth.openLoginModal('/student/dashboard')
-  }
+  auth.isLoggedIn ? router.push('/student/dashboard') : auth.openLoginModal('/student/dashboard')
 }
-
 function quickEnter(role) {
   auth.openLoginModal(role === 'student' ? '/student/dashboard' : '/teacher/dashboard')
 }
-
 function scrollToSubjects() {
   subjectsAnchor.value?.scrollIntoView({ behavior: 'smooth', block: 'start' })
 }
-
 function goContinue() { if (lastLesson.value) router.push(`/lessons/${lastLesson.value.lessonId}`) }
 function goSubjects() { router.push('/subjects') }
 function goKnowledgeMap() { router.push('/student/knowledge-map') }
 function handleSubjectClick(s) {
-  const target = `/subjects/${s.id}`
-  auth.isLoggedIn ? router.push(target) : auth.openLoginModal(target)
+  auth.isLoggedIn ? router.push(`/subjects/${s.id}`) : auth.openLoginModal(`/subjects/${s.id}`)
 }
 
-onMounted(() => {
-  loadSubjects()
-  loadAuthData()
-})
+onMounted(() => { loadSubjects(); loadAuthData() })
 </script>
 
 <style scoped>
@@ -233,164 +233,170 @@ onMounted(() => {
 .portal-inner {
   display: flex;
   flex-direction: column;
-  gap: 32px;
-  padding: 20px 32px 40px;
+  gap: 40px;
+  padding: 36px 60px 48px;
 }
 
-/* ═══ Glass card base ═══ */
-.glass-card {
-  backdrop-filter: blur(var(--glass-blur));
-  -webkit-backdrop-filter: blur(var(--glass-blur));
-  background: rgba(255,255,255,0.04);
-  border: 1px solid var(--glass-border);
-  border-radius: var(--radius-sm);
-  transition: all var(--transition-base);
-}
-
-/* ═══ ① Hero Row ═══ */
+/* ═══ ① Hero Area ═══ */
 .hero-row {
   display: flex;
-  gap: 20px;
+  gap: 24px;
   align-items: stretch;
-  min-height: 220px;
 }
-
-.hero-card {
+.hero-area {
   flex: 1;
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 40px 44px;
-  gap: 40px;
-  background: transparent;
-  backdrop-filter: none;
-  border: none;
-  transition: flex var(--transition-slow);
+  gap: 48px;
+  min-height: 280px;
+  transition: flex 0.3s ease;
 }
-.hero-card.hero-full {
-  flex: 1;
-}
+.hero-area.full { flex: 1; }
 
-.hero-left {
-  max-width: 480px;
-}
+.hero-left { max-width: 560px; }
 
-.hero-title {
-  font-size: 42px;
+.hero-tagline {
+  font-size: 14px;
+  color: #60a5fa;
+  margin: 0 0 12px;
+  letter-spacing: 3px;
+  font-weight: 500;
+}
+.hero-brand {
+  font-size: 56px;
   font-weight: 800;
-  margin: 0 0 8px;
-  line-height: 1.15;
-  background: linear-gradient(135deg, #e6edf3, #60a5fa, #06b6d4);
+  margin: 0 0 12px;
+  line-height: 1.1;
+  background: linear-gradient(135deg, #e6edf3 0%, #60a5fa 40%, #06b6d4 100%);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
+  letter-spacing: 8px;
 }
 .hero-greet {
-  font-size: 30px;
+  font-size: 34px;
   font-weight: 700;
   color: #e6edf3;
-  margin: 0 0 8px;
+  margin: 0 0 12px;
   line-height: 1.3;
 }
-.hero-sub {
-  font-size: 15px;
+.hero-subtitle {
+  font-size: 14px;
   color: rgba(255,255,255,0.45);
-  margin: 0 0 24px;
-  letter-spacing: 2px;
+  margin: 0 0 10px;
+  letter-spacing: 3px;
 }
 .hero-stat {
   font-size: 14px;
   color: rgba(255,255,255,0.45);
-  margin: 0 0 24px;
+  margin: 0 0 10px;
 }
-.hero-stat strong {
-  color: #60a5fa;
-  font-weight: 700;
+.hero-stat strong { color: #60a5fa; font-weight: 700; }
+.hero-desc {
+  font-size: 14px;
+  color: rgba(255,255,255,0.4);
+  line-height: 1.8;
+  margin: 0 0 28px;
 }
-
-.hero-actions {
-  display: flex;
-  gap: 10px;
-  flex-wrap: wrap;
-}
+.hero-actions { display: flex; gap: 12px; flex-wrap: wrap; }
 
 .cta-btn {
-  padding: 9px 24px;
+  padding: 10px 28px;
   border-radius: 10px;
   border: none;
-  background: linear-gradient(135deg, #3b82f6, #06b6d4);
-  color: white;
-  font-size: 14px;
+  font-size: 15px;
   font-weight: 600;
   cursor: pointer;
-  transition: all 0.2s ease;
-  box-shadow: 0 4px 16px rgba(59,130,246,0.3);
+  transition: all 0.2s;
 }
-.cta-btn:hover {
+.cta-btn.primary {
+  background: linear-gradient(135deg, #3b82f6, #06b6d4);
+  color: white;
+  box-shadow: 0 4px 20px rgba(59,130,246,0.35);
+}
+.cta-btn.primary:hover {
   transform: translateY(-1px);
-  box-shadow: 0 6px 24px rgba(59,130,246,0.45);
+  box-shadow: 0 6px 28px rgba(59,130,246,0.5);
 }
-.cta-btn.secondary {
+.cta-btn.ghost {
+  background: transparent;
+  border: 1px solid rgba(255,255,255,0.15);
+  color: rgba(255,255,255,0.6);
+}
+.cta-btn.ghost:hover {
   background: rgba(255,255,255,0.06);
-  border: 1px solid rgba(255,255,255,0.12);
-  box-shadow: none;
-  color: rgba(255,255,255,0.7);
-}
-.cta-btn.secondary:hover {
-  background: rgba(255,255,255,0.1);
   color: #e6edf3;
-  box-shadow: 0 4px 16px rgba(0,0,0,0.2);
-}
-.cta-btn.large {
-  padding: 12px 40px;
-  font-size: 16px;
+  border-color: rgba(255,255,255,0.25);
 }
 
-/* ═══ Orbit animation ═══ */
-.hero-visual {
-  width: 180px;
-  height: 170px;
-  position: relative;
-  flex-shrink: 0;
-}
-.orbit-ring {
-  position: absolute;
-  border-radius: 50%;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  border: 1px solid rgba(255,255,255,0.06);
-  pointer-events: none;
-}
-.ring-1 { width: 160px; height: 160px; animation: spin 20s linear infinite; }
-.ring-2 { width: 115px; height: 115px; animation: spin 14s linear infinite reverse; }
-.ring-3 { width: 68px; height: 68px; animation: spin 10s linear infinite; }
-@keyframes spin {
-  from { transform: translate(-50%, -50%) rotate(0deg); }
-  to { transform: translate(-50%, -50%) rotate(360deg); }
-}
-.center-orb {
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  width: 40px;
-  height: 40px;
-  border-radius: 50%;
-  background: linear-gradient(135deg, #3b82f6, #06b6d4);
+/* ═══ 3D Orbit Spinner ═══ */
+.orbit-3d {
+  width: 220px;
+  height: 220px;
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 16px;
-  font-weight: 800;
-  color: white;
-  box-shadow: 0 0 24px rgba(59,130,246,0.35);
-  z-index: 2;
+  flex-shrink: 0;
+  cursor: pointer;
+}
+.orbit-scene {
+  width: 180px;
+  height: 180px;
+  position: relative;
+  transform-style: preserve-3d;
+  perspective: 340px;
+  animation: orbit-spin 750ms linear infinite;
+}
+.orbit-scene.tilted {
+  transform: rotateX(55deg) rotateY(-15deg);
+}
+.orbit-scene:not(.tilted) {
+  transform: rotateX(0deg) rotateY(0deg);
+}
+.orbit-scene::before {
+  content: '';
+  position: absolute;
+  inset: -20px;
+  border-radius: 50%;
+  border: 1px solid rgba(255,255,255,0.05);
+  transform-style: preserve-3d;
+  animation: orbit-spin 750ms linear infinite reverse;
+}
+
+.ring {
+  position: absolute;
+  border-radius: 50%;
+  top: 50%; left: 50%;
+  border: 1px solid rgba(255,255,255,0.08);
+  pointer-events: none;
+}
+.r1 { width: 170px; height: 170px; margin: -85px 0 0 -85px; }
+.r2 { width: 135px; height: 135px; margin: -67px 0 0 -67px; border-color: rgba(59,130,246,0.15); }
+.r3 { width: 100px; height: 100px; margin: -50px 0 0 -50px; border-color: rgba(255,255,255,0.1); }
+.r4 { width: 68px; height: 68px; margin: -34px 0 0 -34px; border-color: rgba(6,182,212,0.2); }
+.r5 { width: 40px; height: 40px; margin: -20px 0 0 -20px; border-color: rgba(168,85,247,0.15); }
+.core {
+  position: absolute;
+  top: 50%; left: 50%;
+  width: 16px; height: 16px;
+  margin: -8px 0 0 -8px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #3b82f6, #06b6d4);
+  box-shadow: 0 0 20px rgba(59,130,246,0.5);
+}
+
+@keyframes orbit-spin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+.orbit-scene {
+  transition: transform 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
 }
 
 /* ═══ ② Role cards ═══ */
 .role-cards {
-  width: 170px;
+  width: 160px;
   display: flex;
   flex-direction: column;
   gap: 12px;
@@ -403,235 +409,117 @@ onMounted(() => {
   align-items: center;
   justify-content: center;
   gap: 8px;
-  padding: 16px 12px;
+  padding: 18px 12px;
+  border-radius: 12px;
+  background: transparent;
+  border: 1px solid rgba(255,255,255,0.08);
   cursor: pointer;
+  transition: all 0.2s;
 }
 .role-card:hover {
   border-color: rgba(255,255,255,0.18);
   transform: translateY(-1px);
 }
-.role-card.student:hover {
-  border-color: rgba(59,130,246,0.4);
-  box-shadow: 0 4px 16px rgba(59,130,246,0.15);
-}
-.role-card.teacher:hover {
-  border-color: rgba(168,85,247,0.4);
-  box-shadow: 0 4px 16px rgba(168,85,247,0.15);
-}
-
-.role-label {
-  font-size: 13px;
-  color: rgba(255,255,255,0.45);
-}
-.role-link {
-  font-size: 12px;
-  font-weight: 600;
-  color: rgba(255,255,255,0.55);
-}
+.role-card.student:hover { border-color: rgba(59,130,246,0.35); }
+.role-card.teacher:hover { border-color: rgba(168,85,247,0.35); }
+.role-label { font-size: 13px; color: rgba(255,255,255,0.4); }
+.role-arrow { font-size: 12px; font-weight: 600; color: rgba(255,255,255,0.5); }
 
 /* ═══ ③ Core section ═══ */
-.core-section {
-  display: flex;
-  flex-direction: column;
-  gap: 20px;
-}
+.core-section { display: flex; flex-direction: column; gap: 24px; }
 
-.dashboard-row {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 20px;
-}
+.dashboard-row { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
 
 .continue-card, .ai-rec-card {
   padding: 24px 28px;
-  cursor: default;
+  border-radius: 12px;
+  background: transparent;
+  border: 1px solid rgba(255,255,255,0.06);
 }
-.continue-card {
-  cursor: pointer;
-}
-.continue-card:hover {
-  border-color: rgba(59,130,246,0.25);
-  background: rgba(59,130,246,0.04);
-}
+.continue-card { cursor: pointer; }
+.continue-card:hover { border-color: rgba(59,130,246,0.2); }
 
 .card-overline {
-  font-size: 11px;
-  color: rgba(255,255,255,0.35);
-  text-transform: uppercase;
-  letter-spacing: 1px;
-  margin: 0 0 8px;
+  font-size: 11px; color: rgba(255,255,255,0.3);
+  text-transform: uppercase; letter-spacing: 1px; margin: 0 0 10px;
 }
-.card-main {
-  font-size: 16px;
-  font-weight: 700;
-  color: #e6edf3;
-  margin: 0 0 4px;
-}
-.card-sub {
-  font-size: 12px;
-  color: rgba(255,255,255,0.4);
-  margin: 0 0 12px;
-}
+.card-main { font-size: 17px; font-weight: 700; color: #e6edf3; margin: 0 0 4px; }
+.card-sub { font-size: 12px; color: rgba(255,255,255,0.35); margin: 0 0 14px; }
 .progress-bar {
-  height: 4px;
-  border-radius: 2px;
-  background: rgba(255,255,255,0.08);
-  overflow: hidden;
-  margin-bottom: 6px;
+  height: 4px; border-radius: 2px;
+  background: rgba(255,255,255,0.06);
+  overflow: hidden; margin-bottom: 6px;
 }
 .progress-fill {
-  height: 100%;
-  border-radius: 2px;
+  height: 100%; border-radius: 2px;
   background: linear-gradient(90deg, #3b82f6, #06b6d4);
   transition: width 0.4s ease;
 }
-.progress-text {
-  font-size: 12px;
-  font-weight: 600;
-  color: rgba(255,255,255,0.4);
-  margin: 0;
-}
-.card-empty {
-  font-size: 13px;
-  color: rgba(255,255,255,0.25);
-  margin: 0;
-}
+.progress-text { font-size: 12px; font-weight: 600; color: rgba(255,255,255,0.35); margin: 0; }
+.card-empty { font-size: 13px; color: rgba(255,255,255,0.2); margin: 0; }
 
-.rec-list {
-  list-style: none;
-  padding: 0;
-  margin: 0;
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-}
-.rec-item {
-  display: flex;
-  flex-direction: column;
-  gap: 2px;
-}
-.rec-title {
-  font-size: 13px;
-  color: #e6edf3;
-  line-height: 1.4;
-}
-.rec-source {
-  font-size: 11px;
-  color: rgba(255,255,255,0.35);
-}
+.rec-list { list-style: none; padding: 0; margin: 0; display: flex; flex-direction: column; gap: 10px; }
+.rec-item { display: flex; flex-direction: column; gap: 2px; }
+.rec-title { font-size: 13px; color: #e6edf3; line-height: 1.4; }
+.rec-source { font-size: 11px; color: rgba(255,255,255,0.3); }
 
-.section-title {
-  font-size: 20px;
-  font-weight: 700;
-  color: #e6edf3;
-  margin: 8px 0 4px;
-}
+.section-title { font-size: 22px; font-weight: 700; color: #e6edf3; margin: 8px 0 4px; }
 
-.subject-grid {
-  display: grid;
-  grid-template-columns: repeat(4, 1fr);
-  gap: 14px;
-}
+.subject-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 14px; }
 
 .subject-card {
-  display: flex;
-  align-items: center;
-  gap: 12px;
+  display: flex; align-items: center; gap: 12px;
   padding: 14px 18px;
+  border-radius: 12px;
+  background: transparent;
+  border: 1px solid rgba(255,255,255,0.05);
   cursor: pointer;
+  transition: all 0.2s;
 }
 .subject-card:hover {
-  border-color: rgba(255,255,255,0.15);
+  border-color: rgba(255,255,255,0.12);
   transform: translateY(-1px);
-  background: rgba(255,255,255,0.06);
 }
-
 .subject-accent {
-  width: 6px;
-  height: 36px;
-  border-radius: 3px;
-  flex-shrink: 0;
+  width: 5px; height: 32px; border-radius: 3px; flex-shrink: 0;
 }
-
-.subject-info {
-  flex: 1;
-  min-width: 0;
-  display: flex;
-  flex-direction: column;
-  gap: 2px;
-}
-.subject-name {
-  font-size: 14px;
-  font-weight: 600;
-  color: #e6edf3;
-}
-.subject-count {
-  font-size: 11px;
-  color: rgba(255,255,255,0.35);
-}
+.subject-info { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 2px; }
+.subject-name { font-size: 14px; font-weight: 600; color: #e6edf3; }
+.subject-count { font-size: 11px; color: rgba(255,255,255,0.3); }
 .subject-arrow {
-  font-size: 14px;
-  color: rgba(255,255,255,0.2);
-  transition: color 0.2s;
-  flex-shrink: 0;
+  font-size: 14px; color: rgba(255,255,255,0.15);
+  transition: color 0.2s; flex-shrink: 0;
 }
-.subject-card:hover .subject-arrow {
-  color: #60a5fa;
-}
+.subject-card:hover .subject-arrow { color: #60a5fa; }
 
-.empty-hint {
-  text-align: center;
-  color: rgba(255,255,255,0.2);
-  font-size: 13px;
-  padding: 20px 0;
-}
+.empty-hint { text-align: center; color: rgba(255,255,255,0.15); font-size: 13px; padding: 24px 0; }
 
 /* ═══ ④ Bottom CTA ═══ */
-.bottom-cta {
-  text-align: center;
-  padding: 16px 0 20px;
-}
-.cta-heading {
-  font-size: 22px;
-  font-weight: 700;
-  color: #e6edf3;
-  margin: 0 0 10px;
-}
-.cta-desc {
-  font-size: 14px;
-  color: rgba(255,255,255,0.4);
-  margin: 0 0 24px;
-}
-.cta-login-link {
-  font-size: 13px;
-  color: rgba(255,255,255,0.35);
-  margin: 16px 0 0;
-}
-.cta-login-link span {
-  color: #60a5fa;
-  cursor: pointer;
-  text-decoration: underline;
-}
-.cta-login-link span:hover {
-  color: #93c5fd;
-}
+.bottom-cta { text-align: center; padding: 20px 0 30px; }
+.cta-heading { font-size: 24px; font-weight: 700; color: #e6edf3; margin: 0 0 10px; }
+.cta-desc { font-size: 14px; color: rgba(255,255,255,0.35); margin: 0 0 26px; }
+.cta-btn.large { padding: 14px 48px; font-size: 16px; }
+.cta-login-link { font-size: 13px; color: rgba(255,255,255,0.3); margin: 18px 0 0; }
+.cta-login-link span { color: #60a5fa; cursor: pointer; text-decoration: underline; }
+.cta-login-link span:hover { color: #93c5fd; }
 
 /* ═══ Responsive ═══ */
-@media (max-width: 900px) {
-  .hero-card { padding: 20px 24px; }
-  .hero-title { font-size: 28px; }
-  .hero-greet { font-size: 22px; }
-  .hero-visual { display: none; }
+@media (max-width: 1024px) {
+  .portal-inner { padding: 28px 32px 40px; }
+  .hero-area { min-height: auto; }
+  .hero-brand { font-size: 42px; }
+  .orbit-3d { display: none; }
 }
 @media (max-width: 768px) {
-  .portal-inner { padding: 16px 14px 32px; }
-  .hero-row { flex-direction: column; min-height: auto; }
-  .role-cards { width: 100%; flex-direction: row; gap: 10px; }
+  .portal-inner { padding: 20px 16px 32px; }
+  .hero-row { flex-direction: column; }
+  .role-cards { width: 100%; flex-direction: row; }
   .role-card { padding: 14px; }
   .subject-grid { grid-template-columns: repeat(2, 1fr); }
   .dashboard-row { grid-template-columns: 1fr; }
 }
 @media (max-width: 480px) {
+  .hero-brand { font-size: 34px; letter-spacing: 4px; }
   .subject-grid { grid-template-columns: 1fr; }
   .hero-actions { flex-direction: column; }
   .cta-btn { width: 100%; text-align: center; }

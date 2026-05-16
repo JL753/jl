@@ -68,10 +68,10 @@ function goAICompanion() {
   align-items: center;
   justify-content: space-between;
   padding: 0 20px;
-  background: rgba(8, 13, 31, 0.72);
-  backdrop-filter: blur(16px);
-  -webkit-backdrop-filter: blur(16px);
-  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  background: rgba(255, 255, 255, 0.06);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
 }
 
 /* Left */
@@ -94,6 +94,7 @@ function goAICompanion() {
   font-size: 16px; font-weight: 700;
   color: #e6edf3;
   letter-spacing: 2px;
+  text-shadow: 0 1px 2px rgba(0,0,0,0.3);
 }
 
 /* Center — search */
