@@ -163,7 +163,7 @@ async function handleRegister() {
   }
   loading.value = true; errorMsg.value = ''
   try {
-    await auth.register({ username: form.username, password: form.password })
+    await auth.register({ username: form.username, password: form.password, role: 'student', displayName: form.username })
     // 注册成功后初始化六维能力空数据
     try { await apiAbilityEvaluate() } catch {}
     auth.closeLoginModal()
