@@ -13,6 +13,7 @@
           <el-button size="small" @click="switchResourceType('doc')" :type="resourceType === 'doc' ? 'primary' : ''">文档</el-button>
           <el-button size="small" @click="switchResourceType('mindmap')" :type="resourceType === 'mindmap' ? 'primary' : ''">知识图谱</el-button>
           <el-button size="small" @click="switchResourceType('quiz')" :type="resourceType === 'quiz' ? 'primary' : ''">随堂测验</el-button>
+          <el-button size="small" @click="switchResourceType('webcrawl')" :type="resourceType === 'webcrawl' ? 'warning' : ''" class="crawl-tab-btn">🌐 联网搜索</el-button>
         </div>
       </div>
 
@@ -77,6 +78,48 @@
         <!-- 随堂测验 -->
         <div v-else-if="resourceType === 'quiz'" class="quiz-viewer">
           <QuizComponent :documentId="currentDocumentId" :studentId="currentStudentId" />
+        </div>
+
+        <!-- 互联网知识搜索 -->
+        <div v-else-if="resourceType === 'webcrawl'" class="webcrawl-viewer">
+          <div class="crawl-search-bar">
+            <el-input
+              v-model="crawlQuery"
+              placeholder="输入知识点关键词，爬取互联网公开资源..."
+              class="crawl-input"
+              @keydown.enter="startCrawl"
+              clearable
+            />
+            <el-button type="warning" :loading="isCrawling" @click="startCrawl" :disabled="!crawlQuery.trim()">
+              {{ isCrawling ? '爬取中...' : '🌐 开始爬取' }}
+            </el-button>
+          </div>
+          <div v-if="crawlResult" class="crawl-result">
+            <div class="crawl-meta">
+              <span class="crawl-badge">🤖 {{ crawlResult.agentName }}</span>
+              <span class="crawl-confidence">置信度 {{ crawlResult.confidence }}%</span>
+            </div>
+            <div class="crawl-content" v-html="renderMarkdown(crawlResult.markdown)"></div>
+            <div v-if="crawlResult.links && crawlResult.links.length" class="crawl-links">
+              <div class="crawl-links-title">📎 来源链接</div>
+              <a v-for="(link, i) in crawlResult.links" :key="i" :href="link" target="_blank" rel="noopener" class="crawl-link-item">
+                {{ link.length > 60 ? link.substring(0, 60) + '...' : link }}
+              </a>
+            </div>
+          </div>
+          <div v-else-if="!isCrawling" class="empty-state">
+            <p>🌐</p>
+            <p>互联网知识爬取</p>
+            <p class="hint-text">输入关键词，AI 将自动爬取 Wikipedia、知乎、Bilibili 等公开平台的相关知识</p>
+          </div>
+          <div v-if="isCrawling" class="crawl-loading">
+            <div class="crawl-progress">
+              <div class="crawl-step" v-for="(step, i) in crawlSteps" :key="i" :class="{ active: i === crawlStepIndex, done: i < crawlStepIndex }">
+                <span class="step-icon">{{ i < crawlStepIndex ? '✓' : (i === crawlStepIndex ? '⟳' : '○') }}</span>
+                <span>{{ step }}</span>
+              </div>
+            </div>
+          </div>
         </div>
       </div>
     </div>
@@ -183,13 +226,14 @@
             <el-button size="small" text @click="insertTemplate('总结')">📋 总结要点</el-button>
             <el-button size="small" text @click="insertTemplate('举例')">🌰 举例说明</el-button>
             <el-button size="small" text @click="insertTemplate('练习')">✍️ 生成练习</el-button>
+            <el-button size="small" text @click="insertTemplate('搜索')" class="crawl-hint-btn">🌐 联网搜索</el-button>
           </div>
           <div class="input-row">
             <el-input
               v-model="inputMessage"
               type="textarea"
               :rows="3"
-              placeholder="输入您的问题，支持 Markdown 和 LaTeX 公式..."
+              placeholder="输入问题，或用 /搜索 关键词 触发互联网爬取..."
               @keydown.enter.ctrl="sendMessage"
               @keydown.enter.meta="sendMessage"
             />
@@ -204,7 +248,7 @@
             </el-button>
           </div>
           <div class="input-hint">
-            <span>💡 提示：Ctrl+Enter 快速发送 | 支持 LaTeX: $E=mc^2$ | 支持代码块</span>
+            <span>💡 Ctrl+Enter 发送 | /搜索 关键词 触发联网爬取 | 支持 LaTeX: $E=mc^2$</span>
           </div>
         </div>
       </div>
@@ -214,6 +258,7 @@
 
 <script setup>
 import { ref, onMounted, nextTick, watch } from 'vue'
+import { useRoute } from 'vue-router'
 import { marked } from 'marked'
 import DOMPurify from 'dompurify'
 import { ElMessage } from 'element-plus'
@@ -221,6 +266,8 @@ import { openTutorSSE } from '../api/sse'
 import KnowledgeMap from './KnowledgeMap.vue'
 import QuizComponent from './QuizComponent.vue'
 import axios from 'axios'
+
+const route = useRoute()
 
 // ==================== 分屏拖拽逻辑 ====================
 const leftWidth = ref(50) // 左侧宽度百分比
@@ -259,7 +306,7 @@ const stopDrag = () => {
 }
 
 // ==================== 资源预览逻辑 ====================
-const resourceType = ref('pdf') // pdf | video | doc | mindmap | quiz
+const resourceType = ref('pdf') // pdf | video | doc | mindmap | quiz | webcrawl
 const pdfUrl = ref('')
 const videoUrl = ref('')
 const docContent = ref('')
@@ -267,8 +314,55 @@ const currentPage = ref(1)
 const totalPages = ref(10)
 const knowledgeMapData = ref(null)
 const isGeneratingMap = ref(false)
-const currentDocumentId = ref(null) // 当前文档ID（用于生成知识图谱和测验）
-const currentStudentId = ref(1) // 当前学生ID（实际应从登录状态获取）
+const currentDocumentId = ref(null)
+const currentStudentId = ref(1)
+
+// ==================== 互联网爬取逻辑 ====================
+const crawlQuery = ref('')
+const crawlResult = ref(null)
+const isCrawling = ref(false)
+const crawlStepIndex = ref(0)
+const crawlSteps = ['正在连接知识源...', '爬取 Wikipedia 百科...', '聚合公开学习资源...', '整理并格式化结果...']
+
+const startCrawl = async () => {
+  if (!crawlQuery.value.trim() || isCrawling.value) return
+  isCrawling.value = true
+  crawlResult.value = null
+  crawlStepIndex.value = 0
+
+  // 模拟步骤进度
+  const stepTimer = setInterval(() => {
+    if (crawlStepIndex.value < crawlSteps.length - 1) {
+      crawlStepIndex.value++
+    }
+  }, 900)
+
+  try {
+    const token = localStorage.getItem('sp_token')
+    const response = await axios.post('/api/crawl/search',
+      { query: crawlQuery.value },
+      { headers: { Authorization: `Bearer ${token}` } }
+    )
+    if (response.data.success) {
+      crawlResult.value = response.data.data
+      ElMessage.success('互联网知识爬取完成')
+    } else {
+      ElMessage.error(response.data.message || '爬取失败')
+    }
+  } catch (e) {
+    ElMessage.error('爬取失败：' + (e.response?.data?.message || e.message))
+  } finally {
+    clearInterval(stepTimer)
+    isCrawling.value = false
+  }
+}
+
+// 从 AI 对话触发爬取（识别 /搜索 指令）
+const triggerCrawlFromChat = (query) => {
+  crawlQuery.value = query
+  switchResourceType('webcrawl')
+  startCrawl()
+}
 
 const switchResourceType = (type) => {
   resourceType.value = type
@@ -310,7 +404,7 @@ const generateKnowledgeMap = async () => {
       includeDetails: true
     })
 
-    if (response.data.code === 200) {
+    if (response.data.success) {
       knowledgeMapData.value = response.data.data
       ElMessage.success('知识图谱生成成功！')
     } else {
@@ -325,6 +419,12 @@ const generateKnowledgeMap = async () => {
 }
 
 // ==================== AI对话逻辑 ====================
+// 获取当前时间
+const getCurrentTime = () => {
+  const now = new Date()
+  return `${now.getHours().toString().padStart(2, '0')}:${now.getMinutes().toString().padStart(2, '0')}`
+}
+
 const messages = ref([
   {
     role: 'assistant',
@@ -378,19 +478,42 @@ const renderMarkdown = (text) => {
 // 初始化第一条消息的 HTML
 onMounted(() => {
   messages.value[0].html = renderMarkdown(messages.value[0].text)
-})
 
-// 获取当前时间
-const getCurrentTime = () => {
-  const now = new Date()
-  return `${now.getHours().toString().padStart(2, '0')}:${now.getMinutes().toString().padStart(2, '0')}`
-}
+  // 检查 URL 参数，如果有 q 参数则自动提问
+  const queryQuestion = route.query.q
+  if (queryQuestion) {
+    inputMessage.value = queryQuestion
+    nextTick(() => {
+      sendMessage()
+    })
+  }
+})
 
 // 发送消息
 const sendMessage = async () => {
   if (!inputMessage.value.trim() || isLoading.value) return
 
   const userMessage = inputMessage.value.trim()
+
+  // 识别 /搜索 指令，触发爬取智能体
+  const crawlMatch = userMessage.match(/^[\/／]搜索\s+(.+)/)
+  if (crawlMatch) {
+    inputMessage.value = ''
+    messages.value.push({ role: 'user', text: userMessage, timestamp: getCurrentTime() })
+    const keyword = crawlMatch[1].trim()
+    const noticeMsg = {
+      role: 'assistant',
+      text: `已触发互联网爬取，正在搜索「${keyword}」相关知识，结果已显示在左侧联网搜索面板...`,
+      html: '',
+      citations: [],
+      timestamp: getCurrentTime()
+    }
+    messages.value.push(noticeMsg)
+    noticeMsg.html = renderMarkdown(noticeMsg.text)
+    scrollToBottom()
+    triggerCrawlFromChat(keyword)
+    return
+  }
 
   // 添加用户消息
   messages.value.push({
@@ -446,6 +569,8 @@ const sendMessage = async () => {
       onDone() {
         isLoading.value = false
         scrollToBottom()
+        // 保存问答历史到数据库
+        saveQaHistory(userMessage, accumulatedText)
       },
       onError(error) {
         isLoading.value = false
@@ -458,6 +583,25 @@ const sendMessage = async () => {
       }
     }
   )
+}
+
+// 保存问答历史到数据库
+const saveQaHistory = async (question, answer) => {
+  try {
+    const token = localStorage.getItem('sp_token')
+    // 生成摘要（取问题前30字）
+    const summary = question.length > 30 ? question.substring(0, 30) + '...' : question
+    await axios.post('/api/qa/save', {
+      question,
+      answer,
+      summary,
+      sessionId: Date.now().toString()
+    }, {
+      headers: { Authorization: `Bearer ${token}` }
+    })
+  } catch (e) {
+    console.warn('Failed to save QA history:', e)
+  }
 }
 
 // 滚动到底部
@@ -475,7 +619,8 @@ const insertTemplate = (type) => {
     '解释': '请详细解释一下：',
     '总结': '请总结以下内容的要点：',
     '举例': '请举例说明：',
-    '练习': '请根据以下内容生成练习题：'
+    '练习': '请根据以下内容生成练习题：',
+    '搜索': '/搜索 '
   }
   inputMessage.value = templates[type] || ''
 }
@@ -717,6 +862,189 @@ const handleCitationClick = (citation) => {
   height: 100%;
   overflow: hidden;
 }
+
+/* ==================== 互联网爬取面板 ==================== */
+.webcrawl-viewer {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  overflow: hidden;
+}
+
+.crawl-search-bar {
+  display: flex;
+  gap: $spacing-sm;
+  padding: $spacing-md $spacing-lg;
+  border-bottom: 1px solid $border-light;
+  background: linear-gradient(135deg, #fffbe6 0%, #fff7e0 100%);
+
+  .crawl-input {
+    flex: 1;
+  }
+}
+
+.crawl-result {
+  flex: 1;
+  overflow-y: auto;
+  padding: $spacing-lg;
+}
+
+.crawl-meta {
+  display: flex;
+  align-items: center;
+  gap: $spacing-sm;
+  margin-bottom: $spacing-md;
+  padding: $spacing-sm $spacing-md;
+  background: linear-gradient(135deg, rgba(245, 158, 11, 0.08), rgba(251, 191, 36, 0.06));
+  border-radius: $radius-base;
+  border-left: 3px solid #f59e0b;
+}
+
+.crawl-badge {
+  font-size: $font-size-sm;
+  font-weight: $font-weight-semibold;
+  color: #92400e;
+  background: rgba(245, 158, 11, 0.15);
+  padding: 2px 10px;
+  border-radius: $radius-large;
+}
+
+.crawl-confidence {
+  font-size: $font-size-xs;
+  color: #b45309;
+  margin-left: auto;
+}
+
+.crawl-content {
+  line-height: 1.8;
+  color: $text-regular;
+  font-size: $font-size-base;
+
+  :deep(h1), :deep(h2), :deep(h3) {
+    color: $text-primary;
+    margin: $spacing-md 0 $spacing-sm 0;
+    font-weight: $font-weight-semibold;
+  }
+
+  :deep(table) {
+    width: 100%;
+    border-collapse: collapse;
+    margin: $spacing-sm 0;
+    font-size: $font-size-sm;
+
+    th {
+      background: $bg-lighter;
+      padding: $spacing-xs $spacing-sm;
+      border: 1px solid $border-light;
+      text-align: left;
+      font-weight: $font-weight-semibold;
+    }
+
+    td {
+      padding: $spacing-xs $spacing-sm;
+      border: 1px solid $border-light;
+
+      a { color: $primary-color; text-decoration: none; }
+      a:hover { text-decoration: underline; }
+    }
+
+    tr:nth-child(even) td { background: $bg-lighter; }
+  }
+
+  :deep(blockquote) {
+    border-left: 3px solid $warning-color;
+    margin: $spacing-sm 0;
+    padding: $spacing-xs $spacing-md;
+    background: #fffbe6;
+    color: #7c4f00;
+    border-radius: 0 $radius-base $radius-base 0;
+    font-size: $font-size-sm;
+  }
+
+  :deep(a) { color: $primary-color; }
+}
+
+.crawl-links {
+  margin-top: $spacing-lg;
+  padding: $spacing-md;
+  background: $bg-lighter;
+  border-radius: $radius-base;
+}
+
+.crawl-links-title {
+  font-size: $font-size-sm;
+  font-weight: $font-weight-semibold;
+  color: $text-secondary;
+  margin-bottom: $spacing-sm;
+}
+
+.crawl-link-item {
+  display: block;
+  font-size: $font-size-xs;
+  color: $primary-color;
+  padding: 4px 0;
+  word-break: break-all;
+  text-decoration: none;
+
+  &:hover { text-decoration: underline; }
+  &::before { content: '🔗 '; }
+}
+
+.crawl-loading {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: $spacing-xl;
+}
+
+.crawl-progress {
+  display: flex;
+  flex-direction: column;
+  gap: $spacing-md;
+  min-width: 260px;
+}
+
+.crawl-step {
+  display: flex;
+  align-items: center;
+  gap: $spacing-sm;
+  padding: $spacing-sm $spacing-md;
+  border-radius: $radius-base;
+  font-size: $font-size-sm;
+  color: $text-secondary;
+  background: $bg-lighter;
+  transition: all 0.3s ease;
+
+  &.active {
+    background: linear-gradient(135deg, rgba(245, 158, 11, 0.1), rgba(251, 191, 36, 0.08));
+    color: #92400e;
+    font-weight: $font-weight-semibold;
+
+    .step-icon { animation: spin 1s linear infinite; }
+  }
+
+  &.done {
+    background: linear-gradient(135deg, rgba(16, 185, 129, 0.08), rgba(52, 211, 153, 0.06));
+    color: #065f46;
+
+    .step-icon { color: #10b981; }
+  }
+
+  .step-icon {
+    width: 20px;
+    text-align: center;
+    font-size: $font-size-md;
+  }
+}
+
+@keyframes spin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+.crawl-tab-btn { font-weight: $font-weight-semibold; }
+.crawl-hint-btn { color: #f59e0b !important; }
 
 .hint-text {
   font-size: $font-size-xs;

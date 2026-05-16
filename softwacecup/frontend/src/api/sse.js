@@ -45,6 +45,7 @@ export const openTutorSSE = ({ question, context = '', answerMode = '' }, handle
           if (event === 'meta' && handlers.onMeta) handlers.onMeta(payload)
           if (event === 'done' && handlers.onDone) handlers.onDone(payload)
           if (event === 'error' && handlers.onError) handlers.onError(new Error(payload))
+          if (event === 'citations' && handlers.onCitations) { try { handlers.onCitations(JSON.parse(payload)) } catch(e) { handlers.onCitations(payload) } }
         }
       }
       handlers.onClose && handlers.onClose()

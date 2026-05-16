@@ -11,6 +11,33 @@
       </div>
     </section>
 
+    <!-- 考前版图覆盖度检测 -->
+    <section class="map-check-panel panel">
+      <div class="mc-header">
+        <span class="mc-title">🗺️ 考前版图覆盖度检测</span>
+        <span class="mc-hint">点击未覆盖领域前往补习</span>
+      </div>
+      <div class="mc-body">
+        <div class="mc-domains">
+          <div
+            v-for="d in KNOWLEDGE_DOMAINS"
+            :key="d.id"
+            :class="['mc-cell', kmStore.getDomainStatus(d.id)]"
+            @click="kmStore.getDomainStatus(d.id) === 'fog' && $router.push('/student/courses')"
+          >
+            <span class="mc-icon">{{ d.icon }}</span>
+            <span class="mc-name">{{ d.domain }}</span>
+            <span class="mc-status-dot" :class="kmStore.getDomainStatus(d.id)"></span>
+          </div>
+        </div>
+        <div class="mc-summary">
+          <div class="mc-count">{{ kmStore.litCount + kmStore.activeCount }}/{{ KNOWLEDGE_DOMAINS.length }}</div>
+          <div class="mc-label">领域已覆盖</div>
+          <button class="mc-fix-btn" @click="$router.push('/student/workspace')">查漏补缺</button>
+        </div>
+      </div>
+    </section>
+
     <!-- Exam List -->
     <section class="exam-list-panel panel">
       <el-table :data="filteredExams" stripe @row-click="viewExamDetail">
@@ -26,13 +53,23 @@
         </el-table-column>
         <el-table-column prop="score" label="考试满分" width="90" align="center" />
         <el-table-column prop="submitted" label="及格线" width="80" align="center" />
-        <el-table-column label="操作" width="140" align="center" fixed="right">
+        <el-table-column label="操作" width="160" align="center" fixed="right">
           <template #default="{ row }">
-            <el-button link type="primary" size="small" :disabled="row.status !== 'active'" @click.stop="startExam(row)">开始考试</el-button>
-            <el-button link type="primary" size="small" @click.stop="viewExamResult(row)">查看成绩</el-button>
+            <el-button class="exam-btn" size="small" :disabled="row.status !== 'active'" @click.stop="startExam(row)">开始考试</el-button>
+            <el-button class="exam-btn" size="small" @click.stop="viewExamResult(row)">查看成绩</el-button>
           </template>
         </el-table-column>
       </el-table>
+    </section>
+
+    <!-- 错题回流提示 -->
+    <section class="wrong-flow-panel panel">
+      <span class="wf-icon">🔄</span>
+      <div class="wf-info">
+        <div class="wf-title">错题回流机制</div>
+        <div class="wf-desc">考试结束后，错题自动归档到学习工坊的「错题研习档案」，帮助你针对性复习</div>
+      </div>
+      <button class="wf-btn" @click="$router.push('/student/workspace')">查看错题档案 →</button>
     </section>
 
     <!-- ====== Exam Taking Modal ====== -->
@@ -118,13 +155,32 @@
       </div>
     </transition>
     </Teleport>
+
+    <!-- Score Modal -->
+    <el-dialog v-model="showScoreModal" :title="`${scoreModalTitle} - 成绩记录`" width="600px">
+      <div v-if="scoreLoading" style="text-align:center;padding:20px">加载中...</div>
+      <div v-else-if="scoreRecords.length === 0" style="text-align:center;padding:20px;color:#94a3b8">暂无成绩记录</div>
+      <el-table v-else :data="scoreRecords" stripe>
+        <el-table-column prop="recordId" label="记录ID" width="80" />
+        <el-table-column prop="score" label="得分" width="80" align="center">
+          <template #default="{ row }"><strong style="color:#3b82f6">{{ row.score }}</strong></template>
+        </el-table-column>
+        <el-table-column prop="review" label="评语" min-width="160" />
+        <el-table-column prop="submittedAt" label="提交时间" width="160">
+          <template #default="{ row }">{{ row.submittedAt?.slice(0,16) }}</template>
+        </el-table-column>
+      </el-table>
+    </el-dialog>
   </div>
 </template>
 
 <script setup>
-import { ref, computed, reactive, onBeforeUnmount, watch, nextTick } from 'vue'
+import { ref, computed, reactive, onBeforeUnmount, onMounted, watch } from 'vue'
 import { ElMessage, ElMessageBox } from 'element-plus'
-import { apiExamList, apiSubmitExam } from '../../api'
+import { apiExamList, apiSubmitExam, apiExamRecords } from '../../api'
+import { useKnowledgeMapStore, KNOWLEDGE_DOMAINS } from '../../stores/knowledgeMap'
+
+const kmStore = useKnowledgeMapStore()
 
 const filterStatus = ref('')
 const searchKeyword = ref('')
@@ -142,7 +198,7 @@ const timeLeft = ref(3600) // 1 hour in seconds
 const elapsedTime = ref(0)
 let timerInterval = null
 
-// Mock exams
+// Mock exams - will be replaced by real data when API returns
 const allExams = ref([
   { id: 1, category: '', name: '预习练习', type: '练习', status: 'active', score: 36, submitted: 24 },
   { id: 2, category: '', name: '课堂练习', type: '考试', status: 'pending', score: 36, submitted: 21 },
@@ -281,8 +337,29 @@ function saveDraft() {
 }
 
 function viewExamResult(row) {
-  ElMessage.info(`查看 ${row.name} 的成绩详情`)
-  // Could navigate to a result page or show modal
+  showScoreModal.value = true
+  scoreModalTitle.value = row.name
+  scoreRecords.value = []
+  loadScoreRecords(row.id)
+}
+
+const showScoreModal = ref(false)
+const scoreModalTitle = ref('')
+const scoreRecords = ref([])
+const scoreLoading = ref(false)
+
+async function loadScoreRecords(examId) {
+  scoreLoading.value = true
+  try {
+    const res = await apiExamRecords()
+    if (res.data.success) {
+      scoreRecords.value = (res.data.data || []).filter(r => r.examId === examId)
+    }
+  } catch(e) {
+    ElMessage.warning('暂无成绩记录')
+  } finally {
+    scoreLoading.value = false
+  }
 }
 
 function formatTime(seconds) {
@@ -292,6 +369,25 @@ function formatTime(seconds) {
 }
 
 onBeforeUnmount(() => { stopTimer() })
+
+onMounted(async () => {
+  try {
+    const res = await apiExamList('student')
+    if (res.data.success && res.data.data?.length > 0) {
+      allExams.value = res.data.data.map(e => ({
+        id: e.examId,
+        category: e.course || '',
+        name: e.examName,
+        type: e.topic || '考试',
+        status: e.status === '已发布' ? 'active' : 'pending',
+        score: e.questionCount || 0,
+        submitted: 0
+      }))
+    }
+  } catch(e) {
+    console.warn('Failed to load exam list, using mock data')
+  }
+})
 
 watch(showExamModal, (val) => {
   if (!val) { stopTimer(); resetExam() }
@@ -307,6 +403,60 @@ watch(showExamModal, (val) => {
 .tb-right { display: flex; gap: 8px; align-items: center; }
 
 .exam-list-panel { overflow: hidden; }
+
+/* 版图覆盖检测 */
+.map-check-panel {
+  background: rgba(6,182,212,0.05);
+  border: 1px solid rgba(6,182,212,0.2);
+  border-radius: 12px;
+  padding: 14px 16px;
+  .mc-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px; }
+  .mc-title { font-size: 14px; font-weight: 600; color: #06b6d4; }
+  .mc-hint { font-size: 11px; color: #94a3b8; }
+  .mc-body { display: flex; align-items: center; gap: 16px; }
+  .mc-domains { display: flex; gap: 8px; flex: 1; flex-wrap: wrap; }
+  .mc-cell {
+    display: flex; flex-direction: column; align-items: center; gap: 4px;
+    padding: 8px 10px; border-radius: 8px; border: 1px solid rgba(255,255,255,0.1);
+    background: rgba(255,255,255,0.04); cursor: pointer; transition: all 0.2s; min-width: 60px;
+    &.lit { background: rgba(16,185,129,0.1); border-color: rgba(16,185,129,0.3); }
+    &.active { background: rgba(59,130,246,0.1); border-color: rgba(59,130,246,0.3); }
+    &.fog { opacity: 0.5; cursor: pointer; &:hover { opacity: 0.8; } }
+    .mc-icon { font-size: 18px; }
+    .mc-name { font-size: 10px; color: #94a3b8; }
+    .mc-status-dot {
+      width: 6px; height: 6px; border-radius: 50%;
+      &.lit { background: #10b981; }
+      &.active { background: #3b82f6; }
+      &.fog { background: rgba(255,255,255,0.2); }
+    }
+  }
+  .mc-summary { text-align: center; flex-shrink: 0; }
+  .mc-count { font-size: 24px; font-weight: 700; color: #06b6d4; }
+  .mc-label { font-size: 11px; color: #94a3b8; margin-bottom: 8px; }
+  .mc-fix-btn {
+    padding: 5px 12px; border-radius: 6px; font-size: 12px;
+    background: linear-gradient(135deg, #3b82f6, #06b6d4);
+    border: none; color: #fff; cursor: pointer;
+  }
+}
+
+/* 错题回流 */
+.wrong-flow-panel {
+  display: flex; align-items: center; gap: 12px;
+  background: rgba(245,158,11,0.05); border: 1px solid rgba(245,158,11,0.2);
+  border-radius: 12px; padding: 12px 16px;
+  .wf-icon { font-size: 20px; flex-shrink: 0; }
+  .wf-info { flex: 1; }
+  .wf-title { font-size: 13px; font-weight: 600; color: #f59e0b; }
+  .wf-desc { font-size: 12px; color: #94a3b8; margin-top: 2px; }
+  .wf-btn {
+    padding: 6px 14px; border-radius: 8px; font-size: 12px;
+    background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.12);
+    color: #e2e8f0; cursor: pointer; white-space: nowrap;
+    &:hover { background: rgba(255,255,255,0.1); }
+  }
+}
 
 /* Modal */
 .exam-modal-overlay {
@@ -379,6 +529,23 @@ watch(showExamModal, (val) => {
 .status-dot.active { background: #22c55e; box-shadow: 0 0 0 3px rgba(34,197,94,.25); }
 .status-dot.pending { background: #94a3b8; }
 .status-dot.finished { background: #059669; }
+
+.exam-btn {
+  background: #fff;
+  color: #3b82f6;
+  border: 1px solid #3b82f6;
+  border-radius: 6px;
+  transition: all .15s ease;
+  margin: 2px;
+}
+.exam-btn:hover:not(:disabled) {
+  background: #3b82f6;
+  color: #fff;
+}
+.exam-btn:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
 
 @media(max-width:600px){ .exam-header-bar{flex-direction:column;gap:8px;} .exam-timer strong{font-size:22px;} }
 </style>

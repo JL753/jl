@@ -27,10 +27,31 @@ public class DashboardServiceImpl implements DashboardService {
   private final ExamQuestionMapper examQuestionMapper;
   private final ExamRecordMapper examRecordMapper;
   private final WrongQuestionMapper wrongQuestionMapper;
+  private final LearningActivityMapper learningActivityMapper;
+  private final TaskCompletionMapper taskCompletionMapper;
   private final ObjectMapper objectMapper;
+  private final StudentAbilityMapper studentAbilityMapper;
 
   @Override public DashboardStats teacherDashboard() { return stats("教师端总览", countUsers("teacher"), countUsers("student")); }
-  @Override public DashboardStats studentDashboard(Long userId) { return stats(txt(profileService.summary(userId).get("course")), examRecords(userId).size(), wrongQuestions(userId).size()); }
+  @Override public DashboardStats studentDashboard(Long userId) {
+    DashboardStats base = stats(txt(profileService.summary(userId).get("course")), examRecords(userId).size(), wrongQuestions(userId).size());
+    // 从 sp_student_ability 加载六维能力数据
+    StudentAbility ability = studentAbilityMapper.selectOne(
+      new LambdaQueryWrapper<StudentAbility>().eq(StudentAbility::getUserId, userId).orderByDesc(StudentAbility::getEvaluatedAt).last("LIMIT 1")
+    );
+    if (ability != null) {
+      List<Map<String,Object>> radar = List.of(
+        row("name","知识广度","max",100,"value",nz(ability.getBreadthScore())),
+        row("name","知识深度","max",100,"value",nz(ability.getDepthScore())),
+        row("name","解题能力","max",100,"value",nz(ability.getProblemScore())),
+        row("name","学习活跃度","max",100,"value",nz(ability.getActivityScore())),
+        row("name","知识迁移","max",100,"value",nz(ability.getTransferScore())),
+        row("name","学习韧性","max",100,"value",nz(ability.getResilienceScore()))
+      );
+      base.setRadar(radar);
+    }
+    return base;
+  }
   @Override public Map<String,Object> teacherWorkspace() { return row("courseCards", List.of(row("title","智能备课助手","desc","支持 AI 问答与备课"), row("title","考试管理","desc","支持出题与批改")), "pendingTasks", List.of("教师账号数："+countUsers("teacher"), "学生账号数："+countUsers("student"), "考试数："+examMapper.selectCount(new LambdaQueryWrapper<>()))); }
   @Override public Map<String,Object> studentWorkspace(Long userId) { return row("courseSchedule", List.of(row("time","08:00-08:45","name",txt(profileService.summary(userId).get("course"))), row("time","13:55-14:40","name","在线考试训练")), "assistantTabs", List.of("智能问答","资源推荐"), "examInfo", List.of(row("title","阶段测试","count",examList(userId,"student").size()), row("title","考试记录","count",examRecords(userId).size()))); }
   @Override public Map<String,Object> datacenterScreen() { return row("schoolStats", List.of(row("label","学生人数","value",countUsers("student")+"名"), row("label","教师人数","value",countUsers("teacher")+"名"), row("label","课程文档","value",countDocs()+"份"), row("label","平台状态","value","运行中"))); }
@@ -216,5 +237,42 @@ public class DashboardServiceImpl implements DashboardService {
   private String toJson(Object value) {
     try { return objectMapper.writeValueAsString(value); }
     catch (Exception e) { return "{}"; }
+  }
+
+  @Override
+  public List<Map<String, Object>> learningActivityTrend(Long userId) {
+    LocalDate endDate = LocalDate.now();
+    LocalDate startDate = endDate.minusDays(6);
+    List<LearningActivity> activities = learningActivityMapper.selectList(
+      new LambdaQueryWrapper<LearningActivity>()
+        .eq(LearningActivity::getUserId, userId)
+        .between(LearningActivity::getActivityDate, startDate, endDate)
+        .orderByAsc(LearningActivity::getActivityDate)
+    );
+    Map<LocalDate, Integer> activityMap = activities.stream()
+      .collect(Collectors.toMap(LearningActivity::getActivityDate, LearningActivity::getActivityScore));
+    List<Map<String, Object>> result = new ArrayList<>();
+    for (int i = 0; i < 7; i++) {
+      LocalDate date = startDate.plusDays(i);
+      result.add(row("date", date.toString(), "score", activityMap.getOrDefault(date, 0)));
+    }
+    return result;
+  }
+
+  @Override
+  public List<Map<String, Object>> weeklyTaskCompletion(Long userId) {
+    LocalDate today = LocalDate.now();
+    LocalDate weekStart = today.minusDays(today.getDayOfWeek().getValue() - 1);
+    return taskCompletionMapper.selectList(
+      new LambdaQueryWrapper<TaskCompletion>()
+        .eq(TaskCompletion::getUserId, userId)
+        .eq(TaskCompletion::getWeekStartDate, weekStart)
+        .orderByAsc(TaskCompletion::getTaskType)
+    ).stream().map(t -> row(
+      "taskType", txt(t.getTaskType()),
+      "completionRate", nz(t.getCompletionRate()),
+      "totalCount", nz(t.getTotalCount()),
+      "completedCount", nz(t.getCompletedCount())
+    )).toList();
   }
 }

@@ -1,44 +1,74 @@
 import { defineStore } from 'pinia'
-import { apiLogin, apiMe, apiRegister, apiUpdateMe } from '../api/index.js'
+import { apiLogin, apiRegister, apiMe, apiUpdateMe } from '../api/index'
 
 export const useAuthStore = defineStore('auth', {
   state: () => ({
     token: localStorage.getItem('sp_token') || '',
-    user: null
+    user: null,
+    showLoginModal: false,
+    pendingRedirect: null
   }),
+
+  getters: {
+    isLoggedIn: (state) => !!state.token && !!state.user,
+    userRole: (state) => state.user?.role || null
+  },
+
   actions: {
     async login(form) {
-      const res = await apiLogin(form)
-      this.applyAuth(res.data)
+      const data = await apiLogin(form)
+      this.applyAuth(data)
     },
+
     async register(form) {
-      const res = await apiRegister(form)
-      this.applyAuth(res.data)
+      const data = await apiRegister(form)
+      this.applyAuth(data)
     },
+
     async fetchMe() {
-      if (!this.token) return
-      const res = await apiMe()
-      this.user = res.data
+      const data = await apiMe()
+      this.user = data.user || data
     },
+
     async updateMe(form) {
-      const res = await apiUpdateMe(form)
-      this.user = res.data
-      return res.data
+      const data = await apiUpdateMe(form)
+      this.user = data.user || data
     },
+
     logout() {
       this.token = ''
       this.user = null
       localStorage.removeItem('sp_token')
     },
+
     applyAuth(data) {
-      this.token = data.token
-      this.user = {
-        userId: data.userId,
-        username: data.username,
-        role: data.role,
-        displayName: data.displayName
+      const inner = data.data || data
+      const token = inner.token || data.token
+      let user = data.user || inner.user || null
+      // LoginResponse 是扁平结构 {token, userId, username, role, displayName}
+      if (!user && inner.username) {
+        user = {
+          id: inner.userId || inner.id,
+          username: inner.username,
+          role: inner.role,
+          displayName: inner.displayName || inner.username
+        }
       }
-      localStorage.setItem('sp_token', this.token)
+      if (token) {
+        this.token = token
+        localStorage.setItem('sp_token', token)
+        this.user = user
+      }
+    },
+
+    openLoginModal(redirectTo = null) {
+      this.pendingRedirect = redirectTo
+      this.showLoginModal = true
+    },
+
+    closeLoginModal() {
+      this.showLoginModal = false
+      this.pendingRedirect = null
     }
   }
 })

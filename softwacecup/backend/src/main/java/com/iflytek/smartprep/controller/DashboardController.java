@@ -115,4 +115,14 @@ public class DashboardController {
     public ApiResponse<Map<String, Object>> submitExam(@RequestBody ExamSubmitRequest request) {
         return ApiResponse.ok(dashboardService.submitExam(LoginUserHolder.get().getUserId(), request));
     }
+
+    @GetMapping("/learning-activity-trend")
+    public ApiResponse<List<Map<String, Object>>> learningActivityTrend() {
+        return ApiResponse.ok(dashboardService.learningActivityTrend(LoginUserHolder.get().getUserId()));
+    }
+
+    @GetMapping("/weekly-task-completion")
+    public ApiResponse<List<Map<String, Object>>> weeklyTaskCompletion() {
+        return ApiResponse.ok(dashboardService.weeklyTaskCompletion(LoginUserHolder.get().getUserId()));
+    }
 }

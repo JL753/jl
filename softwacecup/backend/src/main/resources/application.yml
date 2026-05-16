@@ -27,13 +27,13 @@ mybatis-plus:
 
 smartprep:
   jwt:
-    secret: ${JWT_SECRET:smartprep-super-secret-key-change-in-prod-smartprep}
+    secret: ${JWT_SECRET:please-set-JWT_SECRET-env-var-before-production}
     expire-hours: ${JWT_EXPIRE_HOURS:24}
   safety:
     blocked-words: ${BLOCKED_WORDS:作弊,违法,恐怖,色情,暴力}
   llm:
-    api-key: ${LLM_API_KEY:b896a4c26ecb57516c684f3046dbc8ec:MzNhMDk2MjU1ODQ4MTk0ZWIzNTE3YWFl}
-    base-url: ${LLM_BASE_URL:https://maas-coding-api.cn-huabei-1.xf-yun.com/v2}
-    model: ${LLM_MODEL:astron-code-latest}
+    api-key: ${LLM_API_KEY:YOUR_DEEPSEEK_API_KEY}
+    base-url: ${LLM_BASE_URL:https://api.deepseek.com/v1}
+    model: ${LLM_MODEL:deepseek-chat}
     temperature: ${LLM_TEMPERATURE:0.7}
     max-tokens: ${LLM_MAX_TOKENS:4096}

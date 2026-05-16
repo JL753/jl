@@ -5,9 +5,7 @@ import path from 'path'
 export default defineConfig({
   plugins: [vue()],
   resolve: {
-    alias: {
-      '@': path.resolve(__dirname, './src')
-    }
+    alias: { '@': path.resolve(__dirname, './src') }
   },
   css: {
     preprocessorOptions: {
@@ -20,7 +18,6 @@ export default defineConfig({
   server: {
     port: 5173,
     host: '0.0.0.0',
-    open: '/portal',
     proxy: {
       '/api': {
         target: 'http://localhost:8080',

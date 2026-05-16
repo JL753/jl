@@ -49,7 +49,7 @@ public class RAGController {
         @RequestParam(value = "tag", required = false, defaultValue = "基础") String tag
     ) {
         try {
-            Long userId = 1L;
+            Long userId = LoginUserHolder.get().getUserId();
             log.info("用户 {} 上传文档: {}, 课程: {}", userId, file.getOriginalFilename(), course);
 
             // 验证文件
@@ -100,6 +100,7 @@ public class RAGController {
      * }
      */
     @PostMapping("/search")
+    @RequireRole({"student", "teacher", "admin"})
     public ResponseEntity<ApiResponse<Map<String, Object>>> searchDocuments(
         @RequestBody Map<String, Object> request
     ) {
@@ -142,7 +143,7 @@ public class RAGController {
     @RequireRole({"teacher", "admin"})
     public ResponseEntity<ApiResponse<String>> deleteDocument(@PathVariable Long documentId) {
         try {
-            Long userId = 1L;
+            Long userId = LoginUserHolder.get().getUserId();
             log.info("用户 {} 删除文档: {}", userId, documentId);
 
             ragService.deleteDocument(documentId);
@@ -164,7 +165,7 @@ public class RAGController {
     @RequireRole({"admin"})
     public ResponseEntity<ApiResponse<String>> reindexAllDocuments() {
         try {
-            Long userId = 1L;
+            Long userId = LoginUserHolder.get().getUserId();
             log.info("用户 {} 触发重新索引", userId);
 
             ragService.reindexAllDocuments();

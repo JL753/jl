@@ -22,16 +22,23 @@ import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.Executor;
+import java.util.concurrent.Executors;
 
 @Service
 @RequiredArgsConstructor
 public class ResourceServiceImpl implements ResourceService {
+
+    private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(ResourceServiceImpl.class);
 
     private final List<Agent> agents;
     private final ProfileService profileService;
     private final LearningResourceMapper resourceMapper;
     private final KnowledgeDocMapper knowledgeDocMapper;
     private final ObjectMapper objectMapper;
+
+    private static final Executor AGENT_POOL = Executors.newFixedThreadPool(5);
 
     @Override
     public List<LearningResource> generate(Long userId, ResourceGenerateRequest request) {
@@ -42,14 +49,28 @@ public class ResourceServiceImpl implements ResourceService {
             profile = profileService.buildByDialogue(userId, fallback);
         }
 
+        final StudentProfile fp = profile;
+        List<CompletableFuture<LearningResource>> futures = agents.stream()
+                .map(agent -> CompletableFuture.supplyAsync(() -> {
+                    AgentResult result = agent.run(fp, request);
+                    if (request.getRequiredTypes() != null && !request.getRequiredTypes().isEmpty()
+                            && !request.getRequiredTypes().contains(result.getType())) {
+                        return null;
+                    }
+                    return saveResource(userId, fp, result);
+                }, AGENT_POOL))
+                .toList();
+
+        CompletableFuture.allOf(futures.toArray(new CompletableFuture[0])).join();
+
         List<LearningResource> out = new ArrayList<>();
-        for (Agent agent : agents) {
-            AgentResult probe = agent.run(profile, request);
-            if (request.getRequiredTypes() != null && !request.getRequiredTypes().isEmpty()
-                    && !request.getRequiredTypes().contains(probe.getType())) {
-                continue;
+        for (CompletableFuture<LearningResource> f : futures) {
+            try {
+                LearningResource res = f.get();
+                if (res != null) out.add(res);
+            } catch (Exception e) {
+                log.warn("Agent 执行失败，跳过该资源: {}", e.getMessage());
             }
-            out.add(saveResource(userId, profile, probe));
         }
         return out;
     }

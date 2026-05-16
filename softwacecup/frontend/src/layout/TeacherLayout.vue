@@ -1,61 +1,58 @@
 <template>
-  <div class="layout-shell teacher-theme">
-    <aside :class="['shell-sidebar', { collapsed }]">
-      <div class="brand-block">
-        <div class="brand-mark">教</div>
-        <transition name="fade-slide">
-          <div v-if="!collapsed" class="brand-copy">
-            <strong>智备优教</strong>
-            <span>Teacher Studio</span>
-            <p>教学设计、题库管理、考试组织与数据洞察一体化工作台</p>
-          </div>
-        </transition>
-      </div>
+  <div class="layout-root">
+    <!-- 壁纸选择弹窗 -->
+    <WallpaperModal
+      :visible="showWallpaperModal"
+      :initial-tab="'background'"
+      @close="showWallpaperModal = false"
+      @restore="showWallpaperModal = false"
+    />
 
-      <nav class="shell-nav">
-        <router-link v-for="item in navItems" :key="item.to" class="nav-link" :to="item.to">
+    <aside class="sidebar" :class="{ collapsed: sidebarCollapsed }">
+      <div class="sidebar-header">
+        <div class="logo-area" v-if="!sidebarCollapsed">
+          <span class="logo-icon">👨‍🏫</span>
+          <span class="logo-text">教师工作台</span>
+        </div>
+        <button class="collapse-btn" @click="sidebarCollapsed = !sidebarCollapsed">
+          <span>{{ sidebarCollapsed ? '›' : '‹' }}</span>
+        </button>
+      </div>
+      <nav class="sidebar-nav">
+        <router-link v-for="item in navItems" :key="item.path" :to="item.path"
+          class="nav-item" :title="sidebarCollapsed ? item.label : ''">
           <span class="nav-icon">{{ item.icon }}</span>
-          <transition name="fade-slide"><em v-if="!collapsed">{{ item.label }}</em></transition>
+          <span class="nav-label" v-if="!sidebarCollapsed">{{ item.label }}</span>
         </router-link>
       </nav>
-
-      <div v-if="!collapsed" class="sidebar-foot teacher-card">
-        <small>本周教学提醒</small>
-        <strong>可继续进行教案优化、题库补充与考试发布。</strong>
-        <p>建议优先检查资源库、组卷策略和班级考试进度。</p>
+      <div class="sidebar-footer" v-if="!sidebarCollapsed">
+        <div class="user-info">
+          <div class="avatar">{{ userInitial }}</div>
+          <div class="user-meta">
+            <div class="user-name">{{ auth.user?.username || '教师' }}</div>
+            <div class="user-role">教师</div>
+          </div>
+        </div>
+        <button class="logout-btn" @click="handleLogout">退出</button>
+      </div>
+      <div class="sidebar-footer-mini" v-else>
+        <button class="logout-btn-mini" @click="handleLogout" title="退出">⏻</button>
       </div>
     </aside>
-
-    <div class="shell-main">
-      <header class="shell-topbar panel">
+    <div class="main-area">
+      <header class="topbar">
         <div class="topbar-left">
-          <button class="icon-btn" type="button" @click="collapsed = !collapsed">☰</button>
-          <div>
-            <div class="crumb-text">教师端 / 智能教学工作台</div>
-            <strong>{{ auth.user?.displayName || '教师用户' }}</strong>
-          </div>
+          <h2 class="page-title">{{ currentPageTitle }}</h2>
         </div>
-
         <div class="topbar-right">
-          <div class="search-box">
-            <span>⌕</span>
-            <input placeholder="搜索课程、资源、试题、考试" />
-          </div>
-          <button class="icon-btn ghost" type="button">◔</button>
-          <button class="icon-btn ghost" type="button">⤢</button>
-          <button class="profile-chip" type="button" @click="router.push('/teacher/profile')">
-            <img v-if="auth.user?.avatarUrl" :src="auth.user.avatarUrl" alt="avatar" class="profile-avatar" />
-            <span v-else class="profile-avatar text-avatar">师</span>
-            <span class="profile-meta">
-              <strong>{{ auth.user?.username || 'teacher' }}</strong>
-              <small>教师账号</small>
-            </span>
+          <button class="btn-wallpaper" @click="showWallpaperModal = true" title="切换壁纸">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="m21 15-5-5L5 21"/></svg>
           </button>
-          <el-button type="danger" plain @click="logout">退出</el-button>
+          <span class="topbar-user">{{ auth.user?.username }}</span>
+          <span class="topbar-badge teacher">教师</span>
         </div>
       </header>
-
-      <main class="shell-content">
+      <main class="content-area">
         <router-view />
       </main>
     </div>
@@ -63,247 +60,89 @@
 </template>
 
 <script setup>
-import { onMounted, ref } from 'vue'
-import { useRouter } from 'vue-router'
+import { ref, computed } from 'vue'
+import { useRouter, useRoute } from 'vue-router'
 import { useAuthStore } from '../stores/auth'
+import WallpaperModal from '../components/WallpaperModal.vue'
 
 const auth = useAuthStore()
 const router = useRouter()
-const collapsed = ref(false)
+const route = useRoute()
+const sidebarCollapsed = ref(false)
+const showWallpaperModal = ref(false)
 
 const navItems = [
-  { to: '/teacher/dashboard', label: '首页', icon: '⌂' },
-  { to: '/teacher/assistant', label: '教学助手', icon: '★' },
-  { to: '/teacher/manage', label: '题库管理', icon: '▤' },
-  { to: '/teacher/exam', label: '考试管理', icon: '▣' },
-  { to: '/teacher/center', label: '数据中台', icon: '▥' },
-  { to: '/teacher/resources', label: '课程资源平台', icon: '⎘' },
-  { to: '/teacher/profile', label: '个人信息', icon: '◪' }
+  { path: '/teacher/dashboard',  icon: '🏠', label: '教师首页' },
+  { path: '/teacher/assistant',  icon: '🤖', label: 'AI 助教' },
+  { path: '/teacher/manage',     icon: '👥', label: '学生管理' },
+  { path: '/teacher/classes',    icon: '📚', label: '班级管理' },
+  { path: '/teacher/content',    icon: '📝', label: '内容管理' },
+  { path: '/teacher/review',     icon: '✅', label: 'AI 审核' },
+  { path: '/teacher/assignments',icon: '📋', label: '作业管理' },
+  { path: '/teacher/exam',       icon: '📋', label: '考试管理' },
+  { path: '/teacher/profile',    icon: '👤', label: '个人中心' },
 ]
 
-onMounted(async () => {
-  if (!auth.user && auth.token) {
-    await auth.fetchMe()
-  }
-})
+const titleMap = Object.fromEntries(navItems.map(i => [i.path, i.label]))
+const currentPageTitle = computed(() => titleMap[route.path] || '教师端')
+const userInitial = computed(() => (auth.user?.username || 'T')[0].toUpperCase())
 
-const logout = () => {
+function handleLogout() {
   auth.logout()
-  router.push('/login')
+  router.push('/')
 }
 </script>
 
-<style scoped lang="scss">
-.layout-shell {
-  display: grid;
-  grid-template-columns: auto 1fr;
-  min-height: 100vh;
-  background: $bg-page;
-  padding: $spacing-lg;
-  gap: $spacing-lg;
+<style scoped>
+.layout-root { display: flex; height: 100vh; width: 100vw; overflow: hidden; background: transparent; }
+.sidebar {
+  width: 220px; min-width: 220px; display: flex; flex-direction: column;
+  background: rgba(0,0,0,0.52); backdrop-filter: blur(18px); -webkit-backdrop-filter: blur(18px);
+  border-right: 1px solid rgba(255,255,255,0.08); transition: width 0.25s ease, min-width 0.25s ease; z-index: 10;
 }
-
-.shell-sidebar {
-  position: sticky;
-  top: 18px;
-  align-self: start;
-  width: 276px;
-  min-height: calc(100vh - 36px);
-  padding: 18px 16px;
-  border-radius: 28px;
-  background: linear-gradient(180deg, rgba(255,255,255,.98), rgba(248,250,255,.94));
-  border: 1px solid var(--panel-border);
-  box-shadow: var(--panel-shadow-soft);
-  display: flex;
-  flex-direction: column;
-  gap: 18px;
-  transition: width .28s ease;
-  
-  &.collapsed { width: 94px; }
+.sidebar.collapsed { width: 60px; min-width: 60px; }
+.sidebar-header { display: flex; align-items: center; justify-content: space-between; padding: 18px 14px 14px; border-bottom: 1px solid rgba(255,255,255,0.07); }
+.logo-area { display: flex; align-items: center; gap: 8px; }
+.logo-icon { font-size: 22px; }
+.logo-text { font-size: 15px; font-weight: 700; color: #e6edf3; letter-spacing: 1px; }
+.collapse-btn { background: rgba(255,255,255,0.08); border: none; border-radius: 6px; color: #8b949e; cursor: pointer; width: 28px; height: 28px; font-size: 16px; display: flex; align-items: center; justify-content: center; transition: background 0.2s; }
+.collapse-btn:hover { background: rgba(255,255,255,0.15); color: #e6edf3; }
+.sidebar-nav { flex: 1; overflow-y: auto; padding: 10px 8px; display: flex; flex-direction: column; gap: 2px; }
+.sidebar-nav::-webkit-scrollbar { width: 3px; }
+.sidebar-nav::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.15); border-radius: 2px; }
+.nav-item { display: flex; align-items: center; gap: 10px; padding: 9px 10px; border-radius: 8px; color: #8b949e; text-decoration: none; font-size: 13.5px; transition: all 0.18s; white-space: nowrap; overflow: hidden; }
+.nav-item:hover { background: rgba(255,255,255,0.08); color: #e6edf3; }
+.nav-item.router-link-active { background: rgba(63,185,80,0.18); color: #3fb950; border-left: 2px solid #3fb950; }
+.nav-icon { font-size: 16px; flex-shrink: 0; }
+.nav-label { font-size: 13px; }
+.sidebar-footer { padding: 12px 10px; border-top: 1px solid rgba(255,255,255,0.07); }
+.user-info { display: flex; align-items: center; gap: 8px; margin-bottom: 8px; }
+.avatar { width: 32px; height: 32px; border-radius: 50%; background: linear-gradient(135deg, #3fb950, #58a6ff); display: flex; align-items: center; justify-content: center; font-size: 14px; font-weight: 700; color: #fff; flex-shrink: 0; }
+.user-meta { overflow: hidden; }
+.user-name { font-size: 13px; color: #e6edf3; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.user-role { font-size: 11px; color: #3fb950; }
+.logout-btn { width: 100%; padding: 7px; border-radius: 7px; background: rgba(248,81,73,0.15); border: 1px solid rgba(248,81,73,0.3); color: #f85149; font-size: 12px; cursor: pointer; transition: all 0.2s; }
+.logout-btn:hover { background: rgba(248,81,73,0.28); }
+.sidebar-footer-mini { padding: 12px 8px; border-top: 1px solid rgba(255,255,255,0.07); display: flex; justify-content: center; }
+.logout-btn-mini { background: rgba(248,81,73,0.15); border: 1px solid rgba(248,81,73,0.3); color: #f85149; border-radius: 7px; width: 36px; height: 36px; font-size: 16px; cursor: pointer; transition: all 0.2s; }
+.logout-btn-mini:hover { background: rgba(248,81,73,0.28); }
+.main-area { flex: 1; display: flex; flex-direction: column; overflow: hidden; }
+.topbar { display: flex; align-items: center; justify-content: space-between; padding: 0 24px; height: 56px; flex-shrink: 0; background: rgba(0,0,0,0.38); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); border-bottom: 1px solid rgba(255,255,255,0.07); }
+.page-title { font-size: 16px; font-weight: 600; color: #e6edf3; margin: 0; }
+.topbar-right { display: flex; align-items: center; gap: 10px; }
+.topbar-user { font-size: 13px; color: #8b949e; }
+.btn-wallpaper {
+  display: flex; align-items: center; justify-content: center;
+  width: 32px; height: 32px; border-radius: 8px;
+  border: 1px solid rgba(255,255,255,0.1);
+  background: rgba(255,255,255,0.06);
+  color: rgba(255,255,255,0.5);
+  cursor: pointer; transition: all 0.2s;
 }
-
-.brand-block {
-  display: flex;
-  gap: 12px;
-  align-items: flex-start;
-  padding: 10px 8px 18px;
-  border-bottom: 1px solid #edf2f8;
-}
-
-.brand-mark {
-  width: 52px;
-  height: 52px;
-  border-radius: 18px;
-  display: grid;
-  place-items: center;
-  font-size: 20px;
-  font-weight: 800;
-  color: white;
-  background: linear-gradient(135deg, #4b82ff, #79b8ff);
-  box-shadow: 0 16px 30px rgba(75, 130, 255, .24);
-}
-
-.brand-copy {
-  strong { display: block; font-size: 28px; color: #2e65c7; }
-  span { display: block; color: #8ea0b8; font-size: 12px; letter-spacing: 1.4px; text-transform: uppercase; }
-  p { margin: 8px 0 0; color: #768aa3; line-height: 1.75; font-size: 12px; }
-}
-
-.shell-nav { display: grid; gap: 8px; }
-
-.nav-link {
-  min-height: 50px;
-  padding: 0 14px;
-  border-radius: 16px;
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  color: #4c607d;
-  text-decoration: none;
-  transition: all .22s ease;
-  
-  &:hover, &.router-link-active {
-    background: linear-gradient(90deg, #edf4ff, #ffffff 86%);
-    color: #407cf0;
-    box-shadow: inset 3px 0 0 #6ea6ff;
-  }
-}
-
-.nav-icon { width: 20px; text-align: center; }
-.nav-link em { font-style: normal; }
-
-.sidebar-foot {
-  margin-top: auto;
-  padding: 18px;
-  border-radius: 20px;
-  border: 1px solid #e5edfa;
-  background: linear-gradient(180deg, #f5f9ff, #fffdf6);
-  
-  small { color: #7d8faa; }
-  strong { display: block; margin-top: 10px; color: #34506f; line-height: 1.7; }
-  p { margin: 8px 0 0; color: #8c9db2; line-height: 1.8; font-size: 12px; }
-}
-
-.shell-main {
-  min-width: 0;
-  min-height: calc(100vh - 36px);
-  display: flex;
-  flex-direction: column;
-  gap: 18px;
-}
-
-.shell-topbar {
-  position: sticky;
-  top: 18px;
-  z-index: 12;
-  min-height: 82px;
-  padding: 16px 18px;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 16px;
-  background: rgba(255,255,255,.82);
-  backdrop-filter: blur(18px);
-}
-
-.topbar-left, .topbar-right { display: flex; align-items: center; gap: 12px; }
-.topbar-right { flex-wrap: wrap; justify-content: flex-end; }
-.crumb-text { margin-bottom: 4px; font-size: 12px; color: #97a7bb; }
-
-.search-box {
-  width: min(34vw, 340px);
-  min-width: 220px;
-  height: 44px;
-  border-radius: 999px;
-  padding: 0 14px;
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  background: #f7faff;
-  border: 1px solid #e6eef8;
-  color: #8da0b8;
-  
-  input {
-    width: 100%;
-    border: 0;
-    outline: 0;
-    background: transparent;
-    color: #536882;
-  }
-}
-
-.icon-btn {
-  width: 40px;
-  height: 40px;
-  border-radius: 13px;
-  border: 1px solid #e6edf7;
-  background: #f8fbff;
-  color: #7488a4;
-  cursor: pointer;
-  
-  &.ghost { background: rgba(248, 251, 255, .78); }
-}
-
-.profile-chip {
-  border: 1px solid #e7eef8;
-  background: #fbfdff;
-  border-radius: 999px;
-  padding: 6px 10px 6px 6px;
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  cursor: pointer;
-}
-
-.profile-meta { display: grid; text-align: left; }
-.profile-meta strong { color: #49607d; font-size: 13px; }
-.profile-meta small { color: #9aacbf; }
-
-.profile-avatar {
-  width: 38px;
-  height: 38px;
-  border-radius: 50%;
-  object-fit: cover;
-  background: linear-gradient(135deg, #e8f0ff, #dff8ff);
-}
-
-.text-avatar {
-  display: grid;
-  place-items: center;
-  color: #4876e6;
-  font-weight: 800;
-}
-
-.shell-content {
-  min-width: 0;
-  flex: 1;
-  padding-bottom: 20px;
-}
-
-.fade-slide-enter-active, .fade-slide-leave-active { transition: all .2s ease; }
-.fade-slide-enter-from, .fade-slide-leave-to { opacity: 0; transform: translateX(-6px); }
-
-@media (max-width: 1280px) {
-  .layout-shell { grid-template-columns: 1fr; }
-  .shell-sidebar {
-    position: relative;
-    top: 0;
-    width: 100%;
-    min-height: auto;
-    &.collapsed { width: 100%; }
-  }
-  .shell-topbar {
-    top: 12px;
-    flex-direction: column;
-    align-items: stretch;
-  }
-  .search-box { width: 100%; }
-}
-
-@media (max-width: 760px) {
-  .layout-shell { padding: 12px; gap: 12px; }
-  .shell-main { min-height: auto; }
-  .topbar-right { justify-content: stretch; }
-  .profile-chip { width: 100%; justify-content: center; }
-}
+.btn-wallpaper:hover { background: rgba(255,255,255,0.1); color: white; }
+.topbar-badge { font-size: 11px; padding: 2px 8px; border-radius: 10px; font-weight: 600; }
+.topbar-badge.teacher { background: rgba(63,185,80,0.18); color: #3fb950; border: 1px solid rgba(63,185,80,0.3); }
+.content-area { flex: 1; overflow-y: auto; padding: 24px; background: transparent; }
+.content-area::-webkit-scrollbar { width: 5px; }
+.content-area::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.12); border-radius: 3px; }
 </style>

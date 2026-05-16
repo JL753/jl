@@ -327,8 +327,8 @@ public class AdminController {
         if (exam == null) {
             return ApiResponse.fail("考试不存在");
         }
-        jdbcTemplate.execute("DELETE FROM sp_exam_question WHERE exam_id = " + id);
-        jdbcTemplate.execute("DELETE FROM sp_exam_record WHERE exam_id = " + id);
+        jdbcTemplate.update("DELETE FROM sp_exam_question WHERE exam_id = ?", id);
+        jdbcTemplate.update("DELETE FROM sp_exam_record WHERE exam_id = ?", id);
         examMapper.deleteById(id);
 
         logAction("删除考试", "考试#" + id, "删除考试: " + exam.getExamName());

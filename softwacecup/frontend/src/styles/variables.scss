@@ -1,81 +1,58 @@
-// ============================================
-// 全局设计系统变量 - 国家级一等奖视觉规范
-// ============================================
+// SCSS 变量 — 映射到 CSS 设计令牌
+$primary-color: var(--primary);
+$primary-light: var(--primary-light);
+$primary-lighter: rgba(59, 130, 246, 0.15);
+$primary-dark: var(--primary-deep);
+$success-color: var(--success);
+$warning-color: var(--warning);
+$danger-color: var(--danger);
 
-// ========== 配色方案 (Color Palette) ==========
-// 主色调
-$primary-color: #409EFF;
-$primary-light: #66b1ff;
-$primary-lighter: #a0cfff;
-$primary-dark: #337ecc;
+$bg-page: var(--bg-main);
+$bg-white: var(--bg-soft);
+$bg-light: var(--bg-alt);
+$bg-lighter: rgba(255, 255, 255, 0.04);
 
-// 辅助色 - 高饱和度
-$success-color: #67C23A;
-$warning-color: #E6A23C;
-$danger-color: #F56C6C;
-$info-color: #909399;
+$text-primary: var(--text-main);
+$text-regular: var(--text-sub);
+$text-secondary: var(--text-sub);
+$text-placeholder: var(--text-faint);
 
-// 状态色 - 用于仪表盘标签
-$status-orange: #FF9F43;
-$status-green: #28C76F;
-$status-purple: #9C27B0;
-$status-blue: #00BCD4;
+$border-base: var(--border-base);
+$border-light: var(--border-light);
+$border-extra-light: rgba(255, 255, 255, 0.08);
+$border-lighter: rgba(255, 255, 255, 0.05);
 
-// 背景色系
-$bg-page: #f5f7fa;
-$bg-white: #ffffff;
-$bg-light: #fafbfc;
-$bg-lighter: #f8f9fb;
+$radius-small: var(--radius-xs);
+$radius-base: var(--radius-sm);
+$radius-medium: var(--radius-md);
+$radius-large: var(--radius-lg);
+$radius-xlarge: var(--radius-xl);
+$radius-round: var(--radius-round);
 
-// 文字色系
-$text-primary: #303133;
-$text-regular: #606266;
-$text-secondary: #909399;
-$text-placeholder: #C0C4CC;
+$shadow-card: var(--shadow-soft);
+$shadow-card-hover: var(--shadow-card);
+$shadow-light: 0 2px 8px rgba(0, 0, 0, 0.3);
+$shadow-medium: 0 4px 16px rgba(0, 0, 0, 0.4);
+$shadow-heavy: 0 8px 32px rgba(0, 0, 0, 0.5);
 
-// 边框色系
-$border-base: #DCDFE6;
-$border-light: #E4E7ED;
-$border-lighter: #EBEEF5;
-$border-extra-light: #F2F6FC;
+$spacing-xs: var(--space-xs);
+$spacing-sm: var(--space-sm);
+$spacing-md: var(--space-md);
+$spacing-lg: var(--space-lg);
+$spacing-xl: var(--space-xl);
+$spacing-xxl: var(--space-2xl);
+$spacing-xxxl: var(--space-3xl);
 
-// ========== 圆角系统 (Border Radius) ==========
-$radius-small: 4px;
-$radius-base: 8px;
-$radius-medium: 12px;
-$radius-large: 16px;
-$radius-xlarge: 20px;
-$radius-round: 999px;
-
-// ========== 阴影系统 (Box Shadow) ==========
-// 极轻微的弥散阴影
-$shadow-card: 0 2px 12px 0 rgba(0, 0, 0, 0.05);
-$shadow-card-hover: 0 4px 16px 0 rgba(0, 0, 0, 0.08);
-$shadow-light: 0 2px 8px 0 rgba(0, 0, 0, 0.04);
-$shadow-medium: 0 4px 12px 0 rgba(0, 0, 0, 0.1);
-$shadow-heavy: 0 8px 24px 0 rgba(0, 0, 0, 0.12);
-
-// ========== 间距系统 (Spacing) ==========
-$spacing-xs: 8px;
-$spacing-sm: 12px;
-$spacing-md: 16px;
-$spacing-lg: 20px;
-$spacing-xl: 24px;
-$spacing-xxl: 32px;
-$spacing-xxxl: 48px;
-
-// ========== 字体系统 (Typography) ==========
-$font-family-base: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei', 'Helvetica Neue', Helvetica, Arial, sans-serif;
-$font-family-code: 'Fira Code', 'Consolas', 'Monaco', monospace;
-
-$font-size-xs: 12px;
-$font-size-sm: 13px;
-$font-size-base: 14px;
-$font-size-md: 15px;
-$font-size-lg: 16px;
-$font-size-xl: 18px;
-$font-size-xxl: 20px;
-$font-size-xxxl: 24px;
+$font-family-base: var(--font-family);
+$font-family-code: 'JetBrains Mono', 'Fira Code', 'Cascadia Code', monospace;
+$font-size-xs: var(--font-xs);
+$font-size-sm: var(--font-sm);
+$font-size-base: var(--font-base);
+$font-size-md: var(--font-md);
+$font-size-lg: var(--font-lg);
+$font-size-xl: var(--font-xl);
+$font-size-xxl: var(--font-2xl);
+$font-size-xxxl: var(--font-3xl);
 
 $font-weight-light: 300;
 $font-weight-normal: 400;
@@ -83,34 +60,23 @@ $font-weight-medium: 500;
 $font-weight-semibold: 600;
 $font-weight-bold: 700;
 
-// ========== 过渡动画 (Transitions) ==========
-$transition-fast: 0.15s ease;
-$transition-base: 0.2s ease;
-$transition-slow: 0.3s ease;
+$transition-fast: var(--transition-fast);
+$transition-base: var(--transition-base);
+$transition-slow: var(--transition-slow);
 
-// ========== 布局尺寸 (Layout) ==========
-$header-height: 64px;
-$sidebar-width: 240px;
-$sidebar-collapsed-width: 64px;
+$header-height: var(--topbar-height);
+$sidebar-width: var(--sidebar-width);
+$sidebar-collapsed-width: var(--sidebar-collapsed);
 
-// ========== 渐变色 (Gradients) ==========
-$gradient-primary: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-$gradient-success: linear-gradient(135deg, #81FBB8 0%, #28C76F 100%);
-$gradient-warning: linear-gradient(135deg, #FFD26F 0%, #FF9F43 100%);
-$gradient-danger: linear-gradient(135deg, #FF6B9D 0%, #F56C6C 100%);
-$gradient-blue: linear-gradient(135deg, #667eea 0%, #409EFF 100%);
+$gradient-primary: var(--gradient-primary);
+$gradient-success: var(--gradient-success);
+$gradient-blue: linear-gradient(135deg, #3b82f6, #06b6d4);
+$gradient-warning: linear-gradient(135deg, #f59e0b, #fbbf24);
+$gradient-danger: linear-gradient(135deg, #ef4444, #f87171);
+$glow-primary: 0 0 20px rgba(59, 130, 246, 0.4);
 
-// ========== 特殊效果 (Special Effects) ==========
-// 发光效果 - 用于激活状态
-$glow-primary: 0 0 20px rgba(64, 158, 255, 0.3);
-$glow-success: 0 0 20px rgba(103, 194, 58, 0.3);
-$glow-warning: 0 0 20px rgba(230, 162, 60, 0.3);
-
-// ========== Z-index 层级 ==========
-$z-index-dropdown: 1000;
-$z-index-sticky: 1020;
-$z-index-fixed: 1030;
-$z-index-modal-backdrop: 1040;
-$z-index-modal: 1050;
-$z-index-popover: 1060;
-$z-index-tooltip: 1070;
+$z-index-dropdown: var(--z-dropdown);
+$z-index-sticky: var(--z-sticky);
+$z-index-fixed: var(--z-fixed);
+$z-index-modal-backdrop: var(--z-modal-backdrop);
+$z-index-modal: var(--z-modal);

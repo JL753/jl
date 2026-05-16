@@ -16,6 +16,10 @@ import com.iflytek.smartprep.service.TutorService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.nio.charset.StandardCharsets;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
+
 @Service
 @RequiredArgsConstructor
 public class AuthServiceImpl implements AuthService {
@@ -28,9 +32,8 @@ public class AuthServiceImpl implements AuthService {
     @Override
     public LoginResponse login(LoginRequest request) {
         User user = userMapper.selectOne(new LambdaQueryWrapper<User>()
-                .eq(User::getUsername, request.getUsername())
-                .eq(User::getPassword, request.getPassword()));
-        if (user == null) {
+                .eq(User::getUsername, request.getUsername()));
+        if (user == null || !user.getPassword().equals(hashPassword(request.getPassword()))) {
             throw new IllegalArgumentException("用户名或密码错误");
         }
         return toLoginResponse(user);
@@ -46,7 +49,7 @@ public class AuthServiceImpl implements AuthService {
         String role = normalizeRole(request.getRole());
         User user = new User();
         user.setUsername(request.getUsername());
-        user.setPassword(request.getPassword());
+        user.setPassword(hashPassword(request.getPassword()));
         user.setRole(role);
         user.setDisplayName(request.getDisplayName());
         userMapper.insert(user);
@@ -71,7 +74,7 @@ public class AuthServiceImpl implements AuthService {
             user.setDisplayName(request.getDisplayName());
         }
         if (request.getPassword() != null && !request.getPassword().isBlank()) {
-            user.setPassword(request.getPassword());
+            user.setPassword(hashPassword(request.getPassword()));
         }
         if (request.getAvatarUrl() != null) {
             user.setAvatarUrl(request.getAvatarUrl());
@@ -107,6 +110,18 @@ public class AuthServiceImpl implements AuthService {
 
     private void initializeUserData(User user) {
         tutorService.initializeUserData(user.getId(), user.getDisplayName(), user.getRole());
+    }
+
+    static String hashPassword(String raw) {
+        try {
+            MessageDigest md = MessageDigest.getInstance("SHA-256");
+            byte[] bytes = md.digest(raw.getBytes(StandardCharsets.UTF_8));
+            StringBuilder sb = new StringBuilder();
+            for (byte b : bytes) sb.append(String.format("%02x", b));
+            return sb.toString();
+        } catch (NoSuchAlgorithmException e) {
+            throw new IllegalStateException("SHA-256 not available", e);
+        }
     }
 
     private LoginResponse toLoginResponse(User user) {

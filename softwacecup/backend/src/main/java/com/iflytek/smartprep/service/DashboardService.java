@@ -28,4 +28,6 @@ public interface DashboardService {
     Map<String, Object> studentDataCenter(Long userId);
     Map<String, Object> profileCard(Long userId, String role);
     Map<String, Object> gradeExam(Long teacherUserId, GradeExamRequest request);
+    List<Map<String, Object>> learningActivityTrend(Long userId);
+    List<Map<String, Object>> weeklyTaskCompletion(Long userId);
 }

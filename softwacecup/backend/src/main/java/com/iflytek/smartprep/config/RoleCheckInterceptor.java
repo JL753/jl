@@ -25,8 +25,11 @@ public class RoleCheckInterceptor implements HandlerInterceptor {
             response.getWriter().write("{\"success\":false,\"message\":\"未登录\"}");
             return false;
         }
+        String userRole = loginUser.getRole();
+        // 教师+管理员角色合并：teacher 兼 admin 权限
         for (String role : requireRole.value()) {
-            if (role.equalsIgnoreCase(loginUser.getRole())) {
+            if (role.equalsIgnoreCase(userRole) ||
+                ("teacher".equalsIgnoreCase(userRole) && "admin".equalsIgnoreCase(role))) {
                 return true;
             }
         }

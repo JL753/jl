@@ -12,8 +12,9 @@ import com.iflytek.smartprep.service.AssessmentService;
 import com.iflytek.smartprep.service.ProfileService;
 import com.iflytek.smartprep.service.ResourceService;
 import com.iflytek.smartprep.service.StudyPathService;
-import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Component;
 
@@ -27,6 +28,7 @@ import java.util.Map;
 public class SchemaInitializer {
 
     private final JdbcTemplate jdbcTemplate;
+    private static final Logger log = LoggerFactory.getLogger(SchemaInitializer.class);
     private final UserMapper userMapper;
     private final StudentProfileMapper studentProfileMapper;
     private final LearningResourceMapper learningResourceMapper;
@@ -45,8 +47,16 @@ public class SchemaInitializer {
     private final AssessmentService assessmentService;
     private final ObjectMapper objectMapper;
 
-    @PostConstruct
+    // 检查 v2 表是否存在，存在则跳过初始化
+    // @PostConstruct
     public void init() {
+        try {
+            jdbcTemplate.queryForObject("SELECT COUNT(*) FROM sp_lesson_progress", Integer.class);
+            log.info("v2 表已存在，跳过 SchemaInitializer 初始化");
+            return;
+        } catch (Exception e) {
+            log.info("v2 表不存在，执行 SchemaInitializer 初始化");
+        }
         jdbcTemplate.execute("CREATE TABLE IF NOT EXISTS sp_user (id BIGINT PRIMARY KEY, username VARCHAR(128), password VARCHAR(255), role VARCHAR(32), display_name VARCHAR(255), avatar_url VARCHAR(512))");
         ensureColumnExists("sp_user", "display_name", "ALTER TABLE sp_user ADD COLUMN display_name VARCHAR(255)");
         ensureColumnExists("sp_user", "avatar_url", "ALTER TABLE sp_user ADD COLUMN avatar_url VARCHAR(512)");

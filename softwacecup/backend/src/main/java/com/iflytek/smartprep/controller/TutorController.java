@@ -4,7 +4,9 @@ import com.iflytek.smartprep.config.LoginUserHolder;
 import com.iflytek.smartprep.dto.ApiResponse;
 import com.iflytek.smartprep.dto.TutorAnswer;
 import com.iflytek.smartprep.dto.TutorAskRequest;
+import com.iflytek.smartprep.dto.TutorStreamEvent;
 import com.iflytek.smartprep.service.TutorService;
+import java.io.IOException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -32,9 +34,20 @@ public class TutorController {
     public SseEmitter stream(@RequestParam String question,
                              @RequestParam(required = false) String context,
                              @RequestParam(required = false) String answerMode,
-                             @RequestHeader("Authorization") String authHeader) {
+                             @RequestHeader(value = "Authorization", required = false) String authHeader) {
+        if (authHeader == null || authHeader.isBlank()) {
+            SseEmitter err = new SseEmitter();
+            try { err.completeWithError(new IllegalArgumentException("Authorization header required")); } catch (Exception ignored) {}
+            return err;
+        }
         String token = authHeader.startsWith("Bearer ") ? authHeader.substring(7) : authHeader;
-        Long uid = Long.valueOf(tutorService.authEvent(token).getContent());
+        TutorStreamEvent authResp = tutorService.authEvent(token);
+        if (authResp == null || authResp.getContent() == null) {
+            SseEmitter err = new SseEmitter();
+            try { err.completeWithError(new IllegalArgumentException("Invalid token")); } catch (Exception ignored) {}
+            return err;
+        }
+        Long uid = Long.valueOf(authResp.getContent());
         TutorAskRequest request = new TutorAskRequest();
         request.setQuestion(question);
         request.setContext(context);

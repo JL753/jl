@@ -18,7 +18,15 @@
       "Bash(git checkout:*)",
       "Bash(done)",
       "Bash(for file in StudentLayout.vue TeacherLayout.vue)",
-      "Bash(do perl:*)"
+      "Bash(do perl:*)",
+      "Skill(update-config)",
+      "Skill(update-config:*)",
+      "Bash(ls -la \"/Users/f4kza6\" | head -20)",
+      "Read(//Users/**)",
+      "Bash(bash *)",
+      "Bash(mvn compile *)",
+      "Bash(npx vite *)",
+      "Bash(git diff-tree *)"
     ],
     "deny": [],
     "ask": []

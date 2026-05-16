@@ -1,4 +1,5 @@
 import axios from 'axios'
+import { useAuthStore } from '../stores/auth'
 
 const http = axios.create({
   baseURL: '/api',
@@ -23,7 +24,19 @@ http.interceptors.response.use(
     }
     return resp.data
   },
-  (err) => Promise.reject(err)
+  (err) => {
+    if (err.response?.status === 401) {
+      localStorage.removeItem('sp_token')
+      // 触发登录弹窗而非跳转页面
+      try {
+        const auth = useAuthStore()
+        auth.showLoginModal = true
+      } catch (e) { /* store not ready */ }
+      return Promise.reject(new Error('登录已过期，请重新登录'))
+    }
+    const message = err.response?.data?.message || err.message || '网络请求失败'
+    return Promise.reject(new Error(message))
+  }
 )
 
 export default http

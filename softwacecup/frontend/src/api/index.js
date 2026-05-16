@@ -47,36 +47,51 @@ export const apiProfileCard = () => http.get('/dashboard/profile-card')
 export const apiGradeExam = (payload) => http.post('/dashboard/grade-exam', payload)
 export const apiSubmitExam = (payload) => http.post('/dashboard/submit-exam', payload)
 
-// ==================== Admin API ====================
-export const apiAdminDashboard = () => http.get('/admin/dashboard')
-
-// 用户管理
-export const apiAdminListUsers = (params) => http.get('/admin/users', { params })
-export const apiAdminCreateUser = (payload) => http.post('/admin/users', payload)
-export const apiAdminUpdateUser = (id, payload) => http.put(`/admin/users/${id}`, payload)
-export const apiAdminDeleteUser = (id) => http.delete(`/admin/users/${id}`)
-
-// 课程管理
-export const apiAdminListCourses = (params) => http.get('/admin/courses', { params })
-export const apiAdminCreateCourse = (payload) => http.post('/admin/courses', payload)
-export const apiAdminUpdateCourse = (id, payload) => http.put(`/admin/courses/${id}`, payload)
-export const apiAdminDeleteCourse = (id) => http.delete(`/admin/courses/${id}`)
-
-// 资源管理
-export const apiAdminListResources = (params) => http.get('/admin/resources', { params })
-export const apiAdminDeleteResource = (id) => http.delete(`/admin/resources/${id}`)
-
-// 考试管理
-export const apiAdminListExams = (params) => http.get('/admin/exams', { params })
-export const apiAdminCreateExam = (payload) => http.post('/admin/exams', payload)
-export const apiAdminUpdateExam = (id, payload) => http.put(`/admin/exams/${id}`, payload)
-export const apiAdminDeleteExam = (id) => http.delete(`/admin/exams/${id}`)
-
-// 日志与设置
-export const apiAdminLogs = (params) => http.get('/admin/logs', { params })
-export const apiAdminGetSettings = () => http.get('/admin/settings')
-export const apiAdminUpdateSettings = (payload) => http.put('/admin/settings', payload)
-
 export const apiPortal = () => http.get('/common/portal')
+
+// ==================== 知域 v2 API ====================
+export const apiSubjects = () => http.get('/subjects')
+export const apiSubjectUnits = (subjectId) => http.get(`/subjects/${subjectId}/units`)
+export const apiUnitLessons = (unitId) => http.get(`/units/${unitId}/lessons`)
+export const apiLessonDetail = (lessonId) => http.get(`/lessons/${lessonId}`)
+export const apiLessonExercises = (lessonId) => http.get(`/lessons/${lessonId}/exercises`)
+export const apiCompleteLesson = (lessonId) => http.post(`/progress/lesson/${lessonId}/complete`)
+export const apiLessonProgress = (lessonId) => http.get(`/progress/lesson/${lessonId}`)
+export const apiCourseProgress = (subjectId) => http.get(`/progress/course/${subjectId}`)
+export const apiSubjectTree = () => http.get('/course/tree')
+export const apiLessonKnowledgePoints = (lessonId) => http.get(`/lessons/${lessonId}/knowledge-points`)
+export const apiAbilityEvaluate = () => http.post('/ability/evaluate')
+export const apiAbilityLatest = () => http.get('/ability/latest')
+export const apiAbilityHistory = () => http.get('/ability/history')
+export const apiRecommendResources = (lessonId) => http.post(`/lessons/${lessonId}/recommend-resources`)
+export const apiMyClasses = () => http.get('/classes/my')
+export const apiJoinClass = (inviteCode) => http.post('/classes/join', { inviteCode })
+export const apiCreateClass = (data) => http.post('/classes', data)
+export const apiClassMembers = (classId) => http.get(`/classes/${classId}/members`)
+export const apiMyClassList = () => http.get('/classes/my-classes')
+export const apiMyAssignments = () => http.get('/assignments/my')
+export const apiSubmitAssignment = (id) => http.post(`/assignments/${id}/submit`)
+export const apiContentReviewPending = () => http.get('/content-review/pending')
+export const apiContentReviewApprove = (id) => http.post(`/content-review/${id}/approve`)
+export const apiContentReviewReject = (id) => http.post(`/content-review/${id}/reject`)
+export const apiAiGenerateContent = (lessonId) => http.post(`/content-review/lessons/${lessonId}/ai-generate-content`)
+export const apiGamificationProgress = () => http.get('/gamification/progress')
+export const apiGamificationBadges = () => http.get('/gamification/badges')
+export const apiGamificationStreak = () => http.get('/gamification/streak')
+export const apiGamificationCheckin = () => http.post('/gamification/checkin')
 export const apiHealth = () => http.get('/common/health')
 export const apiDatacenter = () => http.get('/common/datacenter')
+export const apiSubmitAnswer = (payload) => http.post('/knowledge-graph/submit-answer', payload)
+export const apiKnowledgeGraphFull = () => http.get('/knowledge-graph/full')
+export const apiKnowledgeGraphProgress = () => http.get('/knowledge-graph/my-progress')
+export const apiKnowledgeGraphNextRecommended = () => http.get('/knowledge-graph/next-recommended')
+export const apiKpExercises = (kpId) => http.get(`/knowledge-graph/exercises/${kpId}`)
+
+export const apiGamificationAddXp = (amount, reason) => http.post('/gamification/add-xp', { amount, reason })
+export const apiGamificationLeaderboard = (limit = 10) => http.get('/gamification/leaderboard', { params: { limit } })
+export const apiGamificationDailyChallenges = () => http.get('/gamification/daily-challenges')
+export const apiAnalyticsDashboard = () => http.get('/analytics/dashboard')
+export const apiGenerateAdaptiveQuiz = (payload) => http.post('/adaptive-quiz/generate', payload)
+export const apiSubmitAdaptiveQuiz = (payload) => http.post('/adaptive-quiz/submit', payload)
+export const apiAnalyzeMistake = (payload) => http.post('/adaptive-quiz/analyze-mistake', payload)
+export const apiPrerequisiteChain = (kpId) => http.get(`/knowledge-graph/prerequisite-chain/${kpId}`)
