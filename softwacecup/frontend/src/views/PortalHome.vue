@@ -35,11 +35,11 @@
       <h2 class="section-title">推荐课程</h2>
       <div class="course-grid" v-if="subjects.length > 0">
         <CourseCard
-          v-for="course in subjects"
+          v-for="(course, index) in subjects"
           :key="course.id"
           :title="course.name || course.title || '未知学科'"
           :description="course.description || ''"
-          :icon="course.icon || courseIcons[(subjects.indexOf(course) % courseIcons.length)]"
+          :icon="course.icon || courseIcons[index % courseIcons.length]"
           :tags="course.tags || []"
           :compact="true"
           @click="handleCourseClick(course)"
@@ -69,7 +69,7 @@ onMounted(async () => {
     const res = await apiSubjects()
     subjects.value = res.data?.data || res.data || []
   } catch (e) {
-    // silent
+    console.warn('Failed to fetch subjects', e)
   }
 })
 
@@ -191,20 +191,18 @@ function handleCourseClick(course) {
   width: 42px;
   height: 42px;
   border-radius: 50%;
-  background: rgba(255, 255, 255, 0.06);
-  border: 1px solid rgba(255, 255, 255, 0.1);
   display: flex;
   align-items: center;
   justify-content: center;
   font-size: 11px;
   font-weight: 700;
-  color: rgba(255, 255, 255, 0.6);
+  color: white;
   pointer-events: none;
 }
-.dot-1 { top: 42px; left: 150px; animation: orbit1 12s linear infinite; }
-.dot-2 { top: 90px; left: 34px; animation: orbit2 15s linear infinite reverse; }
-.dot-3 { top: 195px; left: 42px; animation: orbit3 18s linear infinite; }
-.dot-4 { top: 230px; left: 160px; animation: orbit4 14s linear infinite reverse; }
+.dot-1 { background: #3b82f6; border: 1px solid #60a5fa; top: 42px; left: 150px; animation: orbit1 12s linear infinite; }
+.dot-2 { background: #a855f7; border: 1px solid #c084fc; top: 90px; left: 34px; animation: orbit2 15s linear infinite reverse; }
+.dot-3 { background: #60d9fa; border: 1px solid #99e9fc; top: 195px; left: 42px; animation: orbit3 18s linear infinite; }
+.dot-4 { background: #3b82f6; border: 1px solid #60a5fa; top: 230px; left: 160px; animation: orbit4 14s linear infinite reverse; }
 
 @keyframes orbit1 {
   0% { transform: translate(0, 0); }

@@ -101,13 +101,12 @@
 </template>
 
 <script setup>
-import { ref, onMounted, onUnmounted } from 'vue'
+import { ref, onMounted, onUnmounted, nextTick } from 'vue'
 import { useRouter } from 'vue-router'
 import { useAuthStore } from '../../stores/auth'
 import {
   apiAbilityLatest,
-  apiCourseProgress,
-  apiRecommendResources,
+  apiStudentDashboard,
   apiGamificationStreak
 } from '../../api/index.js'
 import * as echarts from 'echarts'
@@ -144,41 +143,36 @@ onMounted(async () => {
       transfer: data.transfer || 0,
       resilience: data.resilience || 0,
     }
-  } catch {
-    // Keep default zeros
+  } catch (e) {
+    console.warn('Failed to fetch ability data', e)
   }
 
   // Fetch streak
   try {
     const res = await apiGamificationStreak()
     userInfo.value.streak = res.data?.data?.currentStreak || 0
-  } catch {
-    // Keep default
+  } catch (e) {
+    console.warn('Failed to fetch streak', e)
   }
 
   userInfo.value.name = auth.user?.username || '学生'
 
-  // Fetch continue course
+  // Fetch dashboard data for current course info
   try {
-    const res = await apiCourseProgress()
-    continueCourse.value = res.data?.data || null
-  } catch {
-    // Keep null
+    const res = await apiStudentDashboard()
+    const data = res.data?.data || {}
+    if (data.summary && data.summary.title) {
+      continueCourse.value = {
+        title: data.summary.title
+      }
+    }
+  } catch (e) {
+    console.warn('Failed to fetch dashboard data', e)
   }
 
-  // Init radar chart
-  setTimeout(() => {
-    initRadarChart()
-  }, 100)
-
-  // Fetch AI resources
-  try {
-    const res = await apiRecommendResources()
-    const data = res.data?.data || res.data || []
-    aiResources.value = Array.isArray(data) ? data : []
-  } catch {
-    // Keep empty
-  }
+  // Init radar chart after data is ready
+  await nextTick()
+  initRadarChart()
 
   // Set some default tasks
   todayTasks.value = ['完成今日推荐课程', '复习已学知识点', '完成课后练习']
@@ -262,7 +256,11 @@ onUnmounted(() => {
 })
 
 function goToCourse(id) {
-  router.push(`/student/subjects/${id}`)
+  if (id) {
+    router.push(`/student/subjects/${id}`)
+  } else {
+    router.push('/student/courses')
+  }
 }
 function goToAllCourses() {
   router.push('/student/courses')
