@@ -221,15 +221,31 @@ public class BilibiliService {
 
     public List<BilibiliVideoMeta> parsePlaylist(String url) {
         List<BilibiliVideoMeta> items = new ArrayList<>();
+
+        // 1. 尝试解析 space.bilibili.com 合集链接
         Matcher m = MID_SID_PATTERN.matcher(url);
-        if (!m.find()) {
-            log.warn("无法从合集URL提取mid/sid: {}", url);
-            return items;
+        if (m.find()) {
+            String mid = m.group(1);
+            String sid = m.group(2);
+            items = fetchSeriesArchives(mid, sid);
+            if (!items.isEmpty()) return items;
         }
 
-        String mid = m.group(1);
-        String sid = m.group(2);
+        // 2. 尝试解析多P视频（BVxxx?p=1 或直接 BVxxx）
+        String bvid = extractBvid(url);
+        if (bvid != null) {
+            items = fetchVideoPages(bvid);
+            if (!items.isEmpty()) return items;
+        }
 
+        if (items.isEmpty()) {
+            log.warn("合集或多P视频均未找到视频: {}", url);
+        }
+        return items;
+    }
+
+    private List<BilibiliVideoMeta> fetchSeriesArchives(String mid, String sid) {
+        List<BilibiliVideoMeta> items = new ArrayList<>();
         try {
             String apiUrl = String.format(SERIES_API, mid, sid);
             Request request = new Request.Builder()
@@ -243,7 +259,6 @@ public class BilibiliService {
                 if (!response.isSuccessful() || response.body() == null) return items;
                 String body = response.body().string();
                 JsonNode root = objectMapper.readTree(body);
-
                 JsonNode archives = root.path("data").path("archives");
                 if (archives.isArray()) {
                     for (JsonNode archive : archives) {
@@ -258,6 +273,60 @@ public class BilibiliService {
             }
         } catch (IOException e) {
             log.warn("解析合集失败: {}", e.getMessage());
+        }
+        return items;
+    }
+
+    private List<BilibiliVideoMeta> fetchVideoPages(String bvid) {
+        List<BilibiliVideoMeta> items = new ArrayList<>();
+        try {
+            Request request = new Request.Builder()
+                    .url(VIEW_API + bvid)
+                    .addHeader("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36")
+                    .addHeader("Referer", "https://www.bilibili.com")
+                    .get()
+                    .build();
+
+            try (Response response = httpClient.newCall(request).execute()) {
+                if (!response.isSuccessful() || response.body() == null) return items;
+                String body = response.body().string();
+                JsonNode root = objectMapper.readTree(body);
+                int code = root.path("code").asInt(-1);
+                if (code != 0) {
+                    // API 失败，回退到页面解析
+                    BilibiliVideoMeta single = fetchFromPage(bvid);
+                    if (single != null) items.add(single);
+                    return items;
+                }
+
+                JsonNode data = root.path("data");
+                JsonNode pages = data.path("pages");
+                if (pages.isArray() && pages.size() > 1) {
+                    int pageNum = 1;
+                    for (JsonNode page : pages) {
+                        BilibiliVideoMeta meta = new BilibiliVideoMeta();
+                        meta.setBvid(bvid + "_p" + pageNum);  // 唯一标识：BV1xx_p1, BV1xx_p2
+                        meta.setTitle(page.path("part").asText(""));
+                        meta.setDescription(data.path("desc").asText(""));
+                        meta.setDuration(page.path("duration").asInt(0));
+                        meta.setCoverUrl(data.path("pic").asText(""));
+                        meta.setAuthorName(data.path("owner").path("name").asText(""));
+                        meta.setCid(page.path("cid").asLong(0));
+                        meta.setPageUrl("https://www.bilibili.com/video/" + bvid + "?p=" + pageNum);
+                        items.add(meta);
+                        pageNum++;
+                    }
+                } else {
+                    BilibiliVideoMeta meta = parseVideoData(data, bvid);
+                    if (meta != null) {
+                        meta.setBvid(bvid + "_p1");
+                        meta.setPageUrl("https://www.bilibili.com/video/" + bvid);
+                        items.add(meta);
+                    }
+                }
+            }
+        } catch (IOException e) {
+            log.warn("获取分P列表失败 for bvid={}: {}", bvid, e.getMessage());
         }
         return items;
     }

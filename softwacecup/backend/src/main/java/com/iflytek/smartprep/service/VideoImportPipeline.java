@@ -40,7 +40,19 @@ public class VideoImportPipeline {
             item.setBvid(bvid);
 
             try {
-                BilibiliVideoMeta meta = bilibiliService.parseVideo("https://www.bilibili.com/video/" + bvid);
+                // 处理多P视频标识：BV1xx_p3 → BV1xx + ?p=3
+                String baseBvid = bvid;
+                String pageParam = "";
+                if (bvid.contains("_p")) {
+                    int idx = bvid.indexOf("_p");
+                    pageParam = bvid.substring(idx + 1); // "p3"
+                    baseBvid = bvid.substring(0, idx);    // "BV1xx"
+                }
+                String videoUrl = "https://www.bilibili.com/video/" + baseBvid;
+                if (!pageParam.isEmpty()) {
+                    videoUrl += "?p=" + pageParam.substring(1); // "?p=3"
+                }
+                BilibiliVideoMeta meta = bilibiliService.parseVideo(videoUrl);
                 if (meta == null) {
                     item.setError("视频信息获取失败");
                     result.getResults().add(item);
@@ -80,7 +92,7 @@ public class VideoImportPipeline {
                 lesson.setUnitId(unitId);
                 lesson.setName(meta.getTitle());
                 lesson.setType("video");
-                lesson.setVideoUrl("https://www.bilibili.com/video/" + bvid);
+                lesson.setVideoUrl(videoUrl);
                 lesson.setContent(content);
                 lesson.setDuration(meta.getDuration());
                 lesson.setStatus("draft");

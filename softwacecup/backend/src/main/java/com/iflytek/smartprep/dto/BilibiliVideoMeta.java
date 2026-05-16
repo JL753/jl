@@ -15,4 +15,5 @@ public class BilibiliVideoMeta {
     private Long cid;
     private String partTitle;
     private Integer playCount;
+    private String pageUrl;
 }
