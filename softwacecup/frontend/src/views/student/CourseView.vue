@@ -44,14 +44,16 @@
 
       <template v-else-if="currentLesson">
         <div v-if="currentLesson.videoUrl" class="video-section">
-          <iframe
-            v-if="isBilibiliUrl(currentLesson.videoUrl)"
-            :src="bilibiliEmbedUrl(currentLesson.videoUrl)"
-            class="lesson-video"
-            frameborder="0"
-            allowfullscreen
-          ></iframe>
-          <video v-else :src="currentLesson.videoUrl" controls class="lesson-video"></video>
+          <div class="video-wrapper">
+            <iframe
+              v-if="isBilibiliUrl(currentLesson.videoUrl)"
+              :src="bilibiliEmbedUrl(currentLesson.videoUrl)"
+              class="lesson-video"
+              frameborder="0"
+              allowfullscreen
+            ></iframe>
+            <video v-else :src="currentLesson.videoUrl" controls class="lesson-video"></video>
+          </div>
         </div>
 
         <div class="content-section glass-card">
@@ -93,11 +95,28 @@
         <button class="panel-tab" :class="{ active: panelTab === 'ai' }" @click="panelTab = 'ai'">AI 辅导</button>
         <button class="panel-tab" :class="{ active: panelTab === 'notes' }" @click="panelTab = 'notes'">笔记</button>
         <button class="panel-tab" :class="{ active: panelTab === 'discuss' }" @click="panelTab = 'discuss'">讨论</button>
+        <button class="panel-tab xiaohui-tab" :class="{ active: showXiaohui }" @click="showXiaohui = !showXiaohui">小慧</button>
         <button class="panel-toggle" @click="panelCollapsed = !panelCollapsed">
           <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline :points="panelCollapsed ? '15 18 9 12 15 6' : '9 18 15 12 9 6'"/></svg>
         </button>
       </div>
       <div class="panel-body" v-show="!panelCollapsed">
+        <!-- Virtual Character 小慧 -->
+        <div v-if="showXiaohui" class="xiaohui-area">
+          <div class="xiaohui-container">
+            <div class="xiaohui-avatar">
+              <div class="xiaohui-face">
+                <div class="xiaohui-eyes">
+                  <div class="xiaohui-eye left"></div>
+                  <div class="xiaohui-eye right"></div>
+                </div>
+                <div class="xiaohui-mouth"></div>
+              </div>
+            </div>
+            <div class="xiaohui-name">小慧</div>
+            <div class="xiaohui-status">AI 学习助手在线</div>
+          </div>
+        </div>
         <!-- AI Chat tab -->
         <div v-if="panelTab === 'ai'" class="ai-chat">
           <div class="chat-messages">
@@ -171,6 +190,7 @@ const treeCollapsed = ref(false)
 const panelCollapsed = ref(false)
 const panelTab = ref('ai')
 const showDeepExplore = ref(false)
+const showXiaohui = ref(false)
 
 const courseName = ref('')
 const subjectTree = ref([])
@@ -270,6 +290,8 @@ function locateLessonInTree(lessonId) {
             if (lesson.id === lessonId) {
               courseName.value = subject.name
               currentUnitName.value = unit.name
+              // 过滤树：只保留当前学科
+              subjectTree.value = [subject]
               return
             }
           }
@@ -439,7 +461,14 @@ function bilibiliEmbedUrl(url) {
 .crumb-sep { margin: 0 6px; }
 .crumb-current { color: rgba(255,255,255,0.7); }
 .video-section { margin-bottom: 16px; }
-.lesson-video { width: 100%; max-height: 360px; border-radius: 8px; background: rgba(0,0,0,0.3); }
+.video-wrapper {
+  position: relative; width: 100%; padding-bottom: 56.25%; /* 16:9 */
+  border-radius: 8px; overflow: hidden; background: rgba(0,0,0,0.3);
+}
+.lesson-video {
+  position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+  border: none; border-radius: 8px; background: #000;
+}
 .lesson-title { font-size: 20px; font-weight: 700; margin-bottom: 12px; }
 .content-body { font-size: 13px; line-height: 1.8; color: rgba(255,255,255,0.6); }
 
@@ -528,6 +557,40 @@ function bilibiliEmbedUrl(url) {
 /* Discuss */
 .discuss-panel { padding: 12px; }
 .discuss-placeholder { font-size: 12px; color: rgba(255,255,255,0.3); text-align: center; padding: 40px 0; }
+
+/* 小慧 Virtual Character */
+.xiaohui-tab { color: #f9a8d4 !important; }
+.xiaohui-tab.active { color: #f472b6 !important; border-bottom-color: #f472b6 !important; }
+.xiaohui-area { padding: 12px; border-bottom: 1px solid rgba(255,255,255,0.06); background: rgba(168,85,247,0.04); }
+.xiaohui-container { text-align: center; }
+.xiaohui-avatar {
+  width: 80px; height: 80px; border-radius: 50%; margin: 0 auto 8px;
+  background: linear-gradient(135deg, #a855f7, #ec4899);
+  display: flex; align-items: center; justify-content: center;
+  box-shadow: 0 0 20px rgba(168,85,247,0.3);
+  animation: xiaohui-pulse 3s ease-in-out infinite;
+}
+.xiaohui-face { position: relative; width: 50px; height: 50px; }
+.xiaohui-eyes { display: flex; justify-content: center; gap: 12px; padding-top: 14px; }
+.xiaohui-eye {
+  width: 8px; height: 10px; border-radius: 50%; background: #fff;
+  animation: xiaohui-blink 4s infinite;
+}
+.xiaohui-eye.right { animation-delay: 0.2s; }
+.xiaohui-mouth {
+  width: 12px; height: 6px; border-radius: 0 0 12px 12px; background: #fff;
+  margin: 8px auto 0; opacity: 0.8;
+}
+.xiaohui-name { font-size: 14px; font-weight: 700; color: #f9a8d4; margin-bottom: 2px; }
+.xiaohui-status { font-size: 10px; color: rgba(255,255,255,0.4); }
+@keyframes xiaohui-pulse {
+  0%, 100% { box-shadow: 0 0 20px rgba(168,85,247,0.3); }
+  50% { box-shadow: 0 0 30px rgba(168,85,247,0.5); }
+}
+@keyframes xiaohui-blink {
+  0%, 96%, 100% { transform: scaleY(1); }
+  98% { transform: scaleY(0.1); }
+}
 
 /* Deep Explore */
 .deep-fab {
