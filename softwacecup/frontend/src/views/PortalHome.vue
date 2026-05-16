@@ -109,7 +109,7 @@
             <div class="subject-accent" :style="{ background: accentGradients[idx % accentGradients.length] }"></div>
             <div class="subject-info">
               <span class="subject-name">{{ s.name }}</span>
-              <span class="subject-count">{{ s.courseCount || 0 }} 门课程</span>
+              <span class="subject-desc">{{ s.description || '' }}</span>
             </div>
             <span class="subject-arrow">→</span>
           </div>
@@ -497,7 +497,10 @@ onMounted(() => { loadSubjects(); loadAuthData() })
 }
 .subject-info { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 2px; }
 .subject-name { font-size: 14px; font-weight: 600; color: #e6edf3; }
-.subject-count { font-size: 11px; color: rgba(255,255,255,0.3); }
+.subject-desc {
+  font-size: 11px; color: rgba(255,255,255,0.3);
+  overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+}
 .subject-arrow {
   font-size: 14px; color: rgba(255,255,255,0.15);
   transition: color 0.2s; flex-shrink: 0;
