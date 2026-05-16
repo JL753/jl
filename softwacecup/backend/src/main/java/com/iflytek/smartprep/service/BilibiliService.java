@@ -11,6 +11,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
@@ -28,7 +30,7 @@ public class BilibiliService {
     private final ObjectMapper objectMapper;
 
     private static final String VIEW_API = "https://api.bilibili.com/x/web-interface/view?bvid=";
-    private static final String SEARCH_API = "https://api.bilibili.com/x/web-interface/search/type?search_type=video&keyword=";
+    private static final String SEARCH_API = "https://api.bilibili.com/x/web-interface/wbi/search/type?search_type=video&keyword=";
     private static final String SERIES_API = "https://api.bilibili.com/x/series/archives?mid=%s&series_id=%s";
     private static final String VIDEO_PAGE_URL = "https://www.bilibili.com/video/";
 
@@ -92,7 +94,7 @@ public class BilibiliService {
                     .build();
             try (Response response = httpClient.newCall(request).execute()) {
                 if (!response.isSuccessful() || response.body() == null) return null;
-                String html = response.body().string();
+                String html = readBodyAsGbk(response);
                 Matcher m = INITIAL_STATE_PATTERN.matcher(html);
                 if (!m.find()) {
                     log.warn("未找到__INITIAL_STATE__ for bvid={}", bvid);
@@ -150,14 +152,35 @@ public class BilibiliService {
 
             Request request = new Request.Builder()
                     .url(url)
-                    .addHeader("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36")
-                    .addHeader("Referer", "https://www.bilibili.com")
+                    .addHeader("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36")
+                    .addHeader("Accept", "application/json, text/plain, */*")
+                    .addHeader("Accept-Language", "zh-CN,zh;q=0.9,en;q=0.8")
+                    .addHeader("Referer", "https://search.bilibili.com/")
+                    .addHeader("Origin", "https://search.bilibili.com")
+                    .addHeader("Accept-Encoding", "identity")
                     .get()
                     .build();
 
             try (Response response = httpClient.newCall(request).execute()) {
                 if (!response.isSuccessful() || response.body() == null) return result;
-                String body = response.body().string();
+                byte[] rawBytes = response.body().bytes();
+                // 检查响应是否被 gzip 压缩（B站可能忽略 identity 请求）
+                String body;
+                if (rawBytes.length >= 2 && rawBytes[0] == 0x1f && rawBytes[1] == (byte) 0x8b) {
+                    // gzip magic bytes — 手动解压
+                    try (java.io.ByteArrayInputStream bis = new java.io.ByteArrayInputStream(rawBytes);
+                         java.util.zip.GZIPInputStream gis = new java.util.zip.GZIPInputStream(bis);
+                         java.io.ByteArrayOutputStream bos = new java.io.ByteArrayOutputStream()) {
+                        byte[] buf = new byte[4096];
+                        int n;
+                        while ((n = gis.read(buf)) > 0) bos.write(buf, 0, n);
+                        body = bos.toString("UTF-8");
+                    }
+                } else {
+                    body = new String(rawBytes, java.nio.charset.StandardCharsets.UTF_8);
+                }
+                if (body == null || body.isEmpty()) return result;
+
                 JsonNode root = objectMapper.readTree(body);
                 int code = root.path("code").asInt(-1);
                 if (code != 0) return result;
@@ -171,8 +194,10 @@ public class BilibiliService {
                         BilibiliVideoMeta meta = new BilibiliVideoMeta();
                         meta.setBvid(item.path("bvid").asText(""));
                         meta.setTitle(item.path("title").asText("").replaceAll("<[^>]+>", ""));
-                        meta.setCoverUrl("https:" + item.path("pic").asText(""));
-                        meta.setDuration(parseDuration(item.path("duration").asText("")));
+                        String pic = item.path("pic").asText("");
+                        meta.setCoverUrl(pic.startsWith("//") ? "https:" + pic : pic);
+                        String dur = item.path("duration").asText("");
+                        meta.setDuration(parseDuration(dur));
                         meta.setAuthorName(item.path("author").asText(""));
                         meta.setPlayCount(item.path("play").asInt(0));
                         result.getItems().add(meta);
@@ -241,5 +266,21 @@ public class BilibiliService {
         if (url == null) return null;
         Matcher m = BV_PATTERN.matcher(url);
         return m.find() ? m.group() : null;
+    }
+
+    private static String readBodyUtf8(Response response) throws IOException {
+        if (response.body() == null) return "";
+        byte[] bytes = response.body().bytes();
+        try {
+            return new String(bytes, java.nio.charset.StandardCharsets.UTF_8);
+        } catch (Exception e) {
+            return new String(bytes, java.nio.charset.Charset.forName("GBK"));
+        }
+    }
+
+    private static String readBodyAsGbk(Response response) throws IOException {
+        if (response.body() == null) return "";
+        byte[] bytes = response.body().bytes();
+        return new String(bytes, java.nio.charset.Charset.forName("GBK"));
     }
 }
