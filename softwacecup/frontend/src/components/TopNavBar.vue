@@ -26,8 +26,28 @@
           <path d="M13.73 21a2 2 0 0 1-3.46 0" />
         </svg>
       </button>
-      <div class="user-avatar" :title="auth.user?.username || '用户'">
+      <div class="user-avatar" :title="auth.user?.username || '用户'" @click="showDropdown = !showDropdown">
         {{ userInitial }}
+        <div v-if="showDropdown" class="avatar-dropdown" @click.stop>
+          <!-- 未登录 -->
+          <template v-if="!auth.isLoggedIn">
+            <button class="dropdown-item" @click="handleLogin">登录</button>
+            <button class="dropdown-item" @click="handleRegister">注册</button>
+            <button class="dropdown-item" @click="handleSettings">设置</button>
+            <button class="dropdown-item" @click="handleAbout">关于</button>
+          </template>
+          <!-- 学生登录 -->
+          <template v-else-if="auth.userRole === 'student'">
+            <button class="dropdown-item" @click="goStudy">学习课程</button>
+            <button class="dropdown-item" @click="handleSettings">设置</button>
+            <button class="dropdown-item" @click="handleLogout">登出</button>
+          </template>
+          <!-- 教师/管理员登录 -->
+          <template v-else>
+            <button class="dropdown-item" @click="handleSettings">设置</button>
+            <button class="dropdown-item" @click="handleLogout">登出</button>
+          </template>
+        </div>
       </div>
     </div>
 
@@ -36,7 +56,7 @@
 </template>
 
 <script setup>
-import { computed, ref } from 'vue'
+import { computed, ref, onMounted, onUnmounted } from 'vue'
 import { useRouter } from 'vue-router'
 import { useAuthStore } from '../stores/auth'
 import WallpaperModal from './WallpaperModal.vue'
@@ -44,6 +64,15 @@ import WallpaperModal from './WallpaperModal.vue'
 const auth = useAuthStore()
 const router = useRouter()
 const showWallpaper = ref(false)
+const showDropdown = ref(false)
+
+function closeDropdown(e) {
+  if (showDropdown.value && !e.target.closest('.user-avatar')) {
+    showDropdown.value = false
+  }
+}
+onMounted(() => document.addEventListener('click', closeDropdown))
+onUnmounted(() => document.removeEventListener('click', closeDropdown))
 
 const userInitial = computed(() => {
   return (auth.user?.username || 'U')[0].toUpperCase()
@@ -55,6 +84,44 @@ function goAICompanion() {
   } else {
     auth.openLoginModal('/student/companion')
   }
+}
+
+function handleLogin() {
+  showDropdown.value = false
+  auth.openLoginModal()
+}
+
+function handleRegister() {
+  showDropdown.value = false
+  auth.openLoginModal()
+  // TODO: switch modal to register tab
+}
+
+function handleLogout() {
+  showDropdown.value = false
+  auth.logout()
+  router.push('/')
+}
+
+function handleSettings() {
+  showDropdown.value = false
+  if (auth.userRole === 'student') {
+    router.push('/student/profile')
+  } else if (auth.userRole === 'teacher' || auth.userRole === 'admin') {
+    router.push('/teacher/profile')
+  } else {
+    router.push('/student/profile')
+  }
+}
+
+function handleAbout() {
+  showDropdown.value = false
+  // Scroll to bottom or show about info
+}
+
+function goStudy() {
+  showDropdown.value = false
+  router.push('/student/subjects')
 }
 </script>
 
@@ -162,9 +229,39 @@ function goAICompanion() {
   cursor: pointer; flex-shrink: 0;
   transition: box-shadow 0.2s;
   margin-left: 2px;
+  position: relative;
 }
 .user-avatar:hover {
   box-shadow: 0 0 12px rgba(59, 130, 246, 0.4);
+}
+
+.avatar-dropdown {
+  position: absolute;
+  top: 40px;
+  right: 0;
+  min-width: 130px;
+  background: rgba(8, 13, 31, 0.95);
+  backdrop-filter: blur(16px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 10px;
+  padding: 6px;
+  z-index: 500;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+  animation: dropdown-in 0.15s ease;
+}
+@keyframes dropdown-in {
+  from { opacity: 0; transform: translateY(-6px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+.dropdown-item {
+  display: block; width: 100%; padding: 8px 14px; text-align: left;
+  border: none; border-radius: 6px; background: transparent;
+  color: rgba(255, 255, 255, 0.7); font-size: 13px; cursor: pointer;
+  font-family: inherit; transition: all 0.12s;
+}
+.dropdown-item:hover {
+  background: rgba(255, 255, 255, 0.08);
+  color: #fff;
 }
 
 /* Responsive */
