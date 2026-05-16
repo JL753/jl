@@ -27,7 +27,12 @@
       "Bash(mvn compile *)",
       "Bash(npx vite *)",
       "Bash(git diff-tree *)",
-      "Bash(git *)"
+      "Bash(git *)",
+      "Bash(python *)",
+      "Bash(mysql *)",
+      "Bash(mvn package *)",
+      "Bash(taskkill //F //IM java.exe)",
+      "Bash(java -jar target/smartprep-backend-1.0.0.jar)"
     ],
     "deny": [],
     "ask": []

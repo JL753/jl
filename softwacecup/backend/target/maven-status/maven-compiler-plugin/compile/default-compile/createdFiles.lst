@@ -5,6 +5,7 @@ com\iflytek\smartprep\domain\User.class
 com\iflytek\smartprep\config\LoginUser$LoginUserBuilder.class
 com\iflytek\smartprep\domain\Course.class
 com\iflytek\smartprep\dto\QuizResult$QuestionGrading.class
+com\iflytek\smartprep\domain\StudyDuration.class
 com\iflytek\smartprep\dto\QuizGenerateRequest.class
 com\iflytek\smartprep\mapper\LearningAssessmentMapper.class
 com\iflytek\smartprep\mapper\UserMapper.class
@@ -62,6 +63,7 @@ com\iflytek\smartprep\domain\AssignmentSubmission.class
 com\iflytek\smartprep\service\agent\QuestionBankAgent.class
 com\iflytek\smartprep\service\impl\ResourceServiceImpl$1.class
 com\iflytek\smartprep\service\impl\TutorServiceImplWithRAG.class
+com\iflytek\smartprep\controller\LearningDataController.class
 com\iflytek\smartprep\domain\Exam.class
 com\iflytek\smartprep\domain\PptTemplate.class
 com\iflytek\smartprep\dto\AdminCourseCreateRequest.class
@@ -157,6 +159,7 @@ com\iflytek\smartprep\dto\AgentResult.class
 com\iflytek\smartprep\dto\QuizSubmission$QuizSubmissionBuilder.class
 com\iflytek\smartprep\config\RequireRole.class
 com\iflytek\smartprep\domain\ZhiyuClass.class
+com\iflytek\smartprep\mapper\StudyDurationMapper.class
 com\iflytek\smartprep\dto\QuizSubmission.class
 com\iflytek\smartprep\service\impl\StudyPathServiceImpl.class
 com\iflytek\smartprep\dto\QuizResult$AbilityChange.class
@@ -181,6 +184,7 @@ com\iflytek\smartprep\service\LLMClient.class
 com\iflytek\smartprep\controller\AssessmentController.class
 com\iflytek\smartprep\service\VideoImportPipeline.class
 com\iflytek\smartprep\domain\ExamRecord.class
+com\iflytek\smartprep\mapper\ExerciseAttemptMapper.class
 com\iflytek\smartprep\domain\OperationLog.class
 com\iflytek\smartprep\mapper\LearningActivityMapper.class
 com\iflytek\smartprep\domain\StudyPath.class
@@ -191,6 +195,7 @@ com\iflytek\smartprep\dto\DashboardStats$DashboardStatsBuilder.class
 com\iflytek\smartprep\service\ProfileService.class
 com\iflytek\smartprep\service\agent\MediaAgent.class
 com\iflytek\smartprep\domain\LearningActivity.class
+com\iflytek\smartprep\domain\ExerciseAttempt.class
 com\iflytek\smartprep\domain\Assignment.class
 com\iflytek\smartprep\dto\KnowledgeMapRequest$KnowledgeMapRequestBuilder.class
 com\iflytek\smartprep\mapper\TaskCompletionMapper.class
