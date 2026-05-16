@@ -238,7 +238,7 @@ onMounted(() => { loadSubjects(); loadAuthData() })
 /* ═══ ① Hero Area ═══ */
 .hero-row {
   display: flex;
-  gap: 24px;
+  gap: 12px;
   align-items: stretch;
 }
 .hero-area {
