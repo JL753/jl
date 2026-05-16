@@ -17,4 +17,12 @@ public class DashboardStats {
     private List<Map<String, Object>> cards;
     private List<Map<String, Object>> table;
     private List<Map<String, Object>> notices;
+    // 学生首页真实数据字段
+    private String userName;
+    private Integer weeklyLessons;
+    private Integer weeklyExercises;
+    private Integer accuracy;
+    private Integer weeklyHours;
+    private Map<String, Object> continueLearning;
+    private List<Map<String, Object>> recommendedPath;
 }

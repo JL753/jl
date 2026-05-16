@@ -31,11 +31,101 @@ public class DashboardServiceImpl implements DashboardService {
   private final TaskCompletionMapper taskCompletionMapper;
   private final ObjectMapper objectMapper;
   private final StudentAbilityMapper studentAbilityMapper;
+  private final LessonProgressMapper lessonProgressMapper;
+  private final LessonMapper lessonMapper;
+  private final UnitMapper unitMapper;
+  private final SubjectMapper subjectMapper;
 
   @Override public DashboardStats teacherDashboard() { return stats("教师端总览", countUsers("teacher"), countUsers("student")); }
   @Override public DashboardStats studentDashboard(Long userId) {
-    DashboardStats base = stats(txt(profileService.summary(userId).get("course")), examRecords(userId).size(), wrongQuestions(userId).size());
-    // 从 sp_student_ability 加载六维能力数据
+    User user = userMapper.selectById(userId);
+    String userName = user != null && user.getDisplayName() != null ? user.getDisplayName() : "同学";
+
+    // 本周学习统计
+    LocalDate today = LocalDate.now();
+    LocalDate weekStart = today.minusDays(today.getDayOfWeek().getValue() - 1);
+    LocalDateTime weekStartTime = weekStart.atStartOfDay();
+
+    int weeklyLessons = (int) (long) lessonProgressMapper.selectCount(
+      new LambdaQueryWrapper<LessonProgress>()
+        .eq(LessonProgress::getUserId, userId)
+        .eq(LessonProgress::getStatus, "completed")
+        .ge(LessonProgress::getCompletedAt, weekStartTime));
+
+    // 从任务完成获取练习题和正确率
+    TaskCompletion exerciseTask = taskCompletionMapper.selectOne(
+      new LambdaQueryWrapper<TaskCompletion>()
+        .eq(TaskCompletion::getUserId, userId)
+        .eq(TaskCompletion::getWeekStartDate, weekStart)
+        .eq(TaskCompletion::getTaskType, "exercise"));
+    int weeklyExercises = exerciseTask != null ? nz(exerciseTask.getTotalCount()) : 0;
+    int accuracy = exerciseTask != null ? nz(exerciseTask.getCompletionRate()) : 0;
+
+    // 计算学习时长（完成课时 × 平均时长估算）
+    int weeklyHours = weeklyLessons > 0 ? Math.max(1, weeklyLessons * 45 / 60) : 0;
+
+    // 继续学习：优先找进行中的课时，否则取最近完成的课时推荐下一个
+    Map<String, Object> continueLearning = null;
+    LessonProgress lastInProgress = lessonProgressMapper.selectOne(
+      new LambdaQueryWrapper<LessonProgress>()
+        .eq(LessonProgress::getUserId, userId)
+        .ne(LessonProgress::getStatus, "completed")
+        .orderByDesc(LessonProgress::getId).last("LIMIT 1"));
+    // fallback: 最近完成的课时
+    if (lastInProgress == null) {
+      lastInProgress = lessonProgressMapper.selectOne(
+        new LambdaQueryWrapper<LessonProgress>()
+          .eq(LessonProgress::getUserId, userId)
+          .eq(LessonProgress::getStatus, "completed")
+          .orderByDesc(LessonProgress::getCompletedAt).last("LIMIT 1"));
+    }
+    if (lastInProgress != null) {
+      Lesson lesson = lessonMapper.selectById(lastInProgress.getLessonId());
+      if (lesson != null) {
+        Unit unit = unitMapper.selectById(lesson.getUnitId());
+        Subject subject = unit != null ? subjectMapper.selectById(unit.getSubjectId()) : null;
+        continueLearning = row(
+          "lessonId", lesson.getId(),
+          "courseName", subject != null ? subject.getName() : "",
+          "unitName", unit != null ? unit.getName() : "",
+          "lessonName", lesson.getName(),
+          "progress", "completed".equals(lastInProgress.getStatus()) ? 100 : 50
+        );
+      }
+    }
+
+    // AI推荐路径：基于最近课时找后续课时
+    List<Map<String, Object>> recommendedPath = new ArrayList<>();
+    if (lastInProgress != null) {
+      Lesson currentLesson = lessonMapper.selectById(lastInProgress.getLessonId());
+      if (currentLesson != null && currentLesson.getUnitId() != null) {
+        List<Lesson> nextLessons = lessonMapper.selectList(
+          new LambdaQueryWrapper<Lesson>()
+            .eq(Lesson::getUnitId, currentLesson.getUnitId())
+            .orderByAsc(Lesson::getSortOrder));
+        boolean foundCurrent = false;
+        for (Lesson l : nextLessons) {
+          if (foundCurrent && recommendedPath.size() < 4) {
+            recommendedPath.add(row("name", l.getName(), "status", "pending", "lessonId", l.getId()));
+          }
+          if (l.getId().equals(currentLesson.getId())) foundCurrent = true;
+        }
+        if (!recommendedPath.isEmpty()) {
+          recommendedPath.get(0).put("status", "active");
+        }
+      }
+    }
+
+    DashboardStats base = stats(txt(userName), weeklyLessons, weeklyExercises);
+    base.setUserName(userName);
+    base.setWeeklyLessons(weeklyLessons);
+    base.setWeeklyExercises(weeklyExercises);
+    base.setAccuracy(accuracy);
+    base.setWeeklyHours(weeklyHours);
+    base.setContinueLearning(continueLearning);
+    base.setRecommendedPath(recommendedPath);
+
+    // 六维能力数据
     StudentAbility ability = studentAbilityMapper.selectOne(
       new LambdaQueryWrapper<StudentAbility>().eq(StudentAbility::getUserId, userId).orderByDesc(StudentAbility::getEvaluatedAt).last("LIMIT 1")
     );
