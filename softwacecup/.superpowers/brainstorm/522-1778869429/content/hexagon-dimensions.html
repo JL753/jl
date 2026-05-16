@@ -1,0 +1,109 @@
+<h2>六维能力图 — 维度方案选择</h2>
+<p class="subtitle">六个维度决定了 AI 如何评判学生、如何生成个性化建议</p>
+
+<div class="cards">
+
+  <!-- 方案 A：布鲁姆认知层次 -->
+  <div class="card" data-choice="bloom" onclick="toggleSelect(this)">
+    <div class="card-image" style="background:#0f172a; height:200px; display:flex; align-items:center; justify-content:center; position:relative; overflow:hidden;">
+      <svg width="180" height="180" viewBox="0 0 180 180">
+        <!-- 背景网格 -->
+        <polygon points="90,18 152,54 152,126 90,162 28,126 28,54" fill="none" stroke="#1e3a5f" stroke-width="1"/>
+        <polygon points="90,36 134,63 134,117 90,144 46,117 46,63" fill="none" stroke="#1e3a5f" stroke-width="1"/>
+        <polygon points="90,54 116,72 116,108 90,126 64,108 64,72" fill="none" stroke="#1e3a5f" stroke-width="1"/>
+        <!-- 数据区域 -->
+        <polygon points="90,30 140,68 138,120 90,148 42,112 44,60" fill="rgba(96,165,250,0.25)" stroke="#60a5fa" stroke-width="1.5"/>
+        <!-- 轴线 -->
+        <line x1="90" y1="90" x2="90" y2="18" stroke="#334155" stroke-width="1"/>
+        <line x1="90" y1="90" x2="152" y2="54" stroke="#334155" stroke-width="1"/>
+        <line x1="90" y1="90" x2="152" y2="126" stroke="#334155" stroke-width="1"/>
+        <line x1="90" y1="90" x2="90" y2="162" stroke="#334155" stroke-width="1"/>
+        <line x1="90" y1="90" x2="28" y2="126" stroke="#334155" stroke-width="1"/>
+        <line x1="90" y1="90" x2="28" y2="54" stroke="#334155" stroke-width="1"/>
+        <!-- 标签 -->
+        <text x="90" y="12" text-anchor="middle" fill="#93c5fd" font-size="9">记忆</text>
+        <text x="160" y="52" text-anchor="start" fill="#93c5fd" font-size="9">理解</text>
+        <text x="160" y="130" text-anchor="start" fill="#93c5fd" font-size="9">应用</text>
+        <text x="90" y="174" text-anchor="middle" fill="#93c5fd" font-size="9">分析</text>
+        <text x="20" y="130" text-anchor="end" fill="#93c5fd" font-size="9">评价</text>
+        <text x="20" y="52" text-anchor="end" fill="#93c5fd" font-size="9">创造</text>
+      </svg>
+    </div>
+    <div class="card-body">
+      <h3>A. 布鲁姆认知层次</h3>
+      <p>记忆 · 理解 · 应用 · 分析 · 评价 · 创造</p>
+      <p style="font-size:12px;color:#94a3b8;margin-top:6px;">来源：Bloom's Taxonomy（1956，教育心理学经典框架）。从低阶到高阶认知，AI 通过题目类型和答题行为推断各层级水平。</p>
+      <div class="pros-cons" style="margin-top:8px;">
+        <div class="pros"><h4>优点</h4><ul><li>学术权威，有理论依据</li><li>与题目难度天然对应</li></ul></div>
+        <div class="cons"><h4>缺点</h4><ul><li>偏学术，学生不易理解</li></ul></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 方案 B：学习行为综合维度 -->
+  <div class="card" data-choice="behavior" onclick="toggleSelect(this)">
+    <div class="card-image" style="background:#0f172a; height:200px; display:flex; align-items:center; justify-content:center; position:relative; overflow:hidden;">
+      <svg width="180" height="180" viewBox="0 0 180 180">
+        <polygon points="90,18 152,54 152,126 90,162 28,126 28,54" fill="none" stroke="#1e3a5f" stroke-width="1"/>
+        <polygon points="90,36 134,63 134,117 90,144 46,117 46,63" fill="none" stroke="#1e3a5f" stroke-width="1"/>
+        <polygon points="90,54 116,72 116,108 90,126 64,108 64,72" fill="none" stroke="#1e3a5f" stroke-width="1"/>
+        <polygon points="90,24 148,72 130,130 90,155 38,118 44,58" fill="rgba(167,139,250,0.25)" stroke="#a78bfa" stroke-width="1.5"/>
+        <line x1="90" y1="90" x2="90" y2="18" stroke="#334155" stroke-width="1"/>
+        <line x1="90" y1="90" x2="152" y2="54" stroke="#334155" stroke-width="1"/>
+        <line x1="90" y1="90" x2="152" y2="126" stroke="#334155" stroke-width="1"/>
+        <line x1="90" y1="90" x2="90" y2="162" stroke="#334155" stroke-width="1"/>
+        <line x1="90" y1="90" x2="28" y2="126" stroke="#334155" stroke-width="1"/>
+        <line x1="90" y1="90" x2="28" y2="54" stroke="#334155" stroke-width="1"/>
+        <text x="90" y="12" text-anchor="middle" fill="#c4b5fd" font-size="9">知识广度</text>
+        <text x="160" y="52" text-anchor="start" fill="#c4b5fd" font-size="9">知识深度</text>
+        <text x="160" y="130" text-anchor="start" fill="#c4b5fd" font-size="9">解题能力</text>
+        <text x="90" y="174" text-anchor="middle" fill="#c4b5fd" font-size="9">学习活跃</text>
+        <text x="20" y="130" text-anchor="end" fill="#c4b5fd" font-size="9">知识迁移</text>
+        <text x="20" y="52" text-anchor="end" fill="#c4b5fd" font-size="9">学习韧性</text>
+      </svg>
+    </div>
+    <div class="card-body">
+      <h3>B. 学习行为综合维度（推荐）</h3>
+      <p>知识广度 · 知识深度 · 解题能力 · 学习活跃度 · 知识迁移 · 学习韧性</p>
+      <p style="font-size:12px;color:#94a3b8;margin-top:6px;">来源：学习科学 + 数据驱动。广度=覆盖学科数，深度=掌握度均值，解题=正确率，活跃=连续天数，迁移=跨章节应用，韧性=错题复习率。</p>
+      <div class="pros-cons" style="margin-top:8px;">
+        <div class="pros"><h4>优点</h4><ul><li>直观易懂</li><li>数据可量化</li><li>AI 可精准计算</li></ul></div>
+        <div class="cons"><h4>缺点</h4><ul><li>偏行为，忽略认知深度</li></ul></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 方案 C：混合框架 -->
+  <div class="card" data-choice="hybrid" onclick="toggleSelect(this)">
+    <div class="card-image" style="background:#0f172a; height:200px; display:flex; align-items:center; justify-content:center; position:relative; overflow:hidden;">
+      <svg width="180" height="180" viewBox="0 0 180 180">
+        <polygon points="90,18 152,54 152,126 90,162 28,126 28,54" fill="none" stroke="#1e3a5f" stroke-width="1"/>
+        <polygon points="90,36 134,63 134,117 90,144 46,117 46,63" fill="none" stroke="#1e3a5f" stroke-width="1"/>
+        <polygon points="90,54 116,72 116,108 90,126 64,108 64,72" fill="none" stroke="#1e3a5f" stroke-width="1"/>
+        <polygon points="90,22 145,65 142,125 90,152 40,120 42,56" fill="rgba(34,197,94,0.2)" stroke="#4ade80" stroke-width="1.5"/>
+        <line x1="90" y1="90" x2="90" y2="18" stroke="#334155" stroke-width="1"/>
+        <line x1="90" y1="90" x2="152" y2="54" stroke="#334155" stroke-width="1"/>
+        <line x1="90" y1="90" x2="152" y2="126" stroke="#334155" stroke-width="1"/>
+        <line x1="90" y1="90" x2="90" y2="162" stroke="#334155" stroke-width="1"/>
+        <line x1="90" y1="90" x2="28" y2="126" stroke="#334155" stroke-width="1"/>
+        <line x1="90" y1="90" x2="28" y2="54" stroke="#334155" stroke-width="1"/>
+        <text x="90" y="12" text-anchor="middle" fill="#86efac" font-size="9">掌握深度</text>
+        <text x="160" y="52" text-anchor="start" fill="#86efac" font-size="9">思维能力</text>
+        <text x="160" y="130" text-anchor="start" fill="#86efac" font-size="9">实践应用</text>
+        <text x="90" y="174" text-anchor="middle" fill="#86efac" font-size="9">学习动力</text>
+        <text x="20" y="130" text-anchor="end" fill="#86efac" font-size="9">协作探索</text>
+        <text x="20" y="52" text-anchor="end" fill="#86efac" font-size="9">自主规划</text>
+      </svg>
+    </div>
+    <div class="card-body">
+      <h3>C. 混合框架</h3>
+      <p>掌握深度 · 思维能力 · 实践应用 · 学习动力 · 协作探索 · 自主规划</p>
+      <p style="font-size:12px;color:#94a3b8;margin-top:6px;">来源：PISA 核心素养 + 21世纪学习框架。兼顾认知能力与非认知能力，AI 结合答题数据 + 学习行为 + 初始问卷综合评估。</p>
+      <div class="pros-cons" style="margin-top:8px;">
+        <div class="pros"><h4>优点</h4><ul><li>最全面</li><li>符合素质教育理念</li></ul></div>
+        <div class="cons"><h4>缺点</h4><ul><li>部分维度难以量化</li></ul></div>
+      </div>
+    </div>
+  </div>
+
+</div>

@@ -1,5 +1,6 @@
 package com.iflytek.smartprep.controller;
 
+import com.iflytek.smartprep.config.LoginUserHolder;
 import com.iflytek.smartprep.config.RequireRole;
 import com.iflytek.smartprep.dto.ApiResponse;
 import com.iflytek.smartprep.dto.BilibiliImportRequest;
@@ -23,7 +24,7 @@ public class BilibiliController {
     private final VideoImportPipeline videoImportPipeline;
 
     @PostMapping("/parse")
-    @RequireRole({"teacher", "admin"})
+    @RequireRole({"teacher", "admin", "student"})
     public ApiResponse<BilibiliVideoMeta> parse(@RequestBody Map<String, String> body) {
         String url = body.get("url");
         if (url == null || url.isBlank()) {
@@ -37,7 +38,7 @@ public class BilibiliController {
     }
 
     @PostMapping("/search")
-    @RequireRole({"teacher", "admin"})
+    @RequireRole({"teacher", "admin", "student"})
     public ApiResponse<BilibiliSearchResult> search(@RequestBody Map<String, Object> body) {
         String keyword = (String) body.getOrDefault("keyword", "");
         int page = (int) body.getOrDefault("page", 1);
@@ -53,7 +54,7 @@ public class BilibiliController {
     }
 
     @PostMapping("/playlist")
-    @RequireRole({"teacher", "admin"})
+    @RequireRole({"teacher", "admin", "student"})
     public ApiResponse<List<BilibiliVideoMeta>> playlist(@RequestBody Map<String, String> body) {
         String url = body.get("url");
         if (url == null || url.isBlank()) {
@@ -67,7 +68,7 @@ public class BilibiliController {
     }
 
     @PostMapping("/import")
-    @RequireRole({"teacher", "admin"})
+    @RequireRole({"teacher", "admin", "student"})
     public ApiResponse<BilibiliImportResult> doImport(@RequestBody BilibiliImportRequest request) {
         if (request.getBvids() == null || request.getBvids().isEmpty()) {
             return ApiResponse.fail("请选择至少一个视频");
@@ -76,8 +77,9 @@ public class BilibiliController {
             return ApiResponse.fail("单次导入上限50个视频");
         }
 
+        Long userId = LoginUserHolder.get().getUserId();
         BilibiliImportResult result = videoImportPipeline.importVideos(
-                request.getBvids(), request.isAutoGenerate());
+                request.getBvids(), request.isAutoGenerate(), userId);
 
         return ApiResponse.ok(result);
     }

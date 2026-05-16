@@ -1,5 +1,6 @@
 com\iflytek\smartprep\dto\AbilityScoreDto.class
 com\iflytek\smartprep\service\AgentService.class
+com\iflytek\smartprep\dto\BilibiliSearchResult.class
 com\iflytek\smartprep\domain\User.class
 com\iflytek\smartprep\config\LoginUser$LoginUserBuilder.class
 com\iflytek\smartprep\domain\Course.class
@@ -36,6 +37,7 @@ com\iflytek\smartprep\service\GamificationService.class
 com\iflytek\smartprep\service\impl\StudyPathServiceImpl$2.class
 com\iflytek\smartprep\config\LoginUser.class
 com\iflytek\smartprep\dto\TutorStreamEvent$TutorStreamEventBuilder.class
+com\iflytek\smartprep\service\VideoImportPipeline$GenerationResult.class
 com\iflytek\smartprep\controller\ProfileController.class
 com\iflytek\smartprep\service\impl\AssessmentServiceImpl$1.class
 com\iflytek\smartprep\mapper\StudyPathMapper.class
@@ -79,6 +81,7 @@ com\iflytek\smartprep\service\AssessmentService.class
 com\iflytek\smartprep\dto\AdminUserCreateRequest.class
 com\iflytek\smartprep\dto\RegisterRequest.class
 com\iflytek\smartprep\rag\model\RetrievalResult$RetrievalResultBuilder.class
+com\iflytek\smartprep\controller\BilibiliController.class
 com\iflytek\smartprep\mapper\ExamAssignmentMapper.class
 com\iflytek\smartprep\dto\TutorAskRequest.class
 com\iflytek\smartprep\mapper\LessonMapper.class
@@ -103,6 +106,7 @@ com\iflytek\smartprep\domain\Subject.class
 com\iflytek\smartprep\dto\DashboardStats.class
 com\iflytek\smartprep\config\WebConfig.class
 com\iflytek\smartprep\dto\GradeExamRequest$QuestionAnnotation.class
+com\iflytek\smartprep\service\BilibiliService.class
 com\iflytek\smartprep\controller\StudentAbilityController.class
 com\iflytek\smartprep\rag\util\DocumentChunker.class
 com\iflytek\smartprep\dto\AbilityScoreDto$AbilityScoreDtoBuilder.class
@@ -116,6 +120,7 @@ com\iflytek\smartprep\controller\AssignmentController.class
 com\iflytek\smartprep\config\JwtTokenProvider.class
 com\iflytek\smartprep\controller\GlobalExceptionHandler.class
 com\iflytek\smartprep\domain\ExamQuestion.class
+com\iflytek\smartprep\dto\BilibiliImportRequest.class
 com\iflytek\smartprep\domain\KnowledgeDoc.class
 com\iflytek\smartprep\service\StudyPathService.class
 com\iflytek\smartprep\service\CourseScheduleService.class
@@ -135,6 +140,8 @@ com\iflytek\smartprep\controller\ContentReviewController.class
 com\iflytek\smartprep\domain\Unit.class
 com\iflytek\smartprep\controller\CourseController.class
 com\iflytek\smartprep\mapper\KnowledgeDocMapper.class
+com\iflytek\smartprep\service\VideoImportPipeline$ClassificationResult.class
+com\iflytek\smartprep\dto\BilibiliVideoMeta.class
 com\iflytek\smartprep\domain\LearningAssessment.class
 com\iflytek\smartprep\domain\Lesson.class
 com\iflytek\smartprep\dto\AdminUserUpdateRequest.class
@@ -165,11 +172,14 @@ com\iflytek\smartprep\controller\KnowledgeMapController.class
 com\iflytek\smartprep\config\AuthInterceptor.class
 com\iflytek\smartprep\mapper\KnowledgePointMapper.class
 com\iflytek\smartprep\service\impl\CourseServiceImpl.class
+com\iflytek\smartprep\dto\BilibiliImportResult.class
 com\iflytek\smartprep\mapper\AssignmentMapper.class
+com\iflytek\smartprep\dto\BilibiliImportResult$BilibiliImportResultItem.class
 com\iflytek\smartprep\controller\ResourceController.class
 com\iflytek\smartprep\dto\ExamPublishRequest.class
 com\iflytek\smartprep\service\LLMClient.class
 com\iflytek\smartprep\controller\AssessmentController.class
+com\iflytek\smartprep\service\VideoImportPipeline.class
 com\iflytek\smartprep\domain\ExamRecord.class
 com\iflytek\smartprep\domain\OperationLog.class
 com\iflytek\smartprep\mapper\LearningActivityMapper.class

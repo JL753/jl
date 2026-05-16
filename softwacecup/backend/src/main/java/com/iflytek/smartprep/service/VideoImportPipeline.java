@@ -30,7 +30,7 @@ public class VideoImportPipeline {
     private final KnowledgePointMapper knowledgePointMapper;
     private final ObjectMapper objectMapper = new ObjectMapper();
 
-    public BilibiliImportResult importVideos(List<String> bvids, boolean autoGenerate) {
+    public BilibiliImportResult importVideos(List<String> bvids, boolean autoGenerate, Long userId) {
         BilibiliImportResult result = new BilibiliImportResult();
         result.setResults(new ArrayList<>());
 
@@ -85,6 +85,7 @@ public class VideoImportPipeline {
                 lesson.setDuration(meta.getDuration());
                 lesson.setStatus("draft");
                 lesson.setSortOrder(0);
+                lesson.setUserId(userId);
                 lessonMapper.insert(lesson);
 
                 item.setLessonId(lesson.getId());

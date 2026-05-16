@@ -1,0 +1,24 @@
+{
+  "permissions": {
+    "allow": [
+      "Skill(grill-me)",
+      "Bash(mvn compile *)",
+      "Bash(mysql *)",
+      "Bash(taskkill //F //PID 865)",
+      "Bash(mvn spring-boot:run -DskipTests)",
+      "Bash(curl -s http://localhost:8080/api/subjects)",
+      "Bash(python3 -m json.tool)",
+      "Bash(echo \"Backend PID: $!\")",
+      "Bash(curl -s http://localhost:8080/api/courses/public)",
+      "Bash(python3 -c \"import sys,json; d=json.load\\(sys.stdin\\); print\\(f'Success: {d[\\\\\"success\\\\\"]}, Count: {len\\(d[\\\\\"data\\\\\"]\\)}'\\)\")",
+      "Bash(curl -s http://localhost:8080/api/subjects/1001/courses)",
+      "Bash(curl *)",
+      "Bash(python3 -c \"import sys,json; d=json.load\\(sys.stdin\\); print\\('courses:', len\\(d.get\\('data',[]\\)\\)\\)\")",
+      "Bash(python3 -c \"import sys,json; d=json.load\\(sys.stdin\\); print\\('courses_by_subject:', len\\(d.get\\('data',[]\\)\\)\\)\")",
+      "Bash(git add *)",
+      "Bash(npm run *)",
+      "Bash(node *)",
+      "Bash(git commit -m ' *)"
+    ]
+  }
+}

@@ -1,0 +1,79 @@
+<h2>设计方案 — 第 2 节：首页 Dashboard</h2>
+<p class="subtitle">对标可汗学院：Continue Learning 为绝对核心，学习周报 + 推荐路径 + 快捷入口</p>
+
+<div class="mockup">
+  <div class="mockup-header">Dashboard 布局（全宽，无侧栏）</div>
+  <div class="mockup-body" style="padding:24px;font-family:system-ui;">
+
+    <!-- Greeting -->
+    <div style="margin-bottom:20px;">
+      <div style="font-size:22px;font-weight:700;">欢迎回来，左雯臣 👋</div>
+      <div style="font-size:12px;color:rgba(255,255,255,0.45);margin-top:4px;">已连续学习 <span style="color:#60d9fa;font-weight:600;">7 天</span> · 掌握 <span style="color:#a855f7;font-weight:600;">23 个</span> 知识点 · 本周学习 <span style="color:#3b82f6;font-weight:600;">4.5 小时</span></div>
+    </div>
+
+    <!-- Row 1: Continue Learning (big) + Weekly Stats (small) -->
+    <div style="display:flex;gap:16px;margin-bottom:16px;">
+      <!-- Continue Learning card -->
+      <div style="flex:1.5;background:linear-gradient(135deg,rgba(59,130,246,0.12),rgba(168,85,247,0.08));border:1px solid rgba(59,130,246,0.2);border-radius:12px;padding:20px;">
+        <div style="font-size:10px;text-transform:uppercase;letter-spacing:1px;color:rgba(255,255,255,0.35);margin-bottom:8px;">继续上次学习</div>
+        <div style="font-size:18px;font-weight:700;margin-bottom:4px;">Python 数据结构 — 链表</div>
+        <div style="font-size:12px;color:rgba(255,255,255,0.5);margin-bottom:12px;">第 2 单元 · 第 3 课时 · 已完成 60%</div>
+        <div style="height:4px;background:rgba(255,255,255,0.06);border-radius:2px;margin-bottom:12px;"><div style="width:60%;height:100%;background:linear-gradient(90deg,#3b82f6,#60d9fa);border-radius:2px;"></div></div>
+        <button class="mock-button" style="background:linear-gradient(135deg,#3b82f6,#2563eb);">继续学习 →</button>
+      </div>
+      <!-- Weekly stats -->
+      <div style="flex:1;background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.06);border-radius:12px;padding:20px;">
+        <div style="font-size:10px;text-transform:uppercase;letter-spacing:1px;color:rgba(255,255,255,0.35);margin-bottom:12px;">本周学习</div>
+        <div style="display:flex;justify-content:space-between;">
+          <div style="text-align:center;"><div style="font-size:24px;font-weight:800;color:#3b82f6;">5</div><div style="font-size:10px;color:rgba(255,255,255,0.4);">完成课时</div></div>
+          <div style="text-align:center;"><div style="font-size:24px;font-weight:800;color:#a855f7;">42</div><div style="font-size:10px;color:rgba(255,255,255,0.4);">练习题</div></div>
+          <div style="text-align:center;"><div style="font-size:24px;font-weight:800;color:#60d9fa;">85%</div><div style="font-size:10px;color:rgba(255,255,255,0.4);">正确率</div></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Row 2: AI Recommended Path -->
+    <div style="background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.06);border-radius:12px;padding:20px;margin-bottom:16px;">
+      <div style="font-size:10px;text-transform:uppercase;letter-spacing:1px;color:rgba(255,255,255,0.35);margin-bottom:12px;">🤖 AI 推荐学习路径</div>
+      <div style="display:flex;gap:12px;overflow-x:auto;">
+        <div style="min-width:160px;background:rgba(96,217,250,0.08);border:1px solid rgba(96,217,250,0.15);border-radius:8px;padding:12px;">
+          <div style="font-size:10px;color:rgba(255,255,255,0.3);">第 1 步</div>
+          <div style="font-size:13px;font-weight:600;">数组基础</div>
+          <div style="font-size:10px;color:#60d9fa;">✓ 已掌握</div>
+        </div>
+        <div style="min-width:160px;background:rgba(96,217,250,0.08);border:1px solid rgba(96,217,250,0.15);border-radius:8px;padding:12px;">
+          <div style="font-size:10px;color:rgba(255,255,255,0.3);">第 2 步</div>
+          <div style="font-size:13px;font-weight:600;">链表操作</div>
+          <div style="font-size:10px;color:#eab308;">◷ 进行中</div>
+        </div>
+        <div style="min-width:160px;background:rgba(255,255,255,0.02);border:1px solid rgba(255,255,255,0.06);border-radius:8px;padding:12px;">
+          <div style="font-size:10px;color:rgba(255,255,255,0.3);">第 3 步</div>
+          <div style="font-size:13px;font-weight:600;">栈与队列</div>
+          <div style="font-size:10px;color:rgba(255,255,255,0.3);">待学习</div>
+        </div>
+        <div style="min-width:160px;background:rgba(255,255,255,0.02);border:1px solid rgba(255,255,255,0.06);border-radius:8px;padding:12px;">
+          <div style="font-size:10px;color:rgba(255,255,255,0.3);">第 4 步</div>
+          <div style="font-size:13px;font-weight:600;">递归入门</div>
+          <div style="font-size:10px;color:rgba(255,255,255,0.3);">待学习</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Row 3: Quick entries (3 cols) -->
+    <div style="display:flex;gap:16px;">
+      <div class="placeholder" style="flex:1;text-align:center;padding:16px;">📝 自适应测验<br><span style="font-size:10px;opacity:0.5;">检测当前掌握度</span></div>
+      <div class="placeholder" style="flex:1;text-align:center;padding:16px;">🏆 今日挑战<br><span style="font-size:10px;opacity:0.5;">连续 7 天签到</span></div>
+      <div class="placeholder" style="flex:1;text-align:center;padding:16px;">📊 学习报告<br><span style="font-size:10px;opacity:0.5;">查看详细分析</span></div>
+    </div>
+  </div>
+</div>
+
+<div class="section">
+  <h3>与旧版 StudentDashboard 的对比</h3>
+  <table style="width:100%;font-size:12px;border-collapse:collapse;">
+    <tr style="border-bottom:1px solid rgba(255,255,255,0.06);"><td style="padding:6px 8px;color:rgba(255,255,255,0.4);width:50%;">旧：能力雷达图占主位</td><td style="padding:6px 8px;">新：Continue Learning 占主位（对标可汗）</td></tr>
+    <tr style="border-bottom:1px solid rgba(255,255,255,0.06);"><td style="padding:6px 8px;color:rgba(255,255,255,0.4);">旧：AI 推荐资源卡片</td><td style="padding:6px 8px;">新：AI 推荐学习路径时间线</td></tr>
+    <tr style="border-bottom:1px solid rgba(255,255,255,0.06);"><td style="padding:6px 8px;color:rgba(255,255,255,0.4);">旧：今日任务列表</td><td style="padding:6px 8px;">新：本周统计数字 + 快捷入口</td></tr>
+    <tr><td style="padding:6px 8px;color:rgba(255,255,255,0.4);">旧：快捷入口 4 宫格</td><td style="padding:6px 8px;">新：3 个快捷卡片（测验/挑战/报告）</td></tr>
+  </table>
+</div>

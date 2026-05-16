@@ -1,0 +1,39 @@
+<h2>课程浏览流程 — 从学科到课时的路径</h2>
+<p class="subtitle">可汗学院用逐层下钻，每一步都是一页；知域目前用单页大杂烩</p>
+
+<div class="section">
+  <h3>可汗学院对标流程</h3>
+  <div style="display:flex;align-items:center;gap:8px;padding:16px;overflow-x:auto;font-size:13px;">
+    <div style="background:rgba(59,130,246,0.15);border:1px solid rgba(59,130,246,0.3);border-radius:8px;padding:10px 14px;white-space:nowrap;">📚 学科列表<br><span style="font-size:10px;opacity:0.6;">8大学科卡片网格</span></div>
+    <span style="color:rgba(255,255,255,0.3);">→</span>
+    <div style="background:rgba(168,85,247,0.15);border:1px solid rgba(168,85,247,0.3);border-radius:8px;padding:10px 14px;white-space:nowrap;">📘 课程列表<br><span style="font-size:10px;opacity:0.6;">该学科下课程</span></div>
+    <span style="color:rgba(255,255,255,0.3);">→</span>
+    <div style="background:rgba(96,217,250,0.15);border:1px solid rgba(96,217,250,0.3);border-radius:8px;padding:10px 14px;white-space:nowrap;">📂 单元列表<br><span style="font-size:10px;opacity:0.6;">课程内单元</span></div>
+    <span style="color:rgba(255,255,255,0.3);">→</span>
+    <div style="background:rgba(6,182,212,0.15);border:1px solid rgba(6,182,212,0.3);border-radius:8px;padding:10px 14px;white-space:nowrap;">📖 课时学习<br><span style="font-size:10px;opacity:0.6;">视频+讲义+练习</span></div>
+  </div>
+</div>
+
+<div class="options">
+  <div class="option" data-choice="a" onclick="toggleSelect(this)">
+    <div class="letter">A</div>
+    <div class="content">
+      <h3>方案 A：逐层下钻（对标可汗）— 每层独立页面</h3>
+      <p>学科列表 → 点击进入课程列表 → 点击进入单元/课时列表 → 点击进入课时学习。每一步都是一个独立的路由页面，面包屑导航，清晰的层级关系。优势：简单清晰，可汗用户熟悉；代价：页面跳转多</p>
+    </div>
+  </div>
+  <div class="option" data-choice="b" onclick="toggleSelect(this)">
+    <div class="letter">B</div>
+    <div class="content">
+      <h3>方案 B：左侧树 + 右侧内容（文档站风格）</h3>
+      <p>课程详情页左侧显示学科→课程→单元→课时四级树形导航，点击任意节点右侧加载内容。一键跳转无需反复进退。适合深度浏览。代价：移动端适配复杂</p>
+    </div>
+  </div>
+  <div class="option" data-choice="c" onclick="toggleSelect(this)">
+    <div class="letter">C</div>
+    <div class="content">
+      <h3>方案 C：混合 — 学科课程两级下钻，到单元/课时切换为侧栏</h3>
+      <p>学科、课程用独立页面（卡片网格），进入具体课程后，单元/课时用左侧树+右侧内容。兼顾浏览的视觉冲击力（前两级）和操作效率（后两级）</p>
+    </div>
+  </div>
+</div>

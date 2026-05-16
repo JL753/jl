@@ -1,0 +1,53 @@
+<h2>信息架构选项 — 学生端页面结构</h2>
+<p class="subtitle">可汗学院的核心是"少即是多"：主流程只有 首页→课程→学习 三步。你的创新功能如何融入？</p>
+
+<div class="section">
+  <h3>当前可汗学院学生端结构（对标）</h3>
+  <div class="mockup">
+    <div class="mockup-body" style="padding:16px;font-family:system-ui;">
+      <div style="display:flex;gap:12px;flex-wrap:wrap;">
+        <div style="flex:1;min-width:140px;background:rgba(255,255,255,0.03);border-radius:8px;padding:12px;text-align:center;border:1px solid rgba(255,255,255,0.06);">
+          <div style="font-weight:700;font-size:14px;">🏠 首页</div>
+          <div style="font-size:11px;color:rgba(255,255,255,0.4);margin-top:4px;">继续学习 · 推荐 · 周报</div>
+        </div>
+        <div style="flex:1;min-width:140px;background:rgba(255,255,255,0.03);border-radius:8px;padding:12px;text-align:center;border:1px solid rgba(255,255,255,0.06);">
+          <div style="font-weight:700;font-size:14px;">📚 学科浏览</div>
+          <div style="font-size:11px;color:rgba(255,255,255,0.4);margin-top:4px;">学科→课程→单元</div>
+        </div>
+        <div style="flex:1;min-width:140px;background:rgba(255,255,255,0.03);border-radius:8px;padding:12px;text-align:center;border:1px solid rgba(255,255,255,0.06);">
+          <div style="font-weight:700;font-size:14px;">📖 课时学习</div>
+          <div style="font-size:11px;color:rgba(255,255,255,0.4);margin-top:4px;">视频+讲义+练习</div>
+        </div>
+        <div style="flex:1;min-width:140px;background:rgba(255,255,255,0.03);border-radius:8px;padding:12px;text-align:center;border:1px solid rgba(255,255,255,0.06);">
+          <div style="font-weight:700;font-size:14px;">👤 我的</div>
+          <div style="font-size:11px;color:rgba(255,255,255,0.4);margin-top:4px;">进度·成就·设置</div>
+        </div>
+      </div>
+      <div style="margin-top:8px;font-size:12px;color:rgba(255,255,255,0.4);text-align:center;">4 个主要页面 + 底部 4 Tab</div>
+    </div>
+  </div>
+</div>
+
+<div class="options">
+  <div class="option" data-choice="a" onclick="toggleSelect(this)">
+    <div class="letter">A</div>
+    <div class="content">
+      <h3>方案 A：严格对标 — 4 主页面，创新功能做子页面</h3>
+      <p>底部 4 Tab：首页 / 学科 / 星图 / 我的。AI 辅导嵌入课时页（侧边栏），测验/考试/游戏化/成就都在"我的"下做子页面，其他创新页（协作/笔记/社区/沉浸式/分析/拼图）全部砍掉路由</p>
+    </div>
+  </div>
+  <div class="option" data-choice="b" onclick="toggleSelect(this)">
+    <div class="letter">B</div>
+    <div class="content">
+      <h3>方案 B：可汗骨架 + 知域创新层 — 5 Tab，创新功能保留</h3>
+      <p>底部 5 Tab：首页 / 学科 / 星图 / AI / 我的。AI 辅导独立成一页（AI tutor chat），星图独立（知识图谱可视化）。游戏化/成就/测验子页面在"我的"下。协作/笔记/社区/沉浸式做浮动入口（Fab 按钮或课程页内嵌）</p>
+    </div>
+  </div>
+  <div class="option" data-choice="c" onclick="toggleSelect(this)">
+    <div class="letter">C</div>
+    <div class="content">
+      <h3>方案 C：课程中心制 — 所有功能围绕课时页展开</h3>
+      <p>首页 → 学科 → 课时（核心枢纽页）。课时页内集成了 AI 辅导按钮、练习入口、笔记面板、协作讨论、相关知识点。知识星图作为"探索"模式单独一个入口。底部仅 3 Tab：首页 / 学科 / 我的。大部分功能不在独立路由，而在课时页内按需弹出</p>
+    </div>
+  </div>
+</div>

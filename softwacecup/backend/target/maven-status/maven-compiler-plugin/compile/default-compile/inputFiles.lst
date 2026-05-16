@@ -12,6 +12,7 @@ C:\Users\ZWC\Desktop\软件杯大赛\softwacecup\backend\src\main\java\com\iflyt
 C:\Users\ZWC\Desktop\软件杯大赛\softwacecup\backend\src\main\java\com\iflytek\smartprep\domain\Unit.java
 C:\Users\ZWC\Desktop\软件杯大赛\softwacecup\backend\src\main\java\com\iflytek\smartprep\mapper\ContentReviewMapper.java
 C:\Users\ZWC\Desktop\软件杯大赛\softwacecup\backend\src\main\java\com\iflytek\smartprep\mapper\TaskCompletionMapper.java
+C:\Users\ZWC\Desktop\软件杯大赛\softwacecup\backend\src\main\java\com\iflytek\smartprep\dto\BilibiliSearchResult.java
 C:\Users\ZWC\Desktop\软件杯大赛\softwacecup\backend\src\main\java\com\iflytek\smartprep\dto\DialogueProfileRequest.java
 C:\Users\ZWC\Desktop\软件杯大赛\softwacecup\backend\src\main\java\com\iflytek\smartprep\dto\LoginResponse.java
 C:\Users\ZWC\Desktop\软件杯大赛\softwacecup\backend\src\main\java\com\iflytek\smartprep\config\WebConfig.java
@@ -25,6 +26,7 @@ C:\Users\ZWC\Desktop\软件杯大赛\softwacecup\backend\src\main\java\com\iflyt
 C:\Users\ZWC\Desktop\软件杯大赛\softwacecup\backend\src\main\java\com\iflytek\smartprep\mapper\CourseScheduleMapper.java
 C:\Users\ZWC\Desktop\软件杯大赛\softwacecup\backend\src\main\java\com\iflytek\smartprep\mapper\LessonMapper.java
 C:\Users\ZWC\Desktop\软件杯大赛\softwacecup\backend\src\main\java\com\iflytek\smartprep\service\agent\MediaAgent.java
+C:\Users\ZWC\Desktop\软件杯大赛\softwacecup\backend\src\main\java\com\iflytek\smartprep\dto\BilibiliImportRequest.java
 C:\Users\ZWC\Desktop\软件杯大赛\softwacecup\backend\src\main\java\com\iflytek\smartprep\dto\PaperCreateRequest.java
 C:\Users\ZWC\Desktop\软件杯大赛\softwacecup\backend\src\main\java\com\iflytek\smartprep\mapper\AssignmentMapper.java
 C:\Users\ZWC\Desktop\软件杯大赛\softwacecup\backend\src\main\java\com\iflytek\smartprep\service\CourseScheduleService.java
@@ -40,6 +42,7 @@ C:\Users\ZWC\Desktop\软件杯大赛\softwacecup\backend\src\main\java\com\iflyt
 C:\Users\ZWC\Desktop\软件杯大赛\softwacecup\backend\src\main\java\com\iflytek\smartprep\domain\UserStreak.java
 C:\Users\ZWC\Desktop\软件杯大赛\softwacecup\backend\src\main\java\com\iflytek\smartprep\dto\ResourceGenerateRequest.java
 C:\Users\ZWC\Desktop\软件杯大赛\softwacecup\backend\src\main\java\com\iflytek\smartprep\mapper\LearningActivityMapper.java
+C:\Users\ZWC\Desktop\软件杯大赛\softwacecup\backend\src\main\java\com\iflytek\smartprep\dto\BilibiliImportResult.java
 C:\Users\ZWC\Desktop\软件杯大赛\softwacecup\backend\src\main\java\com\iflytek\smartprep\service\impl\AssessmentServiceImpl.java
 C:\Users\ZWC\Desktop\软件杯大赛\softwacecup\backend\src\main\java\com\iflytek\smartprep\domain\ContentReview.java
 C:\Users\ZWC\Desktop\软件杯大赛\softwacecup\backend\src\main\java\com\iflytek\smartprep\service\KnowledgeGraphService.java
@@ -105,6 +108,7 @@ C:\Users\ZWC\Desktop\软件杯大赛\softwacecup\backend\src\main\java\com\iflyt
 C:\Users\ZWC\Desktop\软件杯大赛\softwacecup\backend\src\main\java\com\iflytek\smartprep\domain\UserBadge.java
 C:\Users\ZWC\Desktop\软件杯大赛\softwacecup\backend\src\main\java\com\iflytek\smartprep\dto\AdminCourseCreateRequest.java
 C:\Users\ZWC\Desktop\软件杯大赛\softwacecup\backend\src\main\java\com\iflytek\smartprep\domain\KnowledgePoint.java
+C:\Users\ZWC\Desktop\软件杯大赛\softwacecup\backend\src\main\java\com\iflytek\smartprep\dto\BilibiliVideoMeta.java
 C:\Users\ZWC\Desktop\软件杯大赛\softwacecup\backend\src\main\java\com\iflytek\smartprep\domain\KnowledgeDoc.java
 C:\Users\ZWC\Desktop\软件杯大赛\softwacecup\backend\src\main\java\com\iflytek\smartprep\domain\LearningActivity.java
 C:\Users\ZWC\Desktop\软件杯大赛\softwacecup\backend\src\main\java\com\iflytek\smartprep\dto\AdminUserCreateRequest.java
@@ -116,6 +120,7 @@ C:\Users\ZWC\Desktop\软件杯大赛\softwacecup\backend\src\main\java\com\iflyt
 C:\Users\ZWC\Desktop\软件杯大赛\softwacecup\backend\src\main\java\com\iflytek\smartprep\dto\AdminUserUpdateRequest.java
 C:\Users\ZWC\Desktop\软件杯大赛\softwacecup\backend\src\main\java\com\iflytek\smartprep\mapper\BadgeDefMapper.java
 C:\Users\ZWC\Desktop\软件杯大赛\softwacecup\backend\src\main\java\com\iflytek\smartprep\service\impl\TeacherToolServiceImpl.java
+C:\Users\ZWC\Desktop\软件杯大赛\softwacecup\backend\src\main\java\com\iflytek\smartprep\service\VideoImportPipeline.java
 C:\Users\ZWC\Desktop\软件杯大赛\softwacecup\backend\src\main\java\com\iflytek\smartprep\domain\ResourceRecommendation.java
 C:\Users\ZWC\Desktop\软件杯大赛\softwacecup\backend\src\main\java\com\iflytek\smartprep\domain\CourseSchedule.java
 C:\Users\ZWC\Desktop\软件杯大赛\softwacecup\backend\src\main\java\com\iflytek\smartprep\dto\QuizGenerateRequest.java
@@ -168,6 +173,7 @@ C:\Users\ZWC\Desktop\软件杯大赛\softwacecup\backend\src\main\java\com\iflyt
 C:\Users\ZWC\Desktop\软件杯大赛\softwacecup\backend\src\main\java\com\iflytek\smartprep\config\RoleCheckInterceptor.java
 C:\Users\ZWC\Desktop\软件杯大赛\softwacecup\backend\src\main\java\com\iflytek\smartprep\mapper\ExamMapper.java
 C:\Users\ZWC\Desktop\软件杯大赛\softwacecup\backend\src\main\java\com\iflytek\smartprep\service\QaHistoryService.java
+C:\Users\ZWC\Desktop\软件杯大赛\softwacecup\backend\src\main\java\com\iflytek\smartprep\service\BilibiliService.java
 C:\Users\ZWC\Desktop\软件杯大赛\softwacecup\backend\src\main\java\com\iflytek\smartprep\config\AuthInterceptor.java
 C:\Users\ZWC\Desktop\软件杯大赛\softwacecup\backend\src\main\java\com\iflytek\smartprep\dto\GradeExamRequest.java
 C:\Users\ZWC\Desktop\软件杯大赛\softwacecup\backend\src\main\java\com\iflytek\smartprep\domain\Subject.java
@@ -178,6 +184,7 @@ C:\Users\ZWC\Desktop\软件杯大赛\softwacecup\backend\src\main\java\com\iflyt
 C:\Users\ZWC\Desktop\软件杯大赛\softwacecup\backend\src\main\java\com\iflytek\smartprep\mapper\OperationLogMapper.java
 C:\Users\ZWC\Desktop\软件杯大赛\softwacecup\backend\src\main\java\com\iflytek\smartprep\controller\RAGController.java
 C:\Users\ZWC\Desktop\软件杯大赛\softwacecup\backend\src\main\java\com\iflytek\smartprep\domain\StudentProfile.java
+C:\Users\ZWC\Desktop\软件杯大赛\softwacecup\backend\src\main\java\com\iflytek\smartprep\controller\BilibiliController.java
 C:\Users\ZWC\Desktop\软件杯大赛\softwacecup\backend\src\main\java\com\iflytek\smartprep\dto\ExamPublishRequest.java
 C:\Users\ZWC\Desktop\软件杯大赛\softwacecup\backend\src\main\java\com\iflytek\smartprep\service\AgentService.java
 C:\Users\ZWC\Desktop\软件杯大赛\softwacecup\backend\src\main\java\com\iflytek\smartprep\service\impl\StudyPathServiceImpl.java

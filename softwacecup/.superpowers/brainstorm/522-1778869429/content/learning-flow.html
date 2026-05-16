@@ -1,0 +1,97 @@
+<h2>学生打开一个"课时"后，核心体验是什么？</h2>
+<p class="subtitle">这决定了整个平台的学习交互模式</p>
+
+<div class="cards">
+
+  <div class="card" data-choice="video-first" onclick="toggleSelect(this)">
+    <div class="card-image" style="background:#0f172a; height:170px; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:10px; position:relative; overflow:hidden;">
+      <div style="width:200px; height:110px; background:#1e293b; border-radius:8px; border:1px solid #334155; display:flex;align-items:center;justify-content:center; position:relative;">
+        <div style="width:0;height:0;border-top:16px solid transparent;border-bottom:16px solid transparent;border-left:26px solid #60a5fa;"></div>
+        <div style="position:absolute;bottom:6px;left:8px;right:8px;height:3px;background:#1e3a5f;border-radius:2px;">
+          <div style="width:35%;height:100%;background:#3b82f6;border-radius:2px;"></div>
+        </div>
+      </div>
+      <div style="display:flex;gap:6px;">
+        <div style="width:60px;height:18px;background:#1e3a5f;border-radius:4px;"></div>
+        <div style="width:80px;height:18px;background:#1e3a5f;border-radius:4px;"></div>
+        <div style="width:50px;height:18px;background:#1e3a5f;border-radius:4px;"></div>
+      </div>
+    </div>
+    <div class="card-body">
+      <h3>A. 视频优先</h3>
+      <p>先看视频讲解 → 再做练习题。完全对齐可汗学院模式。视频由教师上传或 AI 生成脚本后录制。</p>
+      <div class="pros-cons" style="margin-top:8px;">
+        <div class="pros"><h4>优点</h4><ul><li>最接近可汗学院</li><li>适合视觉学习者</li></ul></div>
+        <div class="cons"><h4>缺点</h4><ul><li>需要视频内容</li><li>初期内容少</li></ul></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="card" data-choice="text-exercise" onclick="toggleSelect(this)">
+    <div class="card-image" style="background:#0f172a; height:170px; display:flex; flex-direction:column; padding:12px; gap:8px; overflow:hidden;">
+      <div style="display:flex;gap:8px;flex:1;">
+        <div style="flex:1; background:#1e293b; border-radius:6px; padding:8px; border:1px solid #334155;">
+          <div style="width:80%;height:5px;background:#334155;border-radius:2px;margin-bottom:5px;"></div>
+          <div style="width:100%;height:5px;background:#334155;border-radius:2px;margin-bottom:5px;"></div>
+          <div style="width:60%;height:5px;background:#334155;border-radius:2px;margin-bottom:10px;"></div>
+          <div style="width:40px;height:16px;background:#1d4ed8;border-radius:4px;font-size:9px;color:white;display:flex;align-items:center;justify-content:center;">讲义</div>
+        </div>
+        <div style="flex:1; background:#1e293b; border-radius:6px; padding:8px; border:1px solid #334155;">
+          <div style="font-size:9px;color:#94a3b8;margin-bottom:6px;">练习题 1/5</div>
+          <div style="width:100%;height:5px;background:#334155;border-radius:2px;margin-bottom:8px;"></div>
+          <div style="display:flex;flex-direction:column;gap:4px;">
+            <div style="width:100%;height:12px;background:#1e3a5f;border-radius:3px;border:1px solid #2563eb;"></div>
+            <div style="width:100%;height:12px;background:#1e293b;border-radius:3px;border:1px solid #334155;"></div>
+            <div style="width:100%;height:12px;background:#1e293b;border-radius:3px;border:1px solid #334155;"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="card-body">
+      <h3>B. 图文 + 练习（推荐）</h3>
+      <p>左侧 AI 生成图文讲义，右侧同步练习题。无需视频内容即可运行，AI 可立即生成。支持后续补充视频。</p>
+      <div class="pros-cons" style="margin-top:8px;">
+        <div class="pros"><h4>优点</h4><ul><li>AI 可立即生成</li><li>内容丰富度高</li></ul></div>
+        <div class="cons"><h4>缺点</h4><ul><li>缺少视频体验</li></ul></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="card" data-choice="hybrid-flow" onclick="toggleSelect(this)">
+    <div class="card-image" style="background:#0f172a; height:170px; display:flex; flex-direction:column; padding:10px; gap:6px; overflow:hidden;">
+      <div style="display:flex; gap:6px; align-items:center; justify-content:center;">
+        <div style="width:50px;height:36px;background:#1e3a5f;border-radius:5px;border:1px solid #2563eb;display:flex;align-items:center;justify-content:center;">
+          <div style="width:0;height:0;border-top:7px solid transparent;border-bottom:7px solid transparent;border-left:11px solid #60a5fa;"></div>
+        </div>
+        <div style="color:#475569;font-size:14px;">→</div>
+        <div style="width:50px;height:36px;background:#1e293b;border-radius:5px;border:1px solid #334155;display:flex;align-items:center;justify-content:center;font-size:9px;color:#94a3b8;">图文</div>
+        <div style="color:#475569;font-size:14px;">→</div>
+        <div style="width:50px;height:36px;background:#1e293b;border-radius:5px;border:1px solid #334155;display:flex;align-items:center;justify-content:center;font-size:9px;color:#94a3b8;">练习</div>
+        <div style="color:#475569;font-size:14px;">→</div>
+        <div style="width:50px;height:36px;background:#14532d;border-radius:5px;border:1px solid #16a34a;display:flex;align-items:center;justify-content:center;font-size:9px;color:#86efac;">掌握✓</div>
+      </div>
+      <div style="display:flex;gap:4px;justify-content:center;margin-top:4px;">
+        <div style="width:16px;height:16px;background:#1d4ed8;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:8px;color:white;">AI</div>
+        <div style="font-size:9px;color:#64748b;line-height:16px;">AI 辅导随时可唤起</div>
+      </div>
+      <div style="background:#1e293b;border-radius:5px;padding:6px;border:1px solid #334155;">
+        <div style="display:flex;gap:4px;align-items:center;">
+          <div style="width:8px;height:8px;background:#f59e0b;border-radius:50%;"></div>
+          <div style="font-size:9px;color:#94a3b8;">掌握度进度条</div>
+          <div style="flex:1;height:4px;background:#334155;border-radius:2px;margin-left:4px;">
+            <div style="width:60%;height:100%;background:linear-gradient(90deg,#f59e0b,#10b981);border-radius:2px;"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="card-body">
+      <h3>C. 全流程混合</h3>
+      <p>视频（可选）→ 图文讲义 → 练习题 → 掌握度解锁。有视频时播放，没有时跳过。AI 辅导悬浮随时可唤起。</p>
+      <div class="pros-cons" style="margin-top:8px;">
+        <div class="pros"><h4>优点</h4><ul><li>最灵活</li><li>内容可渐进补充</li></ul></div>
+        <div class="cons"><h4>缺点</h4><ul><li>流程稍复杂</li></ul></div>
+      </div>
+    </div>
+  </div>
+
+</div>

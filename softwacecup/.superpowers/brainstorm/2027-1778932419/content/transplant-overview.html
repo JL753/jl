@@ -1,0 +1,125 @@
+<h2>移植方案总览 — 前端移植 + 适配 Java 后端</h2>
+<p class="subtitle">从 ai-assistant-teaching-website → softwacecup，保留 Unity 虚拟人 + 交互，后端复用现有讯飞 Java 服务</p>
+
+<div class="section">
+  <h3>需要移植的前端组件</h3>
+</div>
+
+<div class="split">
+  <div class="mockup">
+    <div class="mockup-header">源项目：ai-assistant-teaching-website</div>
+    <div class="mockup-body">
+      <div style="display: flex; flex-direction: column; gap: 12px;">
+        <div class="placeholder" style="background: rgba(59,130,246,0.1); border: 1px solid rgba(59,130,246,0.3);">
+          <strong>UnityComponent.vue</strong><br>
+          <small>Unity WebGL 容器，加载 3D 虚拟人"小慧"</small>
+        </div>
+        <div class="placeholder" style="background: rgba(16,185,129,0.1); border: 1px solid rgba(16,185,129,0.3);">
+          <strong>UnityInteraction.vue</strong><br>
+          <small>聊天 UI + 语音按钮 + 情绪检测 + Unity 通信桥接</small>
+        </div>
+        <div class="placeholder" style="background: rgba(245,158,11,0.1); border: 1px solid rgba(245,158,11,0.3);">
+          <strong>Unity Build 文件</strong><br>
+          <small>.data / .framework.js / .loader.js / .wasm</small>
+        </div>
+        <div class="placeholder" style="background: rgba(139,92,246,0.1); border: 1px solid rgba(139,92,246,0.3);">
+          <strong>recorder.wav.min.js + unity.recorder.js</strong><br>
+          <small>浏览器端麦克风录音支持</small>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="mockup">
+    <div class="mockup-header">目标项目：softwacecup</div>
+    <div class="mockup-body">
+      <div style="display: flex; flex-direction: column; gap: 12px;">
+        <div class="placeholder" style="background: rgba(59,130,246,0.1); border: 1px solid rgba(59,130,246,0.3);">
+          <strong>StudentLayout.vue</strong> ← 新增 AI 伴学入口
+        </div>
+        <div class="placeholder" style="background: rgba(16,185,129,0.1); border: 1px solid rgba(16,185,129,0.3);">
+          <strong>AICompanionView.vue</strong> ← 嵌入 Unity 虚拟人
+        </div>
+        <div class="placeholder" style="background: rgba(245,158,11,0.1); border: 1px solid rgba(245,158,11,0.3);">
+          <strong>AIFloatingBall.vue</strong> ← 增强语音入口
+        </div>
+        <div class="placeholder" style="background: rgba(139,92,246,0.1); border: 1px solid rgba(139,92,246,0.3);">
+          <strong>Java AgentController</strong> ← 新增 STT/TTS/LLM 端点
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="section">
+  <h3>学生端 AI 功能页面布局预览</h3>
+</div>
+
+<div class="mockup">
+  <div class="mockup-header">AI 伴学页面 (替换现有 AICompanionView)</div>
+  <div class="mockup-body">
+    <div style="display: flex; height: 400px; gap: 0;">
+      <!-- Left: Unity Avatar -->
+      <div style="flex: 1; display: flex; flex-direction: column; background: rgba(0,0,0,0.3); border-radius: 12px 0 0 12px; padding: 12px; align-items: center; justify-content: center;">
+        <div class="placeholder" style="width: 90%; height: 70%; display: flex; align-items: center; justify-content: center; flex-direction: column;">
+          <div style="font-size: 48px; margin-bottom: 8px;">👩‍🏫</div>
+          <div style="font-weight: 600; color: #60a5fa;">小慧 3D 虚拟人</div>
+          <small style="color: rgba(255,255,255,0.4);">Unity WebGL</small>
+        </div>
+        <div style="font-size: 11px; color: rgba(255,255,255,0.3); text-align: center; margin-top: 8px;">
+          表情：开心 | 动作：右手放胸前
+        </div>
+      </div>
+      <!-- Right: Chat Panel -->
+      <div style="flex: 1; display: flex; flex-direction: column; background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.08); border-radius: 0 12px 12px 0; overflow: hidden;">
+        <div class="mock-nav" style="margin: 0; padding: 10px 14px;">AI 学习助手 · 对话记录</div>
+        <div style="flex: 1; padding: 12px; overflow-y: auto; display: flex; flex-direction: column; gap: 8px;">
+          <div style="align-self: flex-start; max-width: 80%;">
+            <div class="placeholder" style="background: rgba(59,130,246,0.15); border-radius: 12px 12px 12px 4px; padding: 8px 12px; font-size: 13px;">
+              👋 你好！我是虚拟教学助手小慧<br>有什么可以帮你的吗？
+            </div>
+          </div>
+          <div style="align-self: flex-end; max-width: 80%;">
+            <div class="placeholder" style="background: rgba(16,185,129,0.15); border-radius: 12px 12px 4px 12px; padding: 8px 12px; font-size: 13px;">
+              帮我打开课程平台
+            </div>
+          </div>
+          <div style="align-self: flex-start; max-width: 80%;">
+            <div class="placeholder" style="background: rgba(59,130,246,0.15); border-radius: 12px 12px 12px 4px; padding: 8px 12px; font-size: 13px;">
+              好的，正在跳转到课程平台... ✅
+            </div>
+          </div>
+        </div>
+        <div style="padding: 10px 12px; border-top: 1px solid rgba(255,255,255,0.08); display: flex; gap: 8px;">
+          <button class="mock-button" style="flex: 0; padding: 6px 12px; font-size: 12px;">🎤 语音</button>
+          <input class="mock-input" style="flex: 1; margin: 0;" placeholder="输入你的问题或导航指令...">
+          <button class="mock-button" style="flex: 0; padding: 6px 12px; font-size: 12px;">发送</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="section">
+  <h3>后端适配方案</h3>
+  <div class="pros-cons">
+    <div class="pros">
+      <h4>复用目标项目已有能力</h4>
+      <ul>
+        <li>讯飞 LLM → Java AgentController 新增加 /api/agent/chat 端点</li>
+        <li>讯飞 STT → 新增 /api/agent/stt 语音识别端点</li>
+        <li>讯飞 TTS → 新增 /api/agent/tts 语音合成端点</li>
+        <li>前端 api/index.js 新增对应的 API 函数</li>
+      </ul>
+    </div>
+    <div class="cons">
+      <h4>需要注意的问题</h4>
+      <ul>
+        <li>Unity WebGL 文件较大 (~20MB)，需关注加载速度</li>
+        <li>麦克风权限需要 HTTPS 或 localhost</li>
+        <li>讯飞 STT/TTS API 配额需确认</li>
+        <li>Unity → Vue 通信桥接需要全局函数适配</li>
+      </ul>
+    </div>
+  </div>
+</div>

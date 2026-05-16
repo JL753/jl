@@ -1,0 +1,80 @@
+<h2>知域 · 设计系统方向</h2>
+<p class="subtitle">基于规格文档的星图宇宙风格，为所有学生端页面奠定统一视觉语言</p>
+
+<div class="section">
+  <h3>1. 色彩体系</h3>
+  <p>主色调三色方案，搭配深色背景</p>
+  <div style="display:flex;gap:16px;flex-wrap:wrap;margin-top:12px;">
+    <div style="flex:1;min-width:120px;">
+      <div style="height:60px;border-radius:8px;background:linear-gradient(135deg,#3b82f6,#2563eb);margin-bottom:6px;"></div>
+      <div style="font-size:12px;color:rgba(255,255,255,0.6);">Primary Blue<br/>#3b82f6 → #2563eb</div>
+    </div>
+    <div style="flex:1;min-width:120px;">
+      <div style="height:60px;border-radius:8px;background:linear-gradient(135deg,#a855f7,#7c3aed);margin-bottom:6px;"></div>
+      <div style="font-size:12px;color:rgba(255,255,255,0.6);">Accent Purple<br/>#a855f7 → #7c3aed</div>
+    </div>
+    <div style="flex:1;min-width:120px;">
+      <div style="height:60px;border-radius:8px;background:linear-gradient(135deg,#60d9fa,#0bc5ea);margin-bottom:6px;"></div>
+      <div style="font-size:12px;color:rgba(255,255,255,0.6);">Cyan Accent<br/>#60d9fa → #0bc5ea</div>
+    </div>
+    <div style="flex:1;min-width:120px;">
+      <div style="height:60px;border-radius:8px;background:#080d1f;border:1px solid rgba(255,255,255,0.1);margin-bottom:6px;"></div>
+      <div style="font-size:12px;color:rgba(255,255,255,0.6);">Background<br/>#080d1f</div>
+    </div>
+  </div>
+</div>
+
+<div class="section">
+  <h3>2. 液态玻璃组件</h3>
+  <div style="display:flex;gap:16px;flex-wrap:wrap;">
+    <div style="flex:1;min-width:200px;padding:20px;border-radius:12px;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.06);backdrop-filter:blur(12px);">
+      <div style="font-weight:600;margin-bottom:8px;">玻璃卡片</div>
+      <div style="font-size:12px;color:rgba(255,255,255,0.5);">background: rgba(255,255,255,0.04)<br/>border: 1px solid rgba(255,255,255,0.06)<br/>backdrop-filter: blur(12px)</div>
+    </div>
+    <div style="flex:1;min-width:200px;padding:20px;border-radius:12px;background:rgba(59,130,246,0.08);border:1px solid rgba(59,130,246,0.15);backdrop-filter:blur(12px);">
+      <div style="font-weight:600;margin-bottom:8px;">强调卡片</div>
+      <div style="font-size:12px;color:rgba(255,255,255,0.5);">带蓝色调半透明背景<br/>用于选中/高亮状态</div>
+    </div>
+  </div>
+</div>
+
+<div class="section">
+  <h3>3. 组件风格选项</h3>
+  <p>关键组件有三种风格方向，请选择你偏好的：</p>
+</div>
+
+<div class="options">
+  <div class="option" data-choice="sharp" onclick="toggleSelect(this)">
+    <div class="letter">A</div>
+    <div class="content">
+      <h3>锐利现代</h3>
+      <p>直角 + 细边框 + 高对比度文字。清晰、简洁、技术感强。</p>
+      <div style="margin-top:8px;display:flex;gap:8px;">
+        <span style="padding:4px 12px;border-radius:4px;border:1px solid rgba(255,255,255,0.2);font-size:11px;">Button</span>
+        <span style="padding:4px 12px;border-radius:4px;background:linear-gradient(135deg,#3b82f6,#06b6d4);font-size:11px;">Button</span>
+      </div>
+    </div>
+  </div>
+  <div class="option" data-choice="rounded" onclick="toggleSelect(this)">
+    <div class="letter">B</div>
+    <div class="content">
+      <h3>柔和圆润</h3>
+      <p>大圆角 + 强毛玻璃效果 + 微光渐变。温暖、友好、沉浸感。</p>
+      <div style="margin-top:8px;display:flex;gap:8px;">
+        <span style="padding:4px 14px;border-radius:20px;border:1px solid rgba(255,255,255,0.2);font-size:11px;">Button</span>
+        <span style="padding:4px 14px;border-radius:20px;background:linear-gradient(135deg,#3b82f6,#a855f7);font-size:11px;">Button</span>
+      </div>
+    </div>
+  </div>
+  <div class="option" data-choice="mixed" onclick="toggleSelect(this)">
+    <div class="letter">C</div>
+    <div class="content">
+      <h3>混合风格</h3>
+      <p>卡片大圆角(12px) + 按钮小圆角(8px) + 少量发光效果。兼顾友好与技术感。</p>
+      <div style="margin-top:8px;display:flex;gap:8px;">
+        <span style="padding:4px 12px;border-radius:8px;border:1px solid rgba(255,255,255,0.2);font-size:11px;">Button</span>
+        <span style="padding:4px 12px;border-radius:8px;background:linear-gradient(135deg,#3b82f6,#60d9fa);font-size:11px;">Button</span>
+      </div>
+    </div>
+  </div>
+</div>
