@@ -87,6 +87,12 @@
           </button>
         </div>
 
+        <div class="master-btn-row">
+          <button class="master-btn" @click="markMastered" :disabled="mastering">
+            {{ mastering ? '提交中...' : '我已掌握' }}
+          </button>
+        </div>
+
         <div class="lesson-nav">
           <button v-if="prevLessonId" class="nav-btn" @click="goToLesson(prevLessonId)">上一个</button>
           <span v-else></span>
@@ -201,7 +207,7 @@ import { ref, computed, watch, onMounted, nextTick } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { marked } from 'marked'
 import DOMPurify from 'dompurify'
-import { apiLessonDetail, apiKpExercises, apiSubmitAnswer, apiAskTutor, apiSubjectTree } from '../../api'
+import { apiLessonDetail, apiKpExercises, apiSubmitAnswer, apiAskTutor, apiSubjectTree, apiCompleteLesson, apiAbilityEvaluate } from '../../api'
 
 const route = useRoute()
 const router = useRouter()
@@ -212,6 +218,7 @@ const panelCollapsed = ref(false)
 const panelTab = ref('ai')
 const showDeepExplore = ref(false)
 const showPractice = ref(false)
+const mastering = ref(false)
 const practiceLoading = ref(false)
 const practiceQuestions = ref([])
 const practiceAnswers = ref({})
@@ -271,12 +278,27 @@ async function loadCourse() {
         } catch {}
       }
     } else {
-      // Course mode: load course tree, show first lesson
+      // Course mode: load course tree for specific subject (route.params.id = subjectId)
       const treeRes = await apiSubjectTree()
-      subjectTree.value = treeRes.data || []
-      // Find and load first lesson
-      const first = findFirstLesson()
-      if (first) await loadLesson(first.id)
+      const fullTree = treeRes.data || []
+      const targetSubjectId = Number(id)
+      // Filter to only show the target subject
+      subjectTree.value = fullTree.filter(s => Number(s.id) === targetSubjectId)
+      if (subjectTree.value.length === 0) subjectTree.value = fullTree
+
+      // Set course name
+      if (subjectTree.value.length > 0) {
+        courseName.value = subjectTree.value[0].name || ''
+      }
+
+      // If a specific lesson is requested via ?lesson= query param, load it
+      const queryLessonId = route.query.lesson
+      if (queryLessonId) {
+        await loadLesson(Number(queryLessonId))
+      } else {
+        const first = findFirstLesson()
+        if (first) await loadLesson(first.id)
+      }
       if (currentLessonId.value) locateLessonInTree(currentLessonId.value)
     }
 
@@ -370,6 +392,20 @@ function computeNav() {
 
 function goToLesson(lessonId) {
   loadLesson(lessonId)
+}
+
+async function markMastered() {
+  if (!currentLessonId.value || mastering.value) return
+  mastering.value = true
+  try {
+    await apiCompleteLesson(currentLessonId.value)
+    // 触发六维能力评估更新
+    try { await apiAbilityEvaluate() } catch {}
+  } catch (e) {
+    console.error('Failed to mark mastered:', e)
+  } finally {
+    mastering.value = false
+  }
 }
 
 async function submitExercises() {
@@ -614,6 +650,16 @@ function bilibiliEmbedUrl(url) {
 .discuss-placeholder { font-size: 12px; color: rgba(255,255,255,0.3); text-align: center; padding: 40px 0; }
 
 /* Practice */
+.master-btn-row { margin-top: 20px; text-align: center; }
+.master-btn {
+  padding: 10px 36px; border-radius: 10px; border: 1px solid rgba(168,85,247,0.3);
+  background: linear-gradient(135deg, rgba(168,85,247,0.12), rgba(139,92,246,0.08));
+  color: #c084fc; font-size: 14px; font-weight: 600; cursor: pointer; font-family: inherit;
+  transition: all 0.2s;
+}
+.master-btn:hover { background: linear-gradient(135deg, rgba(168,85,247,0.2), rgba(139,92,246,0.12)); }
+.master-btn:disabled { opacity: 0.4; cursor: not-allowed; }
+
 .practice-area { margin-top: 16px; text-align: center; }
 .practice-btn {
   padding: 10px 32px; border-radius: 10px; border: 1px solid rgba(34,197,94,0.3);
