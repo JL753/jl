@@ -205,10 +205,12 @@ function scrollToSubjects() {
   subjectsAnchor.value?.scrollIntoView({ behavior: 'smooth', block: 'start' })
 }
 function goContinue() { if (lastLesson.value) router.push(`/lessons/${lastLesson.value.lessonId}`) }
-function goSubjects() { router.push('/subjects') }
+function goSubjects() {
+  router.push(auth.isLoggedIn ? '/student/subjects' : '/subjects')
+}
 function goKnowledgeMap() { router.push('/student/knowledge-map') }
 function handleSubjectClick(s) {
-  auth.isLoggedIn ? router.push(`/subjects/${s.id}`) : auth.openLoginModal(`/subjects/${s.id}`)
+  auth.isLoggedIn ? router.push(`/student/subjects/${s.id}`) : auth.openLoginModal(`/student/subjects/${s.id}`)
 }
 
 onMounted(() => { loadSubjects(); loadAuthData() })
