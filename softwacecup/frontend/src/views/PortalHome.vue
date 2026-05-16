@@ -225,7 +225,7 @@ onMounted(() => { loadSubjects(); loadAuthData() })
 <style scoped>
 .portal-root {
   min-height: 100vh;
-  color: #e6edf3;
+  color: #f0f4fa;
   padding: 76px 0 0;
 }
 .portal-inner {
@@ -256,7 +256,7 @@ onMounted(() => { loadSubjects(); loadAuthData() })
 
 .hero-tagline {
   font-size: 15px;
-  color: #60a5fa;
+  color: #93c5fd;
   margin: 0 0 14px;
   letter-spacing: 4px;
   font-weight: 500;
@@ -275,25 +275,25 @@ onMounted(() => { loadSubjects(); loadAuthData() })
 .hero-greet {
   font-size: 40px;
   font-weight: 700;
-  color: #e6edf3;
+  color: #f0f4fa;
   margin: 0 0 14px;
   line-height: 1.3;
 }
 .hero-subtitle {
   font-size: 15px;
-  color: rgba(255,255,255,0.45);
+  color: rgba(255,255,255,0.55);
   margin: 0 0 12px;
   letter-spacing: 4px;
 }
 .hero-stat {
   font-size: 15px;
-  color: rgba(255,255,255,0.45);
+  color: rgba(255,255,255,0.55);
   margin: 0 0 12px;
 }
 .hero-stat strong { color: #60a5fa; font-weight: 700; }
 .hero-desc {
   font-size: 15px;
-  color: rgba(255,255,255,0.4);
+  color: rgba(255,255,255,0.6);
   line-height: 1.9;
   margin: 0 0 32px;
 }
@@ -324,7 +324,7 @@ onMounted(() => { loadSubjects(); loadAuthData() })
 }
 .cta-btn.ghost:hover {
   background: rgba(255,255,255,0.06);
-  color: #e6edf3;
+  color: #f0f4fa;
   border-color: rgba(255,255,255,0.25);
 }
 
@@ -424,18 +424,17 @@ onMounted(() => { loadSubjects(); loadAuthData() })
   padding: 18px 12px;
   border-radius: 12px;
   background: transparent;
-  border: 1px solid rgba(255,255,255,0.08);
+  border: none;
   cursor: pointer;
   transition: all 0.2s;
 }
 .role-card:hover {
-  border-color: rgba(255,255,255,0.18);
   transform: translateY(-1px);
 }
-.role-card.student:hover { border-color: rgba(59,130,246,0.35); }
-.role-card.teacher:hover { border-color: rgba(168,85,247,0.35); }
-.role-label { font-size: 13px; color: rgba(255,255,255,0.4); }
-.role-arrow { font-size: 12px; font-weight: 600; color: rgba(255,255,255,0.5); }
+.role-card.student:hover { box-shadow: 0 0 20px rgba(59,130,246,0.08); }
+.role-card.teacher:hover { box-shadow: 0 0 20px rgba(168,85,247,0.08); }
+.role-label { font-size: 13px; color: var(--text-main); opacity: 0.6; }
+.role-arrow { font-size: 12px; font-weight: 600; color: var(--text-main); opacity: 0.7; }
 
 /* ═══ ③ Core section ═══ */
 .core-section { display: flex; flex-direction: column; gap: 24px; }
@@ -452,14 +451,14 @@ onMounted(() => { loadSubjects(); loadAuthData() })
 .continue-card:hover { border-color: rgba(59,130,246,0.2); }
 
 .card-overline {
-  font-size: 11px; color: rgba(255,255,255,0.3);
+  font-size: 11px; color: rgba(255,255,255,0.5);
   text-transform: uppercase; letter-spacing: 1px; margin: 0 0 10px;
 }
-.card-main { font-size: 17px; font-weight: 700; color: #e6edf3; margin: 0 0 4px; }
-.card-sub { font-size: 12px; color: rgba(255,255,255,0.35); margin: 0 0 14px; }
+.card-main { font-size: 17px; font-weight: 700; color: #f0f4fa; margin: 0 0 4px; }
+.card-sub { font-size: 12px; color: rgba(255,255,255,0.5); margin: 0 0 14px; }
 .progress-bar {
   height: 4px; border-radius: 2px;
-  background: rgba(255,255,255,0.06);
+  background: rgba(255,255,255,0.1);
   overflow: hidden; margin-bottom: 6px;
 }
 .progress-fill {
@@ -467,15 +466,15 @@ onMounted(() => { loadSubjects(); loadAuthData() })
   background: linear-gradient(90deg, #3b82f6, #06b6d4);
   transition: width 0.4s ease;
 }
-.progress-text { font-size: 12px; font-weight: 600; color: rgba(255,255,255,0.35); margin: 0; }
-.card-empty { font-size: 13px; color: rgba(255,255,255,0.2); margin: 0; }
+.progress-text { font-size: 12px; font-weight: 600; color: rgba(255,255,255,0.5); margin: 0; }
+.card-empty { font-size: 13px; color: rgba(255,255,255,0.5); margin: 0; }
 
 .rec-list { list-style: none; padding: 0; margin: 0; display: flex; flex-direction: column; gap: 10px; }
 .rec-item { display: flex; flex-direction: column; gap: 2px; }
-.rec-title { font-size: 13px; color: #e6edf3; line-height: 1.4; }
-.rec-source { font-size: 11px; color: rgba(255,255,255,0.3); }
+.rec-title { font-size: 13px; color: #f0f4fa; line-height: 1.4; }
+.rec-source { font-size: 11px; color: rgba(255,255,255,0.45); }
 
-.section-title { font-size: 22px; font-weight: 700; color: #e6edf3; margin: 8px 0 4px; }
+.section-title { font-size: 22px; font-weight: 700; color: #f0f4fa; margin: 8px 0 4px; }
 
 .subject-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 14px; }
 
@@ -496,25 +495,25 @@ onMounted(() => { loadSubjects(); loadAuthData() })
   width: 5px; height: 32px; border-radius: 3px; flex-shrink: 0;
 }
 .subject-info { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 2px; }
-.subject-name { font-size: 14px; font-weight: 600; color: #e6edf3; }
+.subject-name { font-size: 14px; font-weight: 600; color: #f0f4fa; }
 .subject-desc {
-  font-size: 11px; color: rgba(255,255,255,0.3);
+  font-size: 11px; color: rgba(255,255,255,0.5);
   overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
 }
 .subject-arrow {
-  font-size: 14px; color: rgba(255,255,255,0.15);
+  font-size: 14px; color: rgba(255,255,255,0.25);
   transition: color 0.2s; flex-shrink: 0;
 }
 .subject-card:hover .subject-arrow { color: #60a5fa; }
 
-.empty-hint { text-align: center; color: rgba(255,255,255,0.15); font-size: 13px; padding: 24px 0; }
+.empty-hint { text-align: center; color: rgba(255,255,255,0.25); font-size: 13px; padding: 24px 0; }
 
 /* ═══ ④ Bottom CTA ═══ */
 .bottom-cta { text-align: center; padding: 12px 0 20px; }
-.cta-heading { font-size: 20px; font-weight: 700; color: #e6edf3; margin: 0 0 6px; }
-.cta-desc { font-size: 13px; color: rgba(255,255,255,0.35); margin: 0 0 18px; }
+.cta-heading { font-size: 20px; font-weight: 700; color: #f0f4fa; margin: 0 0 6px; }
+.cta-desc { font-size: 13px; color: rgba(255,255,255,0.5); margin: 0 0 18px; }
 .cta-btn.large { padding: 10px 36px; font-size: 15px; }
-.cta-login-link { font-size: 12px; color: rgba(255,255,255,0.3); margin: 12px 0 0; }
+.cta-login-link { font-size: 12px; color: rgba(255,255,255,0.5); margin: 12px 0 0; }
 .cta-login-link span { color: #60a5fa; cursor: pointer; text-decoration: underline; }
 .cta-login-link span:hover { color: #93c5fd; }
 

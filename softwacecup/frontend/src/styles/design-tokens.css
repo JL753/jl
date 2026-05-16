@@ -153,6 +153,11 @@ html, body, #app {
 }
 body { background: #080d1f; overflow-x: hidden; }
 a { color: inherit; text-decoration: none; }
+
+/* 文字对比度增强（壁纸选择器可调） */
+h1, h2, h3, h4, p, span, a, button, li, .text-content {
+  text-shadow: 0 1px calc(var(--leleo-text-contrast, 0.3) * 8px) rgba(0,0,0, calc(var(--leleo-text-contrast, 0.3) * 0.9));
+}
 img { max-width: 100%; display: block; }
 button, input, textarea, select { font: inherit; }
 
