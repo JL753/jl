@@ -41,11 +41,11 @@
         <div class="hero-right-group">
           <div class="orbit-3d" @mouseenter="orbitTilted = false" @mouseleave="orbitTilted = true">
             <div class="orbit-scene" :class="{ tilted: orbitTilted }">
-              <div class="ring-full r1"><span class="dot d1"></span></div>
-              <div class="ring-full r2"><span class="dot d2"></span></div>
-              <div class="ring-segment r3"></div>
-              <div class="ring-segment r4"></div>
-              <div class="ring-full r5"></div>
+              <div class="plane p1"><div class="ring r1"><span class="dot d1"></span></div></div>
+              <div class="plane p2"><div class="ring r2"><span class="dot d2"></span></div></div>
+              <div class="plane p3"><div class="ring r3"><span class="dot d3"></span></div></div>
+              <div class="plane p4"><div class="ring r4"></div></div>
+              <div class="plane p5"><div class="ring r5"><span class="dot d4"></span></div></div>
               <div class="core-glow"></div>
               <div class="core-orb">知</div>
             </div>
@@ -327,136 +327,121 @@ onMounted(() => { loadSubjects(); loadAuthData() })
 
 /* ═══ 3D Orbit Spinner ═══ */
 .orbit-3d {
-  width: 240px;
-  height: 240px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  flex-shrink: 0;
-  cursor: pointer;
-  position: relative;
+  width: 240px; height: 240px;
+  display: flex; align-items: center; justify-content: center;
+  flex-shrink: 0; cursor: pointer;
 }
 .orbit-scene {
   position: relative;
-  width: 200px;
-  height: 200px;
-  perspective: 600px;
+  width: 200px; height: 200px;
+  perspective: 500px;
   transform-style: preserve-3d;
   transition: transform 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
 }
 .orbit-scene.tilted {
-  transform: rotateX(55deg) rotateY(-20deg);
+  transform: rotateX(-60deg) rotateY(-15deg);
 }
 
-.ring-full {
+/* 轨道平面 — 每个平面有独立倾角 */
+.plane {
+  position: absolute;
+  top: 50%; left: 50%;
+  transform-style: preserve-3d;
+  pointer-events: none;
+}
+.p1 { transform: translate(-50%, -50%) rotateX(0deg) rotateY(0deg); }
+.p2 { transform: translate(-50%, -50%) rotateX(70deg) rotateY(0deg); }
+.p3 { transform: translate(-50%, -50%) rotateX(0deg) rotateY(65deg); }
+.p4 { transform: translate(-50%, -50%) rotateX(-70deg) rotateY(0deg); }
+.p5 { transform: translate(-50%, -50%) rotateX(0deg) rotateY(-60deg); }
+
+.ring {
   position: absolute;
   top: 50%; left: 50%;
   border-radius: 50%;
   pointer-events: none;
-}
-.ring-segment {
-  position: absolute;
-  top: 50%; left: 50%;
-  border-radius: 50%;
-  pointer-events: none;
+  transform: translate(-50%, -50%);
 }
 
-/* 外环 — 蓝光双层 */
+/* r1: 最大外环 — 蓝光 */
 .r1 {
   width: 190px; height: 190px;
-  margin: -95px 0 0 -95px;
-  animation: ring-spin 4s linear infinite;
-  border: 1.5px solid rgba(59, 130, 246, 0.35);
-  box-shadow: 0 0 12px rgba(59, 130, 246, 0.2), inset 0 0 12px rgba(59, 130, 246, 0.05);
+  animation: spin 5s linear infinite;
+  border: 1.5px solid rgba(59, 130, 246, 0.3);
+  box-shadow: 0 0 14px rgba(59, 130, 246, 0.2), inset 0 0 8px rgba(59, 130, 246, 0.06);
 }
-/* 第二环 — 青紫交替 */
+/* r2: 青环 */
 .r2 {
-  width: 150px; height: 150px;
-  margin: -75px 0 0 -75px;
-  animation: ring-spin 3s linear infinite reverse;
+  width: 155px; height: 155px;
+  animation: spin 3.6s linear infinite reverse;
   border: 1.5px solid rgba(6, 182, 212, 0.3);
-  box-shadow: 0 0 10px rgba(6, 182, 212, 0.15);
+  box-shadow: 0 0 10px rgba(6, 182, 212, 0.18);
 }
-/* 拖尾段 — 紫光 */
+/* r3: 紫环 */
 .r3 {
-  width: 115px; height: 115px;
-  margin: -57px 0 0 -57px;
-  animation: ring-spin 2.2s linear infinite;
-  border-top: 2.5px solid #a855f7;
-  border-right: 2.5px solid transparent;
-  border-bottom: 2.5px solid transparent;
-  border-left: 2.5px solid rgba(168, 85, 247, 0.3);
-  box-shadow: 0 0 8px rgba(168, 85, 247, 0.25);
+  width: 120px; height: 120px;
+  animation: spin 2.8s linear infinite;
+  border: 1.5px solid rgba(168, 85, 247, 0.3);
+  box-shadow: 0 0 10px rgba(168, 85, 247, 0.18);
 }
-/* 拖尾段 — 青光 */
+/* r4: 小青环 */
 .r4 {
-  width: 82px; height: 82px;
-  margin: -41px 0 0 -41px;
-  animation: ring-spin 1.7s linear infinite reverse;
-  border-top: 2.5px solid #06b6d4;
-  border-right: 2.5px solid transparent;
-  border-bottom: 2.5px solid transparent;
-  border-left: 2.5px solid rgba(6, 182, 212, 0.25);
-  box-shadow: 0 0 8px rgba(6, 182, 212, 0.3);
+  width: 88px; height: 88px;
+  animation: spin 2.2s linear infinite reverse;
+  border: 1.2px solid rgba(6, 182, 212, 0.35);
+  box-shadow: 0 0 8px rgba(6, 182, 212, 0.2);
 }
-/* 内环 — 蓝紫渐变 */
+/* r5: 内金环 */
 .r5 {
-  width: 54px; height: 54px;
-  margin: -27px 0 0 -27px;
-  animation: ring-spin 1.4s linear infinite;
-  border: 1.5px solid rgba(139, 92, 246, 0.4);
-  box-shadow: 0 0 6px rgba(139, 92, 246, 0.2);
+  width: 56px; height: 56px;
+  animation: spin 1.6s linear infinite;
+  border: 1.2px solid rgba(245, 158, 11, 0.35);
+  box-shadow: 0 0 6px rgba(245, 158, 11, 0.2);
 }
 
-/* 轨道上的发光点 */
+/* 发光点 */
 .dot {
   position: absolute;
-  width: 5px; height: 5px;
+  width: 6px; height: 6px;
   border-radius: 50%;
   pointer-events: none;
+  top: -3px; left: 50%; margin-left: -3px;
 }
-.d1 {
-  top: -3px; left: 50%;
-  margin-left: -2px;
-  background: #60a5fa;
-  box-shadow: 0 0 8px #3b82f6, 0 0 16px rgba(59,130,246,0.6);
-}
-.d2 {
-  bottom: -3px; left: 50%;
-  margin-left: -2px;
-  background: #22d3ee;
-  box-shadow: 0 0 8px #06b6d4, 0 0 16px rgba(6,182,212,0.6);
-}
+.d1 { background: #60a5fa; box-shadow: 0 0 10px #3b82f6, 0 0 20px rgba(59,130,246,0.7); }
+.d2 { background: #22d3ee; box-shadow: 0 0 10px #06b6d4, 0 0 20px rgba(6,182,212,0.7); }
+.d3 { background: #c084fc; box-shadow: 0 0 10px #a855f7, 0 0 20px rgba(168,85,247,0.7); }
+.d4 { background: #fbbf24; box-shadow: 0 0 10px #f59e0b, 0 0 20px rgba(245,158,11,0.7); }
 
 /* 中心光晕 */
 .core-glow {
   position: absolute;
   top: 50%; left: 50%;
-  width: 60px; height: 60px;
-  margin: -30px 0 0 -30px;
+  width: 70px; height: 70px;
+  margin: -35px 0 0 -35px;
   border-radius: 50%;
-  background: radial-gradient(circle, rgba(59,130,246,0.15) 0%, transparent 70%);
-  animation: pulse-glow 2s ease-in-out infinite;
+  background: radial-gradient(circle, rgba(59,130,246,0.2) 0%, rgba(6,182,212,0.08) 40%, transparent 70%);
+  animation: pulse 2.2s ease-in-out infinite;
+  z-index: 1;
 }
-@keyframes pulse-glow {
-  0%, 100% { transform: scale(1); opacity: 0.6; }
-  50% { transform: scale(1.3); opacity: 1; }
+@keyframes pulse {
+  0%, 100% { transform: scale(1); opacity: 0.5; }
+  50% { transform: scale(1.4); opacity: 1; }
 }
 /* 中心球 */
 .core-orb {
   position: absolute;
   top: 50%; left: 50%;
-  width: 28px; height: 28px;
-  margin: -14px 0 0 -14px;
+  width: 30px; height: 30px;
+  margin: -15px 0 0 -15px;
   border-radius: 50%;
   background: linear-gradient(135deg, #3b82f6, #06b6d4);
   display: flex; align-items: center; justify-content: center;
-  font-size: 12px; font-weight: 800; color: white;
-  box-shadow: 0 0 20px rgba(59,130,246,0.6), 0 0 40px rgba(59,130,246,0.3);
+  font-size: 13px; font-weight: 800; color: white;
+  box-shadow: 0 0 24px rgba(59,130,246,0.7), 0 0 48px rgba(59,130,246,0.3), 0 0 72px rgba(6,182,212,0.15);
   z-index: 2;
 }
 
-@keyframes ring-spin {
+@keyframes spin {
   from { transform: translate(-50%, -50%) rotate(0deg); }
   to   { transform: translate(-50%, -50%) rotate(360deg); }
 }
