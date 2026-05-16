@@ -23,28 +23,31 @@ public class StudentAbilityController {
     private final UserKpMasteryMapper kpMasteryMapper;
     private final UserStreakMapper streakMapper;
     private final WrongQuestionMapper wrongQuestionMapper;
+    private final LessonMapper lessonMapper;
     private final LLMClient llmClient;
 
     @PostMapping("/evaluate")
     public ApiResponse<AbilityScoreDto> evaluate() {
         Long userId = LoginUserHolder.get().getUserId();
 
-        long totalLessons = progressMapper.selectCount(
-                new LambdaQueryWrapper<LessonProgress>().eq(LessonProgress::getUserId, userId));
+        // 全部可用课时数（公开课 + 该用户的个人课）
+        long allAvailableLessons = lessonMapper.selectCount(
+                new LambdaQueryWrapper<Lesson>()
+                        .and(w -> w.isNull(Lesson::getUserId).or().eq(Lesson::getUserId, userId)));
         long completedLessons = progressMapper.selectCount(
                 new LambdaQueryWrapper<LessonProgress>()
                         .eq(LessonProgress::getUserId, userId)
                         .eq(LessonProgress::getStatus, "completed"));
 
-        int breadth = totalLessons > 0 ? (int) (completedLessons * 100 / totalLessons) : 0;
+        int breadth = allAvailableLessons > 0 ? (int) (completedLessons * 100 / allAvailableLessons) : 0;
 
         List<UserKpMastery> masteries = kpMasteryMapper.selectList(
                 new LambdaQueryWrapper<UserKpMastery>().eq(UserKpMastery::getUserId, userId));
         int depth = masteries.isEmpty() ? 0 :
                 (int) (masteries.stream().mapToDouble(UserKpMastery::getMastery).average().orElse(0) * 100);
 
-        int problem = totalLessons > 0
-                ? Math.min(95, 20 + (int) (completedLessons * 75.0 / totalLessons))
+        int problem = allAvailableLessons > 0
+                ? Math.min(95, 20 + (int) (completedLessons * 75.0 / allAvailableLessons))
                 : 20;
 
         UserStreak streak = streakMapper.selectOne(
