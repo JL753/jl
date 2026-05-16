@@ -94,21 +94,53 @@ public class DashboardServiceImpl implements DashboardService {
       }
     }
 
-    // AI推荐路径：基于最近课时找后续课时
+    // AI推荐路径：基于最近课时找后续课时（同单元 → 同学科 → 全库）
     List<Map<String, Object>> recommendedPath = new ArrayList<>();
     if (lastInProgress != null) {
       Lesson currentLesson = lessonMapper.selectById(lastInProgress.getLessonId());
-      if (currentLesson != null && currentLesson.getUnitId() != null) {
-        List<Lesson> nextLessons = lessonMapper.selectList(
-          new LambdaQueryWrapper<Lesson>()
-            .eq(Lesson::getUnitId, currentLesson.getUnitId())
-            .orderByAsc(Lesson::getSortOrder));
-        boolean foundCurrent = false;
-        for (Lesson l : nextLessons) {
-          if (foundCurrent && recommendedPath.size() < 4) {
-            recommendedPath.add(row("name", l.getName(), "status", "pending", "lessonId", l.getId()));
+      if (currentLesson != null) {
+        // 策略1：同单元后续课时
+        if (currentLesson.getUnitId() != null) {
+          List<Lesson> unitLessons = lessonMapper.selectList(
+            new LambdaQueryWrapper<Lesson>()
+              .eq(Lesson::getUnitId, currentLesson.getUnitId())
+              .orderByAsc(Lesson::getSortOrder));
+          appendNextLessons(unitLessons, currentLesson.getId(), recommendedPath, 4);
+        }
+        // 策略2：同单元不够，从该学科其他单元找
+        if (recommendedPath.size() < 4 && currentLesson.getUnitId() != null) {
+          Unit unit = unitMapper.selectById(currentLesson.getUnitId());
+          if (unit != null) {
+            List<Unit> allUnits = unitMapper.selectList(
+              new LambdaQueryWrapper<Unit>()
+                .eq(Unit::getSubjectId, unit.getSubjectId())
+                .orderByAsc(Unit::getSortOrder));
+            for (Unit u : allUnits) {
+              if (u.getId().equals(currentLesson.getUnitId())) continue;
+              List<Lesson> otherLessons = lessonMapper.selectList(
+                new LambdaQueryWrapper<Lesson>()
+                  .eq(Lesson::getUnitId, u.getId())
+                  .orderByAsc(Lesson::getSortOrder));
+              for (Lesson l : otherLessons) {
+                if (recommendedPath.size() >= 4) break;
+                recommendedPath.add(row("name", l.getName(), "status", "pending", "lessonId", l.getId()));
+              }
+              if (recommendedPath.size() >= 4) break;
+            }
           }
-          if (l.getId().equals(currentLesson.getId())) foundCurrent = true;
+        }
+        // 策略3：还不够，从任意学科取
+        if (recommendedPath.size() < 4) {
+          List<Lesson> allLessons = lessonMapper.selectList(
+            new LambdaQueryWrapper<Lesson>().orderByAsc(Lesson::getSortOrder).last("LIMIT 20"));
+          for (Lesson l : allLessons) {
+            if (recommendedPath.size() >= 4) break;
+            if (l.getId().equals(currentLesson.getId())) continue;
+            boolean alreadyIn = recommendedPath.stream().anyMatch(r -> r.get("lessonId").equals(l.getId()));
+            if (!alreadyIn) {
+              recommendedPath.add(row("name", l.getName(), "status", "pending", "lessonId", l.getId()));
+            }
+          }
         }
         if (!recommendedPath.isEmpty()) {
           recommendedPath.get(0).put("status", "active");
@@ -299,6 +331,16 @@ public class DashboardServiceImpl implements DashboardService {
     if (finalReview != null && !finalReview.isBlank()) r.setReview(finalReview);
     examRecordMapper.updateById(r);
     return row("recordId", r.getId(), "score", nz(r.getScore()), "review", txt(r.getReview()), "message", "批改完成");
+  }
+
+  private void appendNextLessons(List<Lesson> lessons, Long currentId, List<Map<String,Object>> target, int max) {
+    boolean found = false;
+    for (Lesson l : lessons) {
+      if (found && target.size() < max) {
+        target.add(row("name", l.getName(), "status", "pending", "lessonId", l.getId()));
+      }
+      if (l.getId().equals(currentId)) found = true;
+    }
   }
 
   private DashboardStats stats(String title, Object a, Object b) {
