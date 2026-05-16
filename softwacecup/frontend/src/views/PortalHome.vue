@@ -24,12 +24,11 @@
             <!-- 3D 轨道 -->
             <div class="orbit-3d" @mouseenter="orbitTilted = false" @mouseleave="orbitTilted = true">
               <div class="orbit-scene" :class="{ tilted: orbitTilted }">
-                <div class="ring r1"></div>
-                <div class="ring r2"></div>
-                <div class="ring r3"></div>
-                <div class="ring r4"></div>
-                <div class="ring r5"></div>
-                <div class="core"></div>
+                <div class="ring-full r1"></div>
+                <div class="ring-full r2"></div>
+                <div class="ring-segment r3"></div>
+                <div class="ring-segment r4"></div>
+                <div class="ring-full r5"></div>
               </div>
             </div>
           </template>
@@ -49,12 +48,11 @@
             </div>
             <div class="orbit-3d" @mouseenter="orbitTilted = false" @mouseleave="orbitTilted = true">
               <div class="orbit-scene" :class="{ tilted: orbitTilted }">
-                <div class="ring r1"></div>
-                <div class="ring r2"></div>
-                <div class="ring r3"></div>
-                <div class="ring r4"></div>
-                <div class="ring r5"></div>
-                <div class="core"></div>
+                <div class="ring-full r1"></div>
+                <div class="ring-full r2"></div>
+                <div class="ring-segment r3"></div>
+                <div class="ring-segment r4"></div>
+                <div class="ring-full r5"></div>
               </div>
             </div>
           </template>
@@ -234,7 +232,7 @@ onMounted(() => { loadSubjects(); loadAuthData() })
   display: flex;
   flex-direction: column;
   gap: 44px;
-  padding: 44px 120px 48px;
+  padding: 44px 160px 48px;
 }
 
 /* ═══ ① Hero Area ═══ */
@@ -247,8 +245,8 @@ onMounted(() => { loadSubjects(); loadAuthData() })
   flex: 1;
   display: flex;
   align-items: center;
-  justify-content: space-between;
-  gap: 60px;
+  justify-content: center;
+  gap: 80px;
   min-height: 360px;
   transition: flex 0.3s ease;
 }
@@ -332,8 +330,8 @@ onMounted(() => { loadSubjects(); loadAuthData() })
 
 /* ═══ 3D Orbit Spinner ═══ */
 .orbit-3d {
-  width: 280px;
-  height: 280px;
+  width: 220px;
+  height: 220px;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -341,57 +339,71 @@ onMounted(() => { loadSubjects(); loadAuthData() })
   cursor: pointer;
 }
 .orbit-scene {
-  width: 240px;
-  height: 240px;
   position: relative;
+  width: 180px;
+  height: 180px;
+  perspective: 600px;
   transform-style: preserve-3d;
-  perspective: 340px;
-  animation: orbit-spin 750ms linear infinite;
+  transition: transform 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
 }
 .orbit-scene.tilted {
-  transform: rotateX(55deg) rotateY(-15deg);
-}
-.orbit-scene:not(.tilted) {
-  transform: rotateX(0deg) rotateY(0deg);
-}
-.orbit-scene::before {
-  content: '';
-  position: absolute;
-  inset: -20px;
-  border-radius: 50%;
-  border: 1px solid rgba(255,255,255,0.05);
-  transform-style: preserve-3d;
-  animation: orbit-spin 750ms linear infinite reverse;
+  transform: rotateX(55deg) rotateY(-20deg);
 }
 
-.ring {
+.ring-full {
   position: absolute;
-  border-radius: 50%;
   top: 50%; left: 50%;
-  border: 1px solid rgba(255,255,255,0.08);
+  border-radius: 50%;
+  border: 1px solid rgba(59, 130, 246, 0.15);
   pointer-events: none;
 }
-.r1 { width: 230px; height: 230px; margin: -115px 0 0 -115px; }
-.r2 { width: 185px; height: 185px; margin: -92px 0 0 -92px; border-color: rgba(59,130,246,0.15); }
-.r3 { width: 140px; height: 140px; margin: -70px 0 0 -70px; border-color: rgba(255,255,255,0.1); }
-.r4 { width: 95px; height: 95px; margin: -47px 0 0 -47px; border-color: rgba(6,182,212,0.2); }
-.r5 { width: 52px; height: 52px; margin: -26px 0 0 -26px; border-color: rgba(168,85,247,0.15); }
-.core {
+.ring-segment {
   position: absolute;
   top: 50%; left: 50%;
-  width: 16px; height: 16px;
-  margin: -8px 0 0 -8px;
   border-radius: 50%;
-  background: linear-gradient(135deg, #3b82f6, #06b6d4);
-  box-shadow: 0 0 20px rgba(59,130,246,0.5);
+  pointer-events: none;
 }
 
-@keyframes orbit-spin {
-  from { transform: rotate(0deg); }
-  to { transform: rotate(360deg); }
+.r1 {
+  width: 160px; height: 160px;
+  margin: -80px 0 0 -80px;
+  animation: ring-spin 3s linear infinite;
+  border-color: rgba(59, 130, 246, 0.2);
 }
-.orbit-scene {
-  transition: transform 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
+.r2 {
+  width: 130px; height: 130px;
+  margin: -65px 0 0 -65px;
+  animation: ring-spin 2.4s linear infinite reverse;
+  border-color: rgba(6, 182, 212, 0.18);
+}
+.r3 {
+  width: 100px; height: 100px;
+  margin: -50px 0 0 -50px;
+  animation: ring-spin 2s linear infinite;
+  border-top: 2px solid rgba(139, 92, 246, 0.35);
+  border-right: 2px solid transparent;
+  border-bottom: 2px solid transparent;
+  border-left: 2px solid transparent;
+}
+.r4 {
+  width: 75px; height: 75px;
+  margin: -37px 0 0 -37px;
+  animation: ring-spin 1.6s linear infinite reverse;
+  border-top: 2px solid rgba(6, 182, 212, 0.4);
+  border-right: 2px solid transparent;
+  border-bottom: 2px solid transparent;
+  border-left: 2px solid transparent;
+}
+.r5 {
+  width: 50px; height: 50px;
+  margin: -25px 0 0 -25px;
+  animation: ring-spin 1.2s linear infinite;
+  border-color: rgba(168, 85, 247, 0.25);
+}
+
+@keyframes ring-spin {
+  from { transform: translate(-50%, -50%) rotate(0deg); }
+  to   { transform: translate(-50%, -50%) rotate(360deg); }
 }
 
 /* ═══ ② Role cards ═══ */
