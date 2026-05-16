@@ -162,7 +162,7 @@ const displaySubjects = computed(() => subjects.value.slice(0, 8))
 async function loadSubjects() {
   try {
     const res = await apiSubjects()
-    const data = res.data?.data
+    const data = res.data
     subjects.value = Array.isArray(data) ? data : (data?.subjects || data?.list || [])
   } catch { subjects.value = [] }
 }
@@ -174,7 +174,7 @@ async function loadAuthData() {
       apiAbilityLatest(), apiGamificationStreak(),
     ])
     if (abilityRes.status === 'fulfilled') {
-      const d = abilityRes.value.data?.data || abilityRes.value.data || {}
+      const d = abilityRes.value.data || {}
       masteredKps.value = d.masteredKps || d.mastered_kps || d.totalMastered || 0
       if (d.lastLesson) {
         lastLesson.value = {
@@ -188,7 +188,7 @@ async function loadAuthData() {
       }
     }
     if (streakRes.status === 'fulfilled') {
-      const d = streakRes.value.data?.data || streakRes.value.data || {}
+      const d = streakRes.value.data || {}
       streakDays.value = d.currentStreak || d.current_streak || d.streak || 0
     }
   } catch {}
@@ -197,7 +197,7 @@ async function loadAuthData() {
 async function loadRecommendations(lessonId) {
   try {
     const res = await apiRecommendResources(lessonId)
-    const data = res.data?.data || res.data || {}
+    const data = res.data || {}
     const list = data.resources || data.recommendations || data.list || []
     recommendations.value = list.slice(0, 4)
   } catch { recommendations.value = [] }
