@@ -6,6 +6,7 @@ export const useAuthStore = defineStore('auth', {
     token: localStorage.getItem('sp_token') || '',
     user: null,
     showLoginModal: false,
+    showRegisterModal: false,
     pendingRedirect: null
   }),
 
@@ -64,10 +65,18 @@ export const useAuthStore = defineStore('auth', {
     openLoginModal(redirectTo = null) {
       this.pendingRedirect = redirectTo
       this.showLoginModal = true
+      this.showRegisterModal = false
+    },
+
+    openRegisterModal(redirectTo = null) {
+      this.pendingRedirect = redirectTo
+      this.showRegisterModal = true
+      this.showLoginModal = true
     },
 
     closeLoginModal() {
       this.showLoginModal = false
+      this.showRegisterModal = false
       this.pendingRedirect = null
     }
   }

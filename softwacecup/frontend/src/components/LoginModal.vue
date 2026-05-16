@@ -7,15 +7,14 @@
             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
           </button>
 
-          <!-- 头部 -->
           <div class="head">
             <div class="brand">知</div>
             <h2>知域</h2>
-            <p>标记你的知识版图</p>
+            <p>{{ isRegister ? '创建你的知识账户' : '标记你的知识版图' }}</p>
           </div>
 
-          <!-- 表单 -->
-          <div class="form">
+          <!-- 登录表单 -->
+          <div v-if="!isRegister" class="form">
             <div class="field" :class="{ focus: focusUsername }">
               <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg>
               <input v-model="form.username" type="text" placeholder="账号" @focus="focusUsername = true" @blur="focusUsername = false" @keyup.enter="handleLogin" />
@@ -30,13 +29,45 @@
             </div>
           </div>
 
-          <button class="login-btn" :class="{ loading }" @click="handleLogin" :disabled="loading">
+          <!-- 注册表单 -->
+          <div v-else class="form">
+            <div class="field">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg>
+              <input v-model="form.username" type="text" placeholder="设置账号" @keyup.enter="handleRegister" />
+            </div>
+            <div class="field">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M18 8h-1V6c0-2.76-2.24-5-5-5S7 3.24 7 6v2H6c-1.1 0-2 .9-2 2v10c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V10c0-1.1-.9-2-2-2zm-6 9c-1.1 0-2-.9-2-2s.9-2 2-2 2 .9 2 2-.9 2-2 2zm3.1-9H8.9V6c0-1.71 1.39-3.1 3.1-3.1 1.71 0 3.1 1.39 3.1 3.1v2z"/></svg>
+              <input v-model="form.password" type="password" placeholder="设置密码" @keyup.enter="handleRegister" />
+            </div>
+            <div class="field">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M18 8h-1V6c0-2.76-2.24-5-5-5S7 3.24 7 6v2H6c-1.1 0-2 .9-2 2v10c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V10c0-1.1-.9-2-2-2zm-6 9c-1.1 0-2-.9-2-2s.9-2 2-2 2 .9 2 2-.9 2-2 2zm3.1-9H8.9V6c0-1.71 1.39-3.1 3.1-3.1 1.71 0 3.1 1.39 3.1 3.1v2z"/></svg>
+              <input v-model="confirmPassword" type="password" placeholder="确认密码" @keyup.enter="handleRegister" />
+            </div>
+            <div class="field captcha-field">
+              <input v-model="captchaInput" type="text" placeholder="验证码" class="captcha-input" @keyup.enter="handleRegister" />
+              <canvas ref="captchaCanvas" width="90" height="36" class="captcha" @click="genCaptcha" title="点击刷新"></canvas>
+            </div>
+          </div>
+
+          <!-- 登录按钮 -->
+          <button v-if="!isRegister" class="login-btn" :class="{ loading }" @click="handleLogin" :disabled="loading">
             {{ loading ? '登录中...' : '登 录' }}
+          </button>
+          <button v-else class="login-btn" :class="{ loading }" @click="handleRegister" :disabled="loading">
+            {{ loading ? '注册中...' : '注 册' }}
           </button>
 
           <p v-if="errorMsg" class="error">{{ errorMsg }}</p>
 
-          <div class="quick">
+          <!-- 切换 登录/注册 -->
+          <div class="switch-row" v-if="!isRegister">
+            还没有账号？<span class="switch-link" @click="switchToRegister">注册</span>
+          </div>
+          <div class="switch-row" v-else>
+            已有账号？<span class="switch-link" @click="switchToLogin">登录</span>
+          </div>
+
+          <div class="quick" v-if="!isRegister">
             <span>快速体验</span>
             <div class="quick-row">
               <button @click="quickLogin('student')">学生</button>
@@ -51,14 +82,18 @@
 </template>
 
 <script setup>
-import { ref, reactive, onMounted } from 'vue'
+import { ref, reactive, computed, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 import { useAuthStore } from '../stores/auth'
+import { apiAbilityEvaluate } from '../api'
 
 const auth = useAuthStore()
 const router = useRouter()
 
+const isRegister = computed(() => auth.showRegisterModal)
+
 const form = reactive({ username: '', password: '' })
+const confirmPassword = ref('')
 const captchaInput = ref('')
 const captchaCode = ref('')
 const captchaCanvas = ref(null)
@@ -118,6 +153,45 @@ async function handleLogin() {
   } finally { loading.value = false }
 }
 
+async function handleRegister() {
+  if (!form.username.trim()) { errorMsg.value = '请输入账号'; return }
+  if (!form.password.trim()) { errorMsg.value = '请输入密码'; return }
+  if (form.password !== confirmPassword.value) { errorMsg.value = '两次密码不一致'; return }
+  if (form.password.length < 4) { errorMsg.value = '密码至少4位'; return }
+  if (captchaInput.value.toUpperCase() !== captchaCode.value) {
+    errorMsg.value = '验证码错误'; genCaptcha(); captchaInput.value = ''; return
+  }
+  loading.value = true; errorMsg.value = ''
+  try {
+    await auth.register({ username: form.username, password: form.password })
+    // 注册成功后初始化六维能力空数据
+    try { await apiAbilityEvaluate() } catch {}
+    auth.closeLoginModal()
+    const redirect = auth.pendingRedirect
+    if (redirect) router.push(redirect)
+    else router.push('/student/dashboard')
+  } catch (e) {
+    errorMsg.value = e.message || '注册失败'
+    genCaptcha(); captchaInput.value = ''
+  } finally { loading.value = false }
+}
+
+function switchToRegister() {
+  form.username = ''; form.password = ''
+  confirmPassword.value = ''
+  captchaInput.value = ''; errorMsg.value = ''
+  genCaptcha()
+  auth.showRegisterModal = true
+}
+
+function switchToLogin() {
+  form.username = ''; form.password = ''
+  confirmPassword.value = ''
+  captchaInput.value = ''; errorMsg.value = ''
+  genCaptcha()
+  auth.showRegisterModal = false
+}
+
 function handleClose() { auth.closeLoginModal() }
 
 onMounted(() => genCaptcha())
@@ -154,7 +228,6 @@ onMounted(() => genCaptcha())
 }
 .close:hover { background: rgba(255,255,255,0.12); color: white; }
 
-/* Head */
 .head { text-align: center; margin-bottom: 28px; }
 .brand {
   width: 44px; height: 44px; border-radius: 14px;
@@ -167,7 +240,6 @@ onMounted(() => genCaptcha())
 .head h2 { font-size: 20px; font-weight: 700; color: #e6edf3; margin: 0 0 4px; }
 .head p { font-size: 12px; color: rgba(255,255,255,0.35); margin: 0; letter-spacing: 1px; }
 
-/* Form */
 .form { display: flex; flex-direction: column; gap: 12px; margin-bottom: 20px; }
 .field {
   display: flex; align-items: center; gap: 10px;
@@ -187,9 +259,7 @@ onMounted(() => genCaptcha())
 
 .captcha-field { padding-right: 6px; }
 .captcha-input { width: 100%; }
-.captcha {
-  border-radius: 6px; cursor: pointer; opacity: 0.85; flex-shrink: 0;
-}
+.captcha { border-radius: 6px; cursor: pointer; opacity: 0.85; flex-shrink: 0; }
 .captcha:hover { opacity: 1; }
 
 .login-btn {
@@ -204,6 +274,11 @@ onMounted(() => genCaptcha())
 .login-btn.loading { opacity: 0.75; }
 
 .error { color: #ef6b6b; font-size: 12px; text-align: center; margin: 10px 0 0; }
+
+/* 切换登录/注册 */
+.switch-row { text-align: center; font-size: 12px; color: rgba(255,255,255,0.3); margin-top: 14px; }
+.switch-link { color: #60d9fa; cursor: pointer; font-weight: 500; margin-left: 4px; }
+.switch-link:hover { color: #3b82f6; }
 
 /* Quick login */
 .quick { text-align: center; margin-top: 20px; }

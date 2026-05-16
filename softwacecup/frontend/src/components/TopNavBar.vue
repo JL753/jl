@@ -33,7 +33,6 @@
           <template v-if="!auth.isLoggedIn">
             <button class="dropdown-item" @click="handleLogin">登录</button>
             <button class="dropdown-item" @click="handleRegister">注册</button>
-            <button class="dropdown-item" @click="handleSettings">设置</button>
             <button class="dropdown-item" @click="handleAbout">关于</button>
           </template>
           <!-- 学生登录 -->
@@ -93,8 +92,7 @@ function handleLogin() {
 
 function handleRegister() {
   showDropdown.value = false
-  auth.openLoginModal()
-  // TODO: switch modal to register tab
+  auth.openRegisterModal()
 }
 
 function handleLogout() {
