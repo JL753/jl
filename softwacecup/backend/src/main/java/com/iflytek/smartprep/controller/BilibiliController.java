@@ -77,7 +77,8 @@ public class BilibiliController {
             return ApiResponse.fail("单次导入上限50个视频");
         }
 
-        Long userId = LoginUserHolder.get().getUserId();
+        String role = LoginUserHolder.get().getRole();
+        Long userId = "student".equals(role) ? LoginUserHolder.get().getUserId() : null;
         BilibiliImportResult result = videoImportPipeline.importVideos(
                 request.getBvids(), request.isAutoGenerate(), userId);
 
