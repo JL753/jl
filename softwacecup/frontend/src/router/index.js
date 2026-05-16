@@ -27,6 +27,7 @@ const routes = [
       { path: 'lessons/:id', name: 'student-lesson', component: () => import('../views/student/CourseView.vue') },
       { path: 'knowledge-map', name: 'student-knowledge-map', component: () => import('../views/student/KnowledgeStarMap.vue') },
       { path: 'companion', name: 'companion', component: () => import('../views/student/AICompanionView.vue') },
+      { path: 'companion-immersive', name: 'companion-immersive', component: () => import('../views/student/AICompanionImmersive.vue') },
       { path: 'profile', name: 'student-profile', component: () => import('../views/common/ProfileView.vue') },
       { path: 'community', name: 'student-community', component: () => import('../views/student/CommunityView.vue') },
     ]
