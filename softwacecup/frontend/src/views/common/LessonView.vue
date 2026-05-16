@@ -234,7 +234,8 @@ async function completeLesson() {
   completing.value = true
   try {
     await apiCompleteLesson(lessonId.value)
-    router.push('/courses/' + lesson.value?.subjectId)
+    const basePath = route.path.startsWith('/student') ? '/student' : ''
+    router.push(basePath + '/subjects/' + lesson.value?.subjectId)
   } catch (e) {
     console.error('Failed to complete lesson:', e)
     // Still navigate back on error
@@ -246,7 +247,8 @@ async function completeLesson() {
 
 function navigateToLesson(id) {
   if (id) {
-    router.push('/lessons/' + id)
+    const basePath = route.path.startsWith('/student') ? '/student' : ''
+    router.push(basePath + '/lessons/' + id)
   }
 }
 

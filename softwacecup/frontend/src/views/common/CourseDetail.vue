@@ -64,7 +64,7 @@
                 v-for="lesson in lessonsByUnit[unit.id] || []"
                 :key="lesson.id"
                 class="lesson-row"
-                @click="$router.push('/lessons/' + lesson.id)"
+                @click="goToLesson(lesson.id)"
               >
                 <div class="lesson-left">
                   <ProgressDot :status="getLessonDotStatus(lesson.id)" />
@@ -170,6 +170,11 @@ function getMasteryClass(lessonId) {
 
 function handleBack() {
   router.back()
+}
+
+function goToLesson(lessonId) {
+  const basePath = route.path.startsWith('/student') ? '/student' : ''
+  router.push(basePath + '/lessons/' + lessonId)
 }
 
 onMounted(async () => {
