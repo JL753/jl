@@ -4,9 +4,8 @@
     <div class="portal-inner">
       <!-- ═══ ① Hero + ② 角色分流 ═══ -->
       <div class="hero-row">
-        <!-- Hero 透明区 -->
+        <!-- Hero 左侧文字 -->
         <div class="hero-area" :class="{ full: auth.isLoggedIn }">
-          <!-- 未登录 -->
           <template v-if="!auth.isLoggedIn">
             <div class="hero-left">
               <p class="hero-tagline">自适应学习路径 · 实时学情追踪</p>
@@ -21,18 +20,7 @@
                 <button class="cta-btn ghost" @click="scrollToSubjects">了解功能</button>
               </div>
             </div>
-            <!-- 3D 轨道 -->
-            <div class="orbit-3d" @mouseenter="orbitTilted = false" @mouseleave="orbitTilted = true">
-              <div class="orbit-scene" :class="{ tilted: orbitTilted }">
-                <div class="ring-full r1"></div>
-                <div class="ring-full r2"></div>
-                <div class="ring-segment r3"></div>
-                <div class="ring-segment r4"></div>
-                <div class="ring-full r5"></div>
-              </div>
-            </div>
           </template>
-          <!-- 已登录 -->
           <template v-else>
             <div class="hero-left">
               <p class="hero-tagline">自适应学习路径 · 实时学情追踪</p>
@@ -46,27 +34,31 @@
                 <button class="cta-btn ghost" @click="goKnowledgeMap">知识星图</button>
               </div>
             </div>
-            <div class="orbit-3d" @mouseenter="orbitTilted = false" @mouseleave="orbitTilted = true">
-              <div class="orbit-scene" :class="{ tilted: orbitTilted }">
-                <div class="ring-full r1"></div>
-                <div class="ring-full r2"></div>
-                <div class="ring-segment r3"></div>
-                <div class="ring-segment r4"></div>
-                <div class="ring-full r5"></div>
-              </div>
-            </div>
           </template>
         </div>
 
-        <!-- ② 角色分流卡（仅未登录） -->
-        <div v-if="!auth.isLoggedIn" class="role-cards">
-          <div class="role-card student" @click="quickEnter('student')">
-            <span class="role-label">我是学生</span>
-            <span class="role-arrow">进入学习 →</span>
+        <!-- 右侧: 3D轨道 + 角色分流卡 -->
+        <div class="hero-right-group">
+          <div class="orbit-3d" @mouseenter="orbitTilted = false" @mouseleave="orbitTilted = true">
+            <div class="orbit-scene" :class="{ tilted: orbitTilted }">
+              <div class="ring-full r1"><span class="dot d1"></span></div>
+              <div class="ring-full r2"><span class="dot d2"></span></div>
+              <div class="ring-segment r3"></div>
+              <div class="ring-segment r4"></div>
+              <div class="ring-full r5"></div>
+              <div class="core-glow"></div>
+              <div class="core-orb">知</div>
+            </div>
           </div>
-          <div class="role-card teacher" @click="quickEnter('teacher')">
-            <span class="role-label">我是教师</span>
-            <span class="role-arrow">进入教学 →</span>
+          <div v-if="!auth.isLoggedIn" class="role-cards">
+            <div class="role-card student" @click="quickEnter('student')">
+              <span class="role-label">我是学生</span>
+              <span class="role-arrow">进入学习 →</span>
+            </div>
+            <div class="role-card teacher" @click="quickEnter('teacher')">
+              <span class="role-label">我是教师</span>
+              <span class="role-arrow">进入教学 →</span>
+            </div>
           </div>
         </div>
       </div>
@@ -239,20 +231,25 @@ onMounted(() => { loadSubjects(); loadAuthData() })
 .hero-row {
   display: flex;
   gap: 0;
-  align-items: stretch;
+  align-items: center;
+  min-height: 360px;
 }
 .hero-area {
   flex: 1;
   display: flex;
   align-items: center;
-  justify-content: center;
-  gap: 80px;
-  min-height: 360px;
   transition: flex 0.3s ease;
 }
 .hero-area.full { flex: 1; }
 
 .hero-left { max-width: 620px; }
+
+.hero-right-group {
+  display: flex;
+  align-items: center;
+  gap: 0;
+  flex-shrink: 0;
+}
 
 .hero-tagline {
   font-size: 15px;
@@ -330,18 +327,19 @@ onMounted(() => { loadSubjects(); loadAuthData() })
 
 /* ═══ 3D Orbit Spinner ═══ */
 .orbit-3d {
-  width: 220px;
-  height: 220px;
+  width: 240px;
+  height: 240px;
   display: flex;
   align-items: center;
   justify-content: center;
   flex-shrink: 0;
   cursor: pointer;
+  position: relative;
 }
 .orbit-scene {
   position: relative;
-  width: 180px;
-  height: 180px;
+  width: 200px;
+  height: 200px;
   perspective: 600px;
   transform-style: preserve-3d;
   transition: transform 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
@@ -354,7 +352,6 @@ onMounted(() => { loadSubjects(); loadAuthData() })
   position: absolute;
   top: 50%; left: 50%;
   border-radius: 50%;
-  border: 1px solid rgba(59, 130, 246, 0.15);
   pointer-events: none;
 }
 .ring-segment {
@@ -364,41 +361,99 @@ onMounted(() => { loadSubjects(); loadAuthData() })
   pointer-events: none;
 }
 
+/* 外环 — 蓝光双层 */
 .r1 {
-  width: 160px; height: 160px;
-  margin: -80px 0 0 -80px;
-  animation: ring-spin 3s linear infinite;
-  border-color: rgba(59, 130, 246, 0.2);
+  width: 190px; height: 190px;
+  margin: -95px 0 0 -95px;
+  animation: ring-spin 4s linear infinite;
+  border: 1.5px solid rgba(59, 130, 246, 0.35);
+  box-shadow: 0 0 12px rgba(59, 130, 246, 0.2), inset 0 0 12px rgba(59, 130, 246, 0.05);
 }
+/* 第二环 — 青紫交替 */
 .r2 {
-  width: 130px; height: 130px;
-  margin: -65px 0 0 -65px;
-  animation: ring-spin 2.4s linear infinite reverse;
-  border-color: rgba(6, 182, 212, 0.18);
+  width: 150px; height: 150px;
+  margin: -75px 0 0 -75px;
+  animation: ring-spin 3s linear infinite reverse;
+  border: 1.5px solid rgba(6, 182, 212, 0.3);
+  box-shadow: 0 0 10px rgba(6, 182, 212, 0.15);
 }
+/* 拖尾段 — 紫光 */
 .r3 {
-  width: 100px; height: 100px;
-  margin: -50px 0 0 -50px;
-  animation: ring-spin 2s linear infinite;
-  border-top: 2px solid rgba(139, 92, 246, 0.35);
-  border-right: 2px solid transparent;
-  border-bottom: 2px solid transparent;
-  border-left: 2px solid transparent;
+  width: 115px; height: 115px;
+  margin: -57px 0 0 -57px;
+  animation: ring-spin 2.2s linear infinite;
+  border-top: 2.5px solid #a855f7;
+  border-right: 2.5px solid transparent;
+  border-bottom: 2.5px solid transparent;
+  border-left: 2.5px solid rgba(168, 85, 247, 0.3);
+  box-shadow: 0 0 8px rgba(168, 85, 247, 0.25);
 }
+/* 拖尾段 — 青光 */
 .r4 {
-  width: 75px; height: 75px;
-  margin: -37px 0 0 -37px;
-  animation: ring-spin 1.6s linear infinite reverse;
-  border-top: 2px solid rgba(6, 182, 212, 0.4);
-  border-right: 2px solid transparent;
-  border-bottom: 2px solid transparent;
-  border-left: 2px solid transparent;
+  width: 82px; height: 82px;
+  margin: -41px 0 0 -41px;
+  animation: ring-spin 1.7s linear infinite reverse;
+  border-top: 2.5px solid #06b6d4;
+  border-right: 2.5px solid transparent;
+  border-bottom: 2.5px solid transparent;
+  border-left: 2.5px solid rgba(6, 182, 212, 0.25);
+  box-shadow: 0 0 8px rgba(6, 182, 212, 0.3);
 }
+/* 内环 — 蓝紫渐变 */
 .r5 {
-  width: 50px; height: 50px;
-  margin: -25px 0 0 -25px;
-  animation: ring-spin 1.2s linear infinite;
-  border-color: rgba(168, 85, 247, 0.25);
+  width: 54px; height: 54px;
+  margin: -27px 0 0 -27px;
+  animation: ring-spin 1.4s linear infinite;
+  border: 1.5px solid rgba(139, 92, 246, 0.4);
+  box-shadow: 0 0 6px rgba(139, 92, 246, 0.2);
+}
+
+/* 轨道上的发光点 */
+.dot {
+  position: absolute;
+  width: 5px; height: 5px;
+  border-radius: 50%;
+  pointer-events: none;
+}
+.d1 {
+  top: -3px; left: 50%;
+  margin-left: -2px;
+  background: #60a5fa;
+  box-shadow: 0 0 8px #3b82f6, 0 0 16px rgba(59,130,246,0.6);
+}
+.d2 {
+  bottom: -3px; left: 50%;
+  margin-left: -2px;
+  background: #22d3ee;
+  box-shadow: 0 0 8px #06b6d4, 0 0 16px rgba(6,182,212,0.6);
+}
+
+/* 中心光晕 */
+.core-glow {
+  position: absolute;
+  top: 50%; left: 50%;
+  width: 60px; height: 60px;
+  margin: -30px 0 0 -30px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(59,130,246,0.15) 0%, transparent 70%);
+  animation: pulse-glow 2s ease-in-out infinite;
+}
+@keyframes pulse-glow {
+  0%, 100% { transform: scale(1); opacity: 0.6; }
+  50% { transform: scale(1.3); opacity: 1; }
+}
+/* 中心球 */
+.core-orb {
+  position: absolute;
+  top: 50%; left: 50%;
+  width: 28px; height: 28px;
+  margin: -14px 0 0 -14px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #3b82f6, #06b6d4);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 12px; font-weight: 800; color: white;
+  box-shadow: 0 0 20px rgba(59,130,246,0.6), 0 0 40px rgba(59,130,246,0.3);
+  z-index: 2;
 }
 
 @keyframes ring-spin {
@@ -408,21 +463,21 @@ onMounted(() => { loadSubjects(); loadAuthData() })
 
 /* ═══ ② Role cards ═══ */
 .role-cards {
-  width: 160px;
+  width: 120px;
   display: flex;
   flex-direction: column;
-  gap: 12px;
+  gap: 8px;
   flex-shrink: 0;
+  margin-left: 4px;
 }
 .role-card {
-  flex: 1;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  gap: 8px;
-  padding: 18px 12px;
-  border-radius: 12px;
+  gap: 6px;
+  padding: 14px 8px;
+  border-radius: 10px;
   background: transparent;
   border: none;
   cursor: pointer;
