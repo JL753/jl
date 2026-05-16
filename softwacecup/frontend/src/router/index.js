@@ -21,17 +21,14 @@ const routes = [
     children: [
       { path: '', redirect: '/student/dashboard' },
       { path: 'dashboard', name: 'student-dashboard', component: () => import('../views/student/StudentDashboard.vue') },
-      { path: 'knowledge-map', name: 'student-knowledge-map', component: () => import('../views/student/KnowledgeStarMap.vue') },
-      { path: 'workspace', name: 'workspace', component: () => import('../views/student/AIWorkspace.vue') },
-      { path: 'courses', name: 'courses', component: () => import('../views/student/CoursePlatform.vue') },
       { path: 'subjects', name: 'student-subjects', component: () => import('../views/common/SubjectCatalog.vue') },
       { path: 'subjects/:id', name: 'student-subject-detail', component: () => import('../views/common/CourseDetail.vue') },
-      { path: 'lessons/:id', name: 'student-lesson', component: () => import('../views/common/LessonView.vue') },
+      { path: 'courses/:id', name: 'student-course', component: () => import('../views/student/CourseView.vue') },
+      { path: 'lessons/:id', name: 'student-lesson', component: () => import('../views/student/CourseView.vue') },
+      { path: 'knowledge-map', name: 'student-knowledge-map', component: () => import('../views/student/KnowledgeStarMap.vue') },
       { path: 'companion', name: 'companion', component: () => import('../views/student/AICompanionView.vue') },
-      { path: 'quiz', name: 'quiz', component: () => import('../views/student/AdaptiveQuizView.vue') },
-      { path: 'achievements', name: 'achievements', component: () => import('../views/student/AchievementCenter.vue') },
-      { path: 'exam', name: 'student-exam', component: () => import('../views/student/StudentExam.vue') },
       { path: 'profile', name: 'student-profile', component: () => import('../views/common/ProfileView.vue') },
+      { path: 'community', name: 'student-community', component: () => import('../views/student/CommunityView.vue') },
     ]
   },
 
