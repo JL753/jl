@@ -27,7 +27,7 @@
             <!-- AI Avatar -->
             <div class="ai-section">
               <div class="ai-avatar">
-                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
                   <rect x="2" y="2" width="20" height="8" rx="2" ry="2" />
                   <rect x="2" y="14" width="20" height="8" rx="2" ry="2" />
                   <line x1="6" y1="6" x2="6.01" y2="6" />
@@ -60,7 +60,7 @@
         <Transition name="fade-up" mode="out-in">
           <div class="result-card" key="result">
             <div class="result-icon">
-              <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+              <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
                 <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14" />
                 <polyline points="22 4 12 14.01 9 11.01" />
               </svg>
@@ -90,7 +90,7 @@
             </div>
 
             <button class="start-btn" @click="goToDashboard">
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
                 <polygon points="5 3 19 12 5 21 5 3" />
               </svg>
               开始学习
@@ -103,11 +103,17 @@
 </template>
 
 <script setup>
-import { ref, computed } from 'vue'
+import { ref, computed, onBeforeUnmount } from 'vue'
 import { useRouter } from 'vue-router'
 import { apiBuildProfile } from '../../api/index.js'
 
 const router = useRouter()
+
+let pendingTimeout = null
+
+onBeforeUnmount(() => {
+  if (pendingTimeout) clearTimeout(pendingTimeout)
+})
 
 const currentStep = ref(0)
 const selectedOption = ref('')
@@ -244,7 +250,7 @@ function selectOption(option) {
 
   if (currentStep.value < steps.length - 1) {
     // Auto-advance after brief delay for visual feedback
-    setTimeout(() => {
+    pendingTimeout = setTimeout(() => {
       currentStep.value++
       selectedOption.value = answers.value[steps[currentStep.value].key] || ''
     }, 300)

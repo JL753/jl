@@ -10,7 +10,7 @@
         </div>
       </div>
       <button class="clear-btn" @click="clearConversation">
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
           <polyline points="3 6 5 6 21 6" />
           <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2" />
         </svg>
@@ -19,24 +19,23 @@
     </header>
 
     <!-- Messages -->
-    <div class="messages-area" ref="messagesRef">
+    <div class="messages-area" ref="messagesRef" aria-live="polite">
       <div
         v-for="(msg, idx) in messages"
         :key="idx"
-        :ref="idx === messages.length - 1 ? 'lastMsg' : null"
         :class="['msg-row', msg.role]"
       >
-        <div v-if="msg.role === 'ai'" class="msg-avatar ai-avatar">🤖</div>
+        <div v-if="msg.role === 'ai'" class="msg-avatar ai-avatar" role="img" aria-label="AI 助手">🤖</div>
         <div :class="['msg-bubble', msg.role]">
           <div v-if="msg.role === 'ai'" class="msg-content" v-html="msg.html"></div>
           <div v-else class="msg-content">{{ msg.content }}</div>
         </div>
-        <div v-if="msg.role === 'user'" class="msg-avatar user-avatar">👤</div>
+        <div v-if="msg.role === 'user'" class="msg-avatar user-avatar" role="img" aria-label="用户">👤</div>
       </div>
 
       <!-- Loading indicator -->
       <div v-if="loading" class="msg-row ai">
-        <div class="msg-avatar ai-avatar">🤖</div>
+        <div class="msg-avatar ai-avatar" role="img" aria-label="AI 助手">🤖</div>
         <div class="msg-bubble ai loading-bubble">
           <div class="thinking-indicator">
             <span>思考中</span>
@@ -59,6 +58,7 @@
           placeholder="输入你的问题..."
           @keydown.enter.prevent="send"
           :disabled="loading"
+          maxlength="2000"
         />
         <button
           class="send-btn"
@@ -66,7 +66,7 @@
           :disabled="!input.trim() || loading"
           @click="send"
         >
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
             <line x1="22" y1="2" x2="11" y2="13" />
             <polygon points="22 2 15 22 11 13 2 9 22 2" />
           </svg>
@@ -84,7 +84,6 @@ import { marked } from 'marked'
 import DOMPurify from 'dompurify'
 
 const messagesRef = ref(null)
-const lastMsg = ref(null)
 const messages = ref([
   {
     role: 'ai',
@@ -101,8 +100,8 @@ function renderMarkdown(text) {
 
 function scrollToBottom() {
   nextTick(() => {
-    if (lastMsg.value) {
-      lastMsg.value.scrollIntoView({ behavior: 'smooth', block: 'end' })
+    if (messagesRef.value) {
+      messagesRef.value.scrollTop = messagesRef.value.scrollHeight
     }
   })
 }
