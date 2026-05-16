@@ -21,13 +21,20 @@ public class CourseServiceImpl implements CourseService {
     private final ExerciseMapper exerciseMapper;
 
     @Override
-    public List<Map<String, Object>> getSubjectTree() {
+    public List<Map<String, Object>> getSubjectTree(Long userId) {
         List<Subject> subjects = subjectMapper.selectList(
                 new LambdaQueryWrapper<Subject>().orderByAsc(Subject::getSortOrder));
         List<Unit> allUnits = unitMapper.selectList(
                 new LambdaQueryWrapper<Unit>().orderByAsc(Unit::getSortOrder));
-        List<Lesson> allLessons = lessonMapper.selectList(
-                new LambdaQueryWrapper<Lesson>().orderByAsc(Lesson::getSortOrder));
+        // 公共课(NULL) + 当前用户的个人课
+        LambdaQueryWrapper<Lesson> lessonWrapper = new LambdaQueryWrapper<Lesson>()
+                .orderByAsc(Lesson::getSortOrder);
+        if (userId != null) {
+            lessonWrapper.and(w -> w.isNull(Lesson::getUserId).or().eq(Lesson::getUserId, userId));
+        } else {
+            lessonWrapper.isNull(Lesson::getUserId);
+        }
+        List<Lesson> allLessons = lessonMapper.selectList(lessonWrapper);
 
         return subjects.stream().map(subject -> {
             Map<String, Object> subjNode = new HashMap<>();

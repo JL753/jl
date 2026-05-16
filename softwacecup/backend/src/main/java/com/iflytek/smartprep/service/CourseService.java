@@ -8,7 +8,7 @@ public interface CourseService {
     /**
      * 获取学科树（学科 → 单元 → 课时）
      */
-    List<Map<String, Object>> getSubjectTree();
+    List<Map<String, Object>> getSubjectTree(Long userId);
 
     /**
      * 获取课时详情（包含视频地址、markdown内容、关联知识点、关联练习）

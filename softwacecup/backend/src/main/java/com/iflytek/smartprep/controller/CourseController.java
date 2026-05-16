@@ -1,5 +1,6 @@
 package com.iflytek.smartprep.controller;
 
+import com.iflytek.smartprep.config.LoginUserHolder;
 import com.iflytek.smartprep.dto.ApiResponse;
 import com.iflytek.smartprep.service.CourseService;
 import lombok.RequiredArgsConstructor;
@@ -17,7 +18,9 @@ public class CourseController {
     /** 获取学科→单元→课时树 */
     @GetMapping("/tree")
     public ApiResponse<Object> getSubjectTree() {
-        return ApiResponse.ok(courseService.getSubjectTree());
+        Long userId = null;
+        try { userId = LoginUserHolder.get().getUserId(); } catch (Exception ignored) {}
+        return ApiResponse.ok(courseService.getSubjectTree(userId));
     }
 
     /** 获取课时详情（含视频、内容、知识点、练习） */
