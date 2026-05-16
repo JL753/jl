@@ -230,17 +230,17 @@ onMounted(() => { loadSubjects(); loadAuthData() })
 /* ═══ ① Hero Area ═══ */
 .hero-row {
   display: flex;
-  gap: 0;
+  gap: 16px;
   align-items: center;
+  justify-content: center;
   min-height: 360px;
 }
 .hero-area {
-  flex: 1;
   display: flex;
   align-items: center;
   transition: flex 0.3s ease;
 }
-.hero-area.full { flex: 1; }
+.hero-area.full { }
 
 .hero-left { max-width: 620px; }
 
@@ -468,7 +468,7 @@ onMounted(() => { loadSubjects(); loadAuthData() })
   flex-direction: column;
   gap: 8px;
   flex-shrink: 0;
-  margin-left: 4px;
+  margin-left: 0;
 }
 .role-card {
   display: flex;
@@ -476,7 +476,7 @@ onMounted(() => { loadSubjects(); loadAuthData() })
   align-items: center;
   justify-content: center;
   gap: 6px;
-  padding: 14px 8px;
+  padding: 14px 6px;
   border-radius: 10px;
   background: transparent;
   border: none;
