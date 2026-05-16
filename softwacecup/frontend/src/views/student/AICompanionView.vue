@@ -3,9 +3,10 @@
     <!-- Header -->
     <header class="chat-header">
       <div class="header-left">
-        <span class="ai-icon">🤖</span>
+        <span class="ai-icon">AI</span>
         <div class="header-info">
-          <h2 class="header-title">AI 辅导</h2>
+          <h2 class="header-title">AI 学习助手</h2>
+          <p style="font-size:11px;color:rgba(255,255,255,0.4);margin:2px 0 0;">随时提问，AI 辅导你的学习问题</p>
           <span class="header-status">在线 · 随时为你解答</span>
         </div>
       </div>
@@ -25,17 +26,17 @@
         :key="idx"
         :class="['msg-row', msg.role]"
       >
-        <div v-if="msg.role === 'ai'" class="msg-avatar ai-avatar" role="img" aria-label="AI 助手">🤖</div>
+        <div v-if="msg.role === 'ai'" class="msg-avatar ai-avatar" role="img" aria-label="AI 助手">AI</div>
         <div :class="['msg-bubble', msg.role]">
           <div v-if="msg.role === 'ai'" class="msg-content" v-html="msg.html"></div>
           <div v-else class="msg-content">{{ msg.content }}</div>
         </div>
-        <div v-if="msg.role === 'user'" class="msg-avatar user-avatar" role="img" aria-label="用户">👤</div>
+        <div v-if="msg.role === 'user'" class="msg-avatar user-avatar" role="img" aria-label="用户">我</div>
       </div>
 
       <!-- Loading indicator -->
       <div v-if="loading" class="msg-row ai">
-        <div class="msg-avatar ai-avatar" role="img" aria-label="AI 助手">🤖</div>
+        <div class="msg-avatar ai-avatar" role="img" aria-label="AI 助手">AI</div>
         <div class="msg-bubble ai loading-bubble">
           <div class="thinking-indicator">
             <span>思考中</span>
@@ -160,8 +161,8 @@ onMounted(() => {
   display: flex;
   flex-direction: column;
   height: 100%;
+  padding: 24px;
   background: transparent;
-  position: relative;
 }
 
 /* ── Header ── */
@@ -189,7 +190,9 @@ onMounted(() => {
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 20px;
+  font-size: 14px;
+  font-weight: 700;
+  color: #fff;
   box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
 }
 
@@ -269,17 +272,20 @@ onMounted(() => {
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 16px;
+  font-size: 12px;
+  font-weight: 700;
   flex-shrink: 0;
 
   &.ai-avatar {
     background: rgba(59, 130, 246, 0.15);
     border: 1px solid rgba(59, 130, 246, 0.2);
+    color: #3b82f6;
   }
 
   &.user-avatar {
     background: rgba(16, 185, 129, 0.15);
     border: 1px solid rgba(16, 185, 129, 0.2);
+    color: #10b981;
   }
 }
 
