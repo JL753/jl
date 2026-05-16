@@ -16,4 +16,5 @@ public class Lesson {
     private String status;
     private Integer sortOrder;
     private Long userId;
+    private String coverUrl;
 }

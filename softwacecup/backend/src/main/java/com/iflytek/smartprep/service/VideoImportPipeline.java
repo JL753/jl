@@ -98,6 +98,7 @@ public class VideoImportPipeline {
                 lesson.setStatus("draft");
                 lesson.setSortOrder(0);
                 lesson.setUserId(userId);
+                lesson.setCoverUrl(meta.getCoverUrl());
                 lessonMapper.insert(lesson);
 
                 item.setLessonId(lesson.getId());

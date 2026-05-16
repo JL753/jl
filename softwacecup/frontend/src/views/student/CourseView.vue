@@ -9,17 +9,19 @@
         </button>
       </div>
       <div class="tree-body" v-if="subjectTree.length > 0">
-        <div class="tree-course-name">{{ courseName }}</div>
-        <div v-for="unit in subjectTree" :key="unit.id" class="tree-unit">
-          <div class="tree-unit-name">{{ unit.name }}</div>
-          <div
-            v-for="lesson in unit.lessons" :key="lesson.id"
-            class="tree-lesson"
-            :class="{ active: currentLessonId === lesson.id }"
-            @click="goToLesson(lesson.id)"
-          >
-            <span class="tree-lesson-dot"></span>
-            <span class="tree-lesson-name">{{ lesson.name }}</span>
+        <div v-for="subject in subjectTree" :key="subject.id" class="tree-subject">
+          <div class="tree-subject-name">{{ subject.name }}</div>
+          <div v-for="unit in subject.units" :key="unit.id" class="tree-unit">
+            <div class="tree-unit-name">{{ unit.name }}</div>
+            <div
+              v-for="lesson in unit.lessons" :key="lesson.id"
+              class="tree-lesson"
+              :class="{ active: currentLessonId === lesson.id }"
+              @click="goToLesson(lesson.id)"
+            >
+              <span class="tree-lesson-dot"></span>
+              <span class="tree-lesson-name">{{ lesson.name }}</span>
+            </div>
           </div>
         </div>
       </div>
@@ -213,9 +215,8 @@ async function loadCourse() {
       // Load course tree
       const treeRes = await apiSubjectTree()
       subjectTree.value = treeRes.data || []
-      if (subjectTree.value.length > 0) {
-        courseName.value = subjectTree.value[0].name || ''
-      }
+      // Find which subject/unit contains this lesson
+      locateLessonInTree(currentLessonId.value)
 
       // Load exercises
       if (currentLesson.value.knowledgePointId) {
@@ -228,12 +229,10 @@ async function loadCourse() {
       // Course mode: load course tree, show first lesson
       const treeRes = await apiSubjectTree()
       subjectTree.value = treeRes.data || []
-      if (subjectTree.value.length > 0) {
-        courseName.value = subjectTree.value[0].name || ''
-      }
       // Find and load first lesson
       const first = findFirstLesson()
       if (first) await loadLesson(first.id)
+      if (currentLessonId.value) locateLessonInTree(currentLessonId.value)
     }
 
     // Compute prev/next
@@ -252,10 +251,32 @@ async function loadCourse() {
 }
 
 function findFirstLesson() {
-  for (const unit of subjectTree.value) {
-    if (unit.lessons?.length > 0) return unit.lessons[0]
+  for (const subject of subjectTree.value) {
+    if (subject.units) {
+      for (const unit of subject.units) {
+        if (unit.lessons?.length > 0) return unit.lessons[0]
+      }
+    }
   }
   return null
+}
+
+function locateLessonInTree(lessonId) {
+  for (const subject of subjectTree.value) {
+    if (subject.units) {
+      for (const unit of subject.units) {
+        if (unit.lessons) {
+          for (const lesson of unit.lessons) {
+            if (lesson.id === lessonId) {
+              courseName.value = subject.name
+              currentUnitName.value = unit.name
+              return
+            }
+          }
+        }
+      }
+    }
+  }
 }
 
 async function loadLesson(lessonId) {
@@ -383,7 +404,7 @@ function bilibiliEmbedUrl(url) {
 }
 .course-tree.collapsed { width: 40px; min-width: 40px; }
 .course-tree.collapsed .tree-title,
-.course-tree.collapsed .tree-course-name,
+.course-tree.collapsed .tree-subject-name, .tree-course-name,
 .course-tree.collapsed .tree-unit-name,
 .course-tree.collapsed .tree-lesson-name { display: none; }
 .tree-header {
@@ -393,11 +414,12 @@ function bilibiliEmbedUrl(url) {
 .tree-title { font-size: 10px; text-transform: uppercase; letter-spacing: 1px; color: rgba(255, 255, 255, 0.3); }
 .tree-toggle { background: none; border: none; color: rgba(255,255,255,0.3); cursor: pointer; }
 .tree-body { flex: 1; overflow-y: auto; padding: 8px; }
-.tree-course-name { font-size: 12px; font-weight: 600; padding: 4px 8px; margin-bottom: 4px; }
-.tree-unit { margin-bottom: 4px; }
-.tree-unit-name { font-size: 11px; color: rgba(255, 255, 255, 0.35); padding: 6px 8px 2px; }
+.tree-subject { margin-bottom: 8px; }
+.tree-subject-name { font-size: 12px; font-weight: 600; padding: 4px 8px; margin-bottom: 2px; color: #f1f5f9; }
+.tree-unit { margin-bottom: 4px; margin-left: 4px; }
+.tree-unit-name { font-size: 11px; color: rgba(255, 255, 255, 0.35); padding: 4px 8px 1px; }
 .tree-lesson {
-  display: flex; align-items: center; gap: 6px; padding: 4px 8px 4px 18px;
+  display: flex; align-items: center; gap: 6px; padding: 4px 8px 4px 22px;
   border-radius: 4px; cursor: pointer; font-size: 11px; color: rgba(255, 255, 255, 0.5);
 }
 .tree-lesson:hover { background: rgba(255, 255, 255, 0.04); }
@@ -554,7 +576,7 @@ function bilibiliEmbedUrl(url) {
 @media (max-width: 1280px) {
   .course-tree { width: 40px; min-width: 40px; }
   .course-tree .tree-title,
-  .course-tree .tree-course-name,
+  .course-tree .tree-subject-name, .tree-course-name,
   .course-tree .tree-unit-name,
   .course-tree .tree-lesson-name { display: none; }
   .ai-panel { width: 300px; min-width: 300px; }

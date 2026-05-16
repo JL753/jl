@@ -22,7 +22,8 @@
       <div class="imports-row">
         <div v-for="imp in myImports" :key="imp.bvid" class="import-card glass-card" @click="$router.push('/student/lessons/' + imp.firstLessonId)">
           <div class="import-cover">
-            <div class="import-cover-placeholder">{{ imp.title?.charAt(0) || 'V' }}</div>
+            <img v-if="imp.coverUrl" :src="imp.coverUrl" class="import-cover-img" @error="e => e.target.style.display='none'" />
+            <div v-if="!imp.coverUrl" class="import-cover-placeholder">{{ imp.title?.charAt(0) || 'V' }}</div>
           </div>
           <div class="import-info">
             <div class="import-title">{{ imp.title }}</div>
@@ -110,6 +111,9 @@ onMounted(async () => {
 }
 .import-card:hover { background: rgba(255,255,255,0.08); transform: translateY(-2px); }
 .import-cover { margin-bottom: 10px; }
+.import-cover-img {
+  width: 100%; height: 100px; border-radius: 6px; object-fit: cover; display: block;
+}
 .import-cover-placeholder {
   width: 100%; height: 100px; border-radius: 6px;
   background: linear-gradient(135deg, #3b82f6, #a855f7);

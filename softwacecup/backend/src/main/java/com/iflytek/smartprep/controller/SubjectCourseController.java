@@ -181,7 +181,7 @@ public class SubjectCourseController {
             item.put("unitName", unitName);
             item.put("lessonCount", lessons.size());
             item.put("firstLessonId", first.getId());
-            item.put("coverUrl", ""); // 后续可存储封面
+            item.put("coverUrl", first.getCoverUrl() != null ? first.getCoverUrl() : "");
             result.add(item);
         }
         return ApiResponse.ok(result);
