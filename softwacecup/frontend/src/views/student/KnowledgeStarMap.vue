@@ -211,12 +211,11 @@ onMounted(async () => {
     const rect = chartRef.value.getBoundingClientRect()
     console.log('Chart container size:', rect.width, 'x', rect.height)
 
-    if (!(await ensureEcharts())) {
-      console.warn('ECharts load failed')
-      loading.value = false
-      return
-    }
+    const ok = await ensureEcharts()
+    console.log('ensureEcharts:', ok, 'hasInit:', !!echarts?.init)
+    if (!ok || !echarts?.init) { loading.value = false; return }
     chartInstance = echarts.init(chartRef.value)
+    console.log('chartInstance:', !!chartInstance)
     chartInstance.resize()
     chartInstance.setOption({
       backgroundColor: 'transparent',
@@ -415,6 +414,7 @@ async function loadPuzzleTab() {
   width: 100%;
   height: 480px;
   min-height: 400px;
+  background: rgba(255,0,0,0.1);
 }
 .path-chart {
   width: 100%;
