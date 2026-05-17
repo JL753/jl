@@ -59,6 +59,16 @@
               >
                 去学习
               </button>
+
+              <!-- 百度搜索推荐资源 -->
+              <div class="search-resources" v-if="searchResults.length > 0">
+                <div class="sr-label">推荐学习资源</div>
+                <a v-for="(r, i) in searchResults" :key="i" :href="r.url" target="_blank" class="sr-item">
+                  <div class="sr-title">{{ r.title || r.url }}</div>
+                  <div class="sr-snippet" v-if="r.snippet">{{ r.snippet }}</div>
+                </a>
+              </div>
+              <div v-if="searchLoading" class="sr-loading">搜索中...</div>
             </div>
           </div>
         </transition>
@@ -107,7 +117,7 @@
 <script setup>
 import { ref, onMounted, onUnmounted, nextTick, watch } from 'vue'
 import { useRouter } from 'vue-router'
-import { apiKnowledgeGraphFull, apiKnowledgeGraphProgress, apiKnowledgeGraphNextRecommended } from '../../api/index.js'
+import { apiKnowledgeGraphFull, apiKnowledgeGraphProgress, apiKnowledgeGraphNextRecommended, apiGraphNeo4j, apiGraphSearchResource } from '../../api/index.js'
 
 const router = useRouter()
 let echarts = null
@@ -124,6 +134,8 @@ const nextRecommended = ref([])
 const pathChartRef = ref(null)
 const puzzleLoading = ref(false)
 const puzzlePieces = ref([])
+const searchResults = ref([])
+const searchLoading = ref(false)
 
 function masteryColor(mastery) {
   if (mastery >= 80) return '#fbbf24'
@@ -145,8 +157,17 @@ async function ensureEcharts() {
 onMounted(async () => {
   try {
     loading.value = true
-    const [graphRes, progressRes] = await Promise.all([
-      apiKnowledgeGraphFull(),
+    // 优先从 Neo4j 加载，失败回退旧API
+    let graphRes = null
+    try {
+      graphRes = await apiGraphNeo4j()
+      if (graphRes.data?.fallback || !graphRes.data?.nodes?.length) {
+        graphRes = await apiKnowledgeGraphFull()
+      }
+    } catch {
+      graphRes = await apiKnowledgeGraphFull()
+    }
+    const [progressRes] = await Promise.all([
       apiKnowledgeGraphProgress(),
     ])
 
@@ -216,12 +237,20 @@ onMounted(async () => {
       }],
     })
 
-    chartInstance.on('click', (params) => {
+    chartInstance.on('click', async (params) => {
       if (params.dataType === 'node') {
         const node = nodes.value.find(n => String(n.id) === String(params.data.id))
         if (node) {
           selectedNode.value = node
           showDetail.value = true
+          // 触发百度搜索
+          searchResults.value = []
+          searchLoading.value = true
+          try {
+            const res = await apiGraphSearchResource(node.name || '')
+            searchResults.value = res.data || []
+          } catch { searchResults.value = [] }
+          finally { searchLoading.value = false }
         }
       }
     })
@@ -496,6 +525,15 @@ async function loadPuzzleTab() {
   transform: translateY(-1px);
   box-shadow: 0 6px 20px rgba(59, 130, 246, 0.3);
 }
+
+/* Search Results */
+.search-resources { margin-top: 14px; padding-top: 12px; border-top: 1px solid rgba(255,255,255,0.08); }
+.sr-label { font-size: 10px; text-transform: uppercase; letter-spacing: 1px; color: rgba(255,255,255,0.3); margin-bottom: 8px; }
+.sr-item { display: block; padding: 6px 0; text-decoration: none; border-bottom: 1px solid rgba(255,255,255,0.04); }
+.sr-item:hover .sr-title { color: #60d9fa; }
+.sr-title { font-size: 11px; color: rgba(255,255,255,0.6); font-weight: 500; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.sr-snippet { font-size: 10px; color: rgba(255,255,255,0.3); margin-top: 2px; line-height: 1.4; }
+.sr-loading { font-size: 11px; color: rgba(255,255,255,0.3); margin-top: 8px; text-align: center; }
 
 /* Transitions */
 .popup-fade-enter-active,

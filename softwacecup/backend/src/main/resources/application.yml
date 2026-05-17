@@ -37,3 +37,9 @@ smartprep:
     model: ${LLM_MODEL:deepseek-chat}
     temperature: ${LLM_TEMPERATURE:0.7}
     max-tokens: ${LLM_MAX_TOKENS:4096}
+  neo4j:
+    uri: ${NEO4J_URI:bolt://localhost:7687}
+    username: ${NEO4J_USERNAME:neo4j}
+    password: ${NEO4J_PASSWORD:password123}
+  baidu:
+    search-token: ${BAIDU_SEARCH_TOKEN:YOUR_BAIDU_SEARCH_TOKEN}

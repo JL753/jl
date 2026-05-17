@@ -133,6 +133,12 @@
             <artifactId>commons-io</artifactId>
             <version>2.15.1</version>
         </dependency>
+
+        <!-- Spring Data Neo4j -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-data-neo4j</artifactId>
+        </dependency>
     </dependencies>
 
     <build>

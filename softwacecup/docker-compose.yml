@@ -17,6 +17,18 @@ services:
     ports:
       - "6379:6379"
 
+  neo4j:
+    image: neo4j:5-community
+    container_name: smartprep-neo4j
+    environment:
+      NEO4J_AUTH: ${NEO4J_AUTH}
+      NEO4J_PLUGINS: '["apoc"]'
+    ports:
+      - "7474:7474"
+      - "7687:7687"
+    volumes:
+      - neo4j-data:/data
+
   backend:
     image: maven:3.9.6-eclipse-temurin-17
     container_name: smartprep-backend
@@ -41,3 +53,6 @@ services:
       - "5173:5173"
     depends_on:
       - backend
+
+volumes:
+  neo4j-data:

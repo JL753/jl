@@ -104,6 +104,10 @@ export const apiBilibiliPlaylist = (url) => http.post('/bilibili/playlist', { ur
 export const apiBilibiliImport = (bvids, autoGenerate = true) => http.post('/bilibili/import', { bvids, autoGenerate })
 export const apiMyImports = () => http.get('/lessons/my-imports')
 
+// ==================== Neo4j 知识图谱 ====================
+export const apiGraphNeo4j = () => http.get('/graph/neo4j')
+export const apiGraphSearchResource = (nodeName, subjectName = '') => http.post('/graph/search-resource', { nodeName, subjectName })
+
 // ==================== 学习数据采集 ====================
 export const apiExerciseSubmit = (data) => http.post('/exercise/submit', data)
 export const apiStudyHeartbeat = (lessonId, seconds) => http.post('/study/heartbeat', { lessonId, seconds })
