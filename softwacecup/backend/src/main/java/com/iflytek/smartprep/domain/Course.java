@@ -17,7 +17,10 @@ public class Course {
     private String status;
     private Integer totalHours;
     private String targetAudience;
-    private String chaptersJson;
+    private Long subjectId;
+    private String background;
+    private String target;
+    private String principle;
     private Long createdBy;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
