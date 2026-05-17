@@ -26,8 +26,17 @@
       </div>
 
       <template v-else>
+        <div class="debug-info" style="color:#60d9fa;font-size:12px;margin-bottom:8px;">
+          {{ nodes.length }} 个知识点 · {{ links.length }} 条依赖
+        </div>
         <!-- Chart Container -->
-        <div ref="chartRef" class="chart-container"></div>
+        <div ref="chartRef" class="chart-container">
+          <div v-if="nodes.length > 0 && !chartInstance" class="node-fallback" style="display:flex;flex-wrap:wrap;gap:6px;padding:12px;">
+            <span v-for="n in nodes.slice(0,40)" :key="n.id"
+              style="padding:4px 10px;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);border-radius:6px;font-size:11px;cursor:pointer;color:rgba(255,255,255,0.6);"
+              @click="selectedNode = n; showDetail = true">{{ n.name }}</span>
+          </div>
+        </div>
 
         <!-- Node Detail Popup -->
         <transition name="popup-fade">
