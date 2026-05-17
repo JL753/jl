@@ -18,6 +18,8 @@ public class Course {
     private Integer totalHours;
     private String targetAudience;
     private Long subjectId;
+    private String chaptersJson;
+    private String difficulty;
     private String background;
     private String target;
     private String principle;

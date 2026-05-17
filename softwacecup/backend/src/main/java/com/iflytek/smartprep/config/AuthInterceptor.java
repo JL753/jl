@@ -26,6 +26,7 @@ public class AuthInterceptor implements HandlerInterceptor {
             "/api/courses",
             "/api/subjects",
             "/api/knowledge-graph/full",
+            "/api/graph",
             "/v3/api-docs",
             "/swagger-ui",
             "/swagger-ui/index.html",

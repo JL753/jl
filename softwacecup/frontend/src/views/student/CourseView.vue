@@ -3,29 +3,19 @@
     <!-- LEFT: Course Tree -->
     <aside class="course-tree" :class="{ collapsed: treeCollapsed }">
       <div class="tree-header">
-        <span class="tree-title">导航</span>
+        <span class="tree-title">目录</span>
         <button class="tree-toggle" @click="treeCollapsed = !treeCollapsed">
           <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline :points="treeCollapsed ? '15 18 9 12 15 6' : '9 18 15 12 9 6'"/></svg>
         </button>
       </div>
-      <div class="tree-body" v-if="subjectTree.length > 0">
-        <div v-for="subject in subjectTree" :key="subject.id" class="tree-subject">
-          <div class="tree-subject-name">{{ subject.name }}</div>
-          <div v-for="unit in subject.units" :key="unit.id" class="tree-unit">
-            <div class="tree-unit-name">{{ unit.name }}</div>
-            <div
-              v-for="lesson in unit.lessons" :key="lesson.id"
-              class="tree-lesson"
-              :class="{ active: currentLessonId === lesson.id }"
-              @click="goToLesson(lesson.id)"
-            >
-              <span class="tree-lesson-dot"></span>
-              <span class="tree-lesson-name">{{ lesson.name }}</span>
-            </div>
-          </div>
-        </div>
+      <div class="tree-body">
+        <ChapterTree
+          :chapters="chapters"
+          :active-id="currentSubChapterId"
+          :loading="treeLoading"
+          @select="(sc) => loadSubChapter(sc.id)"
+        />
       </div>
-      <div v-else class="tree-loading"><span class="spinner"></span></div>
     </aside>
 
     <!-- CENTER: Main Content -->
@@ -35,29 +25,29 @@
         <span class="crumb-sep">/</span>
         <span>{{ courseName }}</span>
         <span class="crumb-sep">/</span>
-        <span>{{ currentUnitName }}</span>
+        <span>{{ currentChapterName }}</span>
         <span class="crumb-sep">/</span>
-        <span class="crumb-current">{{ currentLesson?.name || '加载中...' }}</span>
+        <span class="crumb-current">{{ currentSubChapter?.title || '加载中...' }}</span>
       </div>
 
       <div v-if="loading" class="loading-state">加载中...</div>
 
-      <template v-else-if="currentLesson">
-        <div v-if="currentLesson.videoUrl" class="video-section">
+      <template v-else-if="currentSubChapter">
+        <div v-if="currentSubChapter.videoUrl" class="video-section">
           <div class="video-wrapper">
             <iframe
-              v-if="isBilibiliUrl(currentLesson.videoUrl)"
-              :src="bilibiliEmbedUrl(currentLesson.videoUrl)"
+              v-if="isBilibiliUrl(currentSubChapter.videoUrl)"
+              :src="bilibiliEmbedUrl(currentSubChapter.videoUrl)"
               class="lesson-video"
               frameborder="0"
               allowfullscreen
             ></iframe>
-            <video v-else :src="currentLesson.videoUrl" controls class="lesson-video"></video>
+            <video v-else :src="currentSubChapter.videoUrl" controls class="lesson-video"></video>
           </div>
         </div>
 
         <div class="content-section glass-card">
-          <h2 class="lesson-title">{{ currentLesson.name }}</h2>
+          <h2 class="lesson-title">{{ currentSubChapter.title }}</h2>
           <div class="content-body markdown-body" v-html="renderedContent"></div>
         </div>
 
@@ -94,9 +84,9 @@
         </div>
 
         <div class="lesson-nav">
-          <button v-if="prevLessonId" class="nav-btn" @click="goToLesson(prevLessonId)">上一个</button>
+          <button v-if="prevLessonId" class="nav-btn" @click="goToSubChapter(prevLessonId)">上一个</button>
           <span v-else></span>
-          <button v-if="nextLessonId" class="nav-btn next" @click="goToLesson(nextLessonId)">下一个</button>
+          <button v-if="nextLessonId" class="nav-btn next" @click="goToSubChapter(nextLessonId)">下一个</button>
         </div>
       </template>
     </div>
@@ -145,7 +135,7 @@
 
         <!-- Discuss tab -->
         <div v-if="panelTab === 'discuss'" class="discuss-panel">
-          <div class="discuss-placeholder">讨论功能即将上线</div>
+          <CourseQA :course-id="courseId" />
         </div>
       </div>
     </aside>
@@ -207,7 +197,9 @@ import { ref, computed, watch, onMounted, onUnmounted, nextTick } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { marked } from 'marked'
 import DOMPurify from 'dompurify'
-import { apiLessonDetail, apiKpExercises, apiSubmitAnswer, apiAskTutor, apiSubjectTree, apiCompleteLesson, apiAbilityEvaluate, apiExerciseSubmit, apiStudyHeartbeat } from '../../api'
+import { apiSubmitAnswer, apiAskTutor, apiAbilityEvaluate, apiExerciseSubmit, apiStudyHeartbeat, apiCourseChapters, apiSubChapterDetail, apiCompleteSubChapter } from '../../api'
+import ChapterTree from '../../components/course/ChapterTree.vue'
+import CourseQA from '../../components/course/CourseQA.vue'
 
 const route = useRoute()
 const router = useRouter()
@@ -225,10 +217,12 @@ const practiceAnswers = ref({})
 const practiceSubmitted = ref(false)
 
 const courseName = ref('')
-const subjectTree = ref([])
-const currentLessonId = ref(null)
-const currentLesson = ref(null)
-const currentUnitName = ref('')
+const courseId = ref(null)
+const chapters = ref([])
+const treeLoading = ref(false)
+const currentSubChapterId = ref(null)
+const currentSubChapter = ref(null)
+const currentChapterName = ref('')
 const exercises = ref([])
 const selectedAnswers = ref({})
 const submitted = ref(false)
@@ -254,8 +248,8 @@ onMounted(() => {
   loadCourse()
   // 每30秒发送学习时长心跳
   heartbeatTimer = setInterval(() => {
-    if (currentLessonId.value) {
-      apiStudyHeartbeat(currentLessonId.value, 30).catch(() => {})
+    if (currentSubChapterId.value) {
+      apiStudyHeartbeat(currentSubChapterId.value, 30).catch(() => {})
     }
   }, 30000)
 })
@@ -266,164 +260,88 @@ onUnmounted(() => {
 
 async function loadCourse() {
   loading.value = true
+  courseId.value = Number(route.params.id)
+
   try {
-    const id = route.params.id
-    if (route.path.includes('/lessons/')) {
-      // Lesson mode: load lesson first, then find its course
-      const lessonRes = await apiLessonDetail(id)
-      currentLesson.value = lessonRes.data
-      currentLessonId.value = lessonRes.data.id
-      renderedContent.value = DOMPurify.sanitize(marked(currentLesson.value.content || ''))
-      currentUnitName.value = lessonRes.data.unitName || ''
+    treeLoading.value = true
+    const chRes = await apiCourseChapters(courseId.value)
+    chapters.value = chRes.data || []
 
-      // Load course tree
-      const treeRes = await apiSubjectTree()
-      subjectTree.value = treeRes.data || []
-      // Find which subject/unit contains this lesson
-      locateLessonInTree(currentLessonId.value)
+    // Set course name from route or first subject
+    courseName.value = '课程'
 
-      // Load exercises
-      if (currentLesson.value.knowledgePointId) {
-        try {
-          const exRes = await apiKpExercises(currentLesson.value.knowledgePointId)
-          exercises.value = exRes.data || []
-        } catch {}
-      }
-    } else {
-      // Course mode: load course tree for specific subject (route.params.id = subjectId)
-      const treeRes = await apiSubjectTree()
-      const fullTree = treeRes.data || []
-      const targetSubjectId = Number(id)
-      // Filter to only show the target subject
-      subjectTree.value = fullTree.filter(s => Number(s.id) === targetSubjectId)
-      if (subjectTree.value.length === 0) subjectTree.value = fullTree
-
-      // Set course name
-      if (subjectTree.value.length > 0) {
-        courseName.value = subjectTree.value[0].name || ''
-      }
-
-      // If a specific lesson is requested via ?lesson= query param, load it
-      const queryLessonId = route.query.lesson
-      if (queryLessonId) {
-        await loadLesson(Number(queryLessonId))
-      } else {
-        const first = findFirstLesson()
-        if (first) await loadLesson(first.id)
-      }
-      if (currentLessonId.value) locateLessonInTree(currentLessonId.value)
-    }
-
-    // Compute prev/next
-    computeNav()
-
-    // Init AI chat
-    if (currentLesson.value) {
-      chatHistory.value = [{
-        role: 'assistant',
-        html: `你好，可以看到你在学习<strong>${currentLesson.value.name}</strong>，有什么问题可以随时问我。`
-      }]
-    }
+    const first = findFirstSubChapter()
+    if (first) await loadSubChapter(first.id)
   } finally {
     loading.value = false
+    treeLoading.value = false
   }
 }
 
-function findFirstLesson() {
-  for (const subject of subjectTree.value) {
-    if (subject.units) {
-      for (const unit of subject.units) {
-        if (unit.lessons?.length > 0) return unit.lessons[0]
-      }
-    }
+function findFirstSubChapter() {
+  for (const ch of chapters.value) {
+    if (ch.subChapters?.length > 0) return ch.subChapters[0]
   }
   return null
 }
 
-function locateLessonInTree(lessonId) {
-  for (const subject of subjectTree.value) {
-    if (subject.units) {
-      for (const unit of subject.units) {
-        if (unit.lessons) {
-          for (const lesson of unit.lessons) {
-            if (lesson.id === lessonId) {
-              courseName.value = subject.name
-              currentUnitName.value = unit.name
-              // 过滤树：只保留当前学科
-              subjectTree.value = [subject]
-              return
-            }
-          }
-        }
+async function loadSubChapter(subChapterId) {
+  currentSubChapterId.value = subChapterId
+  const res = await apiSubChapterDetail(subChapterId)
+  currentSubChapter.value = res.data
+  currentChapterName.value = findChapterName(subChapterId)
+  renderedContent.value = DOMPurify.sanitize(marked(res.data.content || ''))
+  exercises.value = res.data.exercises || []
+  selectedAnswers.value = {}
+  submitted.value = false
+  computeNav()
+  // Email AI chat initialization
+  chatHistory.value = [{
+    role: 'assistant',
+    html: `你好，可以看到你在学习<strong>${res.data.title}</strong>，有什么问题可以随时问我。`
+  }]
+}
+
+function findChapterName(subChapterId) {
+  for (const ch of chapters.value) {
+    if (ch.subChapters) {
+      for (const sc of ch.subChapters) {
+        if (sc.id === subChapterId) return ch.title
       }
     }
   }
-}
-
-async function loadLesson(lessonId) {
-  currentLessonId.value = lessonId
-  try {
-    const res = await apiLessonDetail(lessonId)
-    currentLesson.value = res.data
-    currentUnitName.value = res.data.unitName || ''
-    renderedContent.value = DOMPurify.sanitize(marked(res.data.content || ''))
-
-    exercises.value = []
-    selectedAnswers.value = {}
-    submitted.value = false
-
-    if (res.data.knowledgePointId) {
-      try {
-        const exRes = await apiKpExercises(res.data.knowledgePointId)
-        exercises.value = exRes.data || []
-      } catch {}
-    }
-
-    computeNav()
-
-    chatHistory.value = [{
-      role: 'assistant',
-      html: `你好，可以看到你在学习<strong>${res.data.name}</strong>，有什么问题可以随时问我。`
-    }]
-  } catch (e) {
-    // Handle load error
-  }
+  return ''
 }
 
 function computeNav() {
-  const allLessons = []
-  for (const unit of subjectTree.value) {
-    if (unit.lessons) {
-      allLessons.push(...unit.lessons.map(l => ({ ...l, unitIndex: subjectTree.value.indexOf(unit) })))
+  const allSubChapters = []
+  for (const ch of chapters.value) {
+    if (ch.subChapters) {
+      for (const sc of ch.subChapters) allSubChapters.push(sc)
     }
   }
-  const idx = allLessons.findIndex(l => l.id === currentLessonId.value)
-  prevLessonId.value = idx > 0 ? allLessons[idx - 1].id : null
-  nextLessonId.value = idx < allLessons.length - 1 ? allLessons[idx + 1].id : null
+  const idx = allSubChapters.findIndex(sc => sc.id === currentSubChapterId.value)
+  prevLessonId.value = idx > 0 ? allSubChapters[idx - 1].id : null
+  nextLessonId.value = idx < allSubChapters.length - 1 ? allSubChapters[idx + 1].id : null
 }
 
-function goToLesson(lessonId) {
-  loadLesson(lessonId)
+function goToSubChapter(subChapterId) {
+  loadSubChapter(subChapterId)
 }
 
 async function markMastered() {
-  if (!currentLessonId.value || mastering.value) return
+  if (!currentSubChapterId.value || mastering.value) return
   mastering.value = true
   try {
-    await apiCompleteLesson(currentLessonId.value)
-    // 触发六维能力评估更新
+    await apiCompleteSubChapter(currentSubChapterId.value)
     try { await apiAbilityEvaluate() } catch {}
-  } catch (e) {
-    console.error('Failed to mark mastered:', e)
-  } finally {
-    mastering.value = false
-  }
+  } finally { mastering.value = false }
 }
 
 async function submitExercises() {
   submitted.value = true
   try {
-    await apiSubmitAnswer({ lessonId: currentLessonId.value, answers: selectedAnswers.value })
+    await apiSubmitAnswer({ subChapterId: currentSubChapterId.value, answers: selectedAnswers.value })
   } catch {}
 }
 
@@ -437,7 +355,7 @@ async function sendMessage() {
   scrollChat()
 
   try {
-    const res = await apiAskTutor({ question: text, context: { lessonId: currentLessonId.value, lessonName: currentLesson.value?.name } })
+    const res = await apiAskTutor({ question: text, context: { subChapterId: currentSubChapterId.value, lessonName: currentSubChapter.value?.title } })
     chatHistory.value.push({ role: 'assistant', html: DOMPurify.sanitize(marked(res.data?.answer || res.data || '')) })
   } catch {
     chatHistory.value.push({ role: 'assistant', html: '抱歉，回答出错了，请稍后重试。' })
@@ -482,8 +400,8 @@ async function generatePractice() {
   practiceSubmitted.value = false
 
   try {
-    const lessonName = currentLesson.value?.name || ''
-    const content = currentLesson.value?.content || ''
+    const lessonName = currentSubChapter.value?.title || ''
+    const content = currentSubChapter.value?.content || ''
     const prompt = `根据以下课程内容，生成5道选择题（每题4个选项，含正确答案索引和解析）：\n课时：${lessonName}\n内容摘要：${content.substring(0, 1000)}`
     const res = await apiAskTutor({ question: prompt })
     const text = res.data?.answer || res.data || ''
@@ -513,7 +431,7 @@ async function submitPractice() {
     const correct = userAnswer === q.answer ? 1 : 0
     try {
       await apiExerciseSubmit({
-        lessonId: currentLessonId.value,
+        subChapterId: currentSubChapterId.value,
         exerciseId: q.id || (i + 1),
         difficulty: q.difficulty || 2,
         correct

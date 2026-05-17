@@ -2,7 +2,12 @@
   <div class="knowledge-star-map">
     <!-- Header -->
     <div class="map-header">
-      <h2 class="page-title">知识星图</h2>
+      <h2 class="page-title">
+        知识星图
+        <span v-if="dataSource === 'neo4j'" class="ds-badge ds-neo4j">Neo4j</span>
+        <span v-else-if="dataSource === 'loading'" class="ds-badge ds-loading">加载中</span>
+        <span v-else class="ds-badge ds-mysql">MySQL</span>
+      </h2>
       <div class="map-legend">
         <span class="legend-item"><span class="dot dot-gray"></span>未学习</span>
         <span class="legend-item"><span class="dot dot-blue"></span>学习中</span>
@@ -136,6 +141,7 @@ const puzzleLoading = ref(false)
 const puzzlePieces = ref([])
 const searchResults = ref([])
 const searchLoading = ref(false)
+const dataSource = ref('loading')
 
 function masteryColor(mastery) {
   if (mastery >= 80) return '#fbbf24'
@@ -162,9 +168,16 @@ onMounted(async () => {
     try {
       graphRes = await apiGraphNeo4j()
       if (graphRes.data?.fallback || !graphRes.data?.nodes?.length) {
+        console.log('[星图] Neo4j 返回空数据，回退到 MySQL')
+        dataSource.value = 'mysql (Neo4j empty)'
         graphRes = await apiKnowledgeGraphFull()
+      } else {
+        console.log('[星图] ✅ 数据来源: Neo4j 图数据库')
+        dataSource.value = 'neo4j'
       }
-    } catch {
+    } catch (e) {
+      console.log('[星图] Neo4j API 失败:', e.message, '，回退到 MySQL')
+      dataSource.value = 'mysql (Neo4j error)'
       graphRes = await apiKnowledgeGraphFull()
     }
     const [progressRes] = await Promise.all([
@@ -183,11 +196,20 @@ onMounted(async () => {
         return String(pid) === String(node.id)
       })
       const mastery = prog?.mastery !== undefined ? prog.mastery : 0
-      // color by mastery: 精通=金, 已掌握=绿, 学习中=蓝, 未学习=灰
-      let color = '#334155' // gray = 未学习
-      if (mastery >= 80) color = '#fbbf24'       // gold = 精通
-      else if (mastery >= 60) color = '#10b981'   // green = 已掌握
-      else if (mastery > 0) color = '#3b82f6'     // blue = 学习中
+      // Neo4j 提供学科颜色 > 按掌握度着色 > 默认灰
+      const neo4jColor = node.color
+      let color
+      if (mastery >= 80) {
+        color = '#fbbf24'       // gold = 精通
+      } else if (mastery >= 60) {
+        color = '#10b981'       // green = 已掌握
+      } else if (mastery > 0) {
+        color = '#3b82f6'       // blue = 学习中
+      } else if (neo4jColor && neo4jColor !== '#334155') {
+        color = neo4jColor      // 未学习时用 Neo4j 学科颜色
+      } else {
+        color = '#334155'       // 无学科颜色回退灰色
+      }
       const id = node.id || node.knowledgePointId || node.kpId
       return {
         id: String(id),
@@ -360,6 +382,32 @@ async function loadPuzzleTab() {
   font-weight: 700;
   color: #e6edf3;
   margin: 0;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.ds-badge {
+  font-size: 10px;
+  font-weight: 600;
+  padding: 2px 8px;
+  border-radius: 4px;
+  letter-spacing: 0.5px;
+}
+.ds-neo4j {
+  background: rgba(16, 185, 129, 0.15);
+  color: #10b981;
+  border: 1px solid rgba(16, 185, 129, 0.3);
+}
+.ds-mysql {
+  background: rgba(239, 68, 68, 0.1);
+  color: #ef4444;
+  border: 1px solid rgba(239, 68, 68, 0.25);
+}
+.ds-loading {
+  background: rgba(255, 255, 255, 0.05);
+  color: rgba(255, 255, 255, 0.4);
+  border: 1px solid rgba(255, 255, 255, 0.1);
 }
 
 .map-legend {

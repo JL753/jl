@@ -47,15 +47,18 @@ public class SchemaInitializer {
     private final AssessmentService assessmentService;
     private final ObjectMapper objectMapper;
 
-    // 检查 v2 表是否存在，存在则跳过初始化
     // @PostConstruct
     public void init() {
+        // v3 表始终创建（独立于旧的 v1/v2 门控）
+        ensureV3Tables();
+
+        // 检查 v2 表是否存在，存在则跳过旧的 v1 初始化
         try {
             jdbcTemplate.queryForObject("SELECT COUNT(*) FROM sp_lesson_progress", Integer.class);
-            log.info("v2 表已存在，跳过 SchemaInitializer 初始化");
+            log.info("v2 表已存在，跳过 SchemaInitializer 旧版初始化");
             return;
         } catch (Exception e) {
-            log.info("v2 表不存在，执行 SchemaInitializer 初始化");
+            log.info("v2 表不存在，执行 SchemaInitializer 旧版初始化");
         }
         jdbcTemplate.execute("CREATE TABLE IF NOT EXISTS sp_user (id BIGINT PRIMARY KEY, username VARCHAR(128), password VARCHAR(255), role VARCHAR(32), display_name VARCHAR(255), avatar_url VARCHAR(512))");
         ensureColumnExists("sp_user", "display_name", "ALTER TABLE sp_user ADD COLUMN display_name VARCHAR(255)");
@@ -66,6 +69,13 @@ public class SchemaInitializer {
         jdbcTemplate.execute("CREATE TABLE IF NOT EXISTS sp_wrong_question (id BIGINT PRIMARY KEY, user_id BIGINT, exam_record_id BIGINT, exam_question_id BIGINT, question_title TEXT, my_answer TEXT, correct_answer TEXT, analysis TEXT, created_at DATETIME)");
         jdbcTemplate.execute("CREATE TABLE IF NOT EXISTS sp_course (id BIGINT PRIMARY KEY, title VARCHAR(255), category VARCHAR(128), description TEXT, cover_image VARCHAR(512), price VARCHAR(64), tag VARCHAR(64), status VARCHAR(32), total_hours INT, target_audience VARCHAR(255), chapters_json LONGTEXT, created_by BIGINT, created_at DATETIME, updated_at DATETIME)");
         jdbcTemplate.execute("CREATE TABLE IF NOT EXISTS sp_operation_log (id BIGINT AUTO_INCREMENT PRIMARY KEY, user_id BIGINT, username VARCHAR(128), action VARCHAR(128), target VARCHAR(255), details TEXT, ip_address VARCHAR(64), created_at DATETIME)");
+
+        seedDemoAccounts();
+    }
+
+    /** Always create v3 tables and migrate data from old sp_unit/sp_lesson if needed */
+    private void ensureV3Tables() {
+        // Create v3 tables
         jdbcTemplate.execute("CREATE TABLE IF NOT EXISTS sp_chapter (id BIGINT PRIMARY KEY, course_id BIGINT NOT NULL, title VARCHAR(256) NOT NULL, description TEXT, sort_order INT DEFAULT 0, prerequisite_chapter_id BIGINT, created_at DATETIME, updated_at DATETIME)");
         jdbcTemplate.execute("CREATE TABLE IF NOT EXISTS sp_sub_chapter (id BIGINT PRIMARY KEY, chapter_id BIGINT NOT NULL, title VARCHAR(256) NOT NULL, description TEXT, sort_order INT DEFAULT 0, type VARCHAR(32) DEFAULT 'doc', video_url VARCHAR(512), duration INT, content LONGTEXT, cover_url VARCHAR(512), status VARCHAR(32) DEFAULT 'published', user_id BIGINT)");
         jdbcTemplate.execute("CREATE TABLE IF NOT EXISTS sp_chapter_resource (id BIGINT PRIMARY KEY, course_id BIGINT NOT NULL, chapter_id BIGINT NOT NULL, type VARCHAR(32), title VARCHAR(256) NOT NULL, description TEXT, url VARCHAR(512), size VARCHAR(32), created_at DATETIME, updated_at DATETIME)");
@@ -79,12 +89,33 @@ public class SchemaInitializer {
         ensureColumnExists("sp_course", "target", "ALTER TABLE sp_course ADD COLUMN target VARCHAR(512)");
         ensureColumnExists("sp_course", "principle", "ALTER TABLE sp_course ADD COLUMN principle VARCHAR(512)");
 
-        // Ensure sp_lesson_progress has sub_chapter_id
+        // Ensure dependent tables have sub_chapter_id
         ensureColumnExists("sp_lesson_progress", "sub_chapter_id", "ALTER TABLE sp_lesson_progress ADD COLUMN sub_chapter_id BIGINT");
-        // Ensure sp_knowledge_point has sub_chapter_id
         ensureColumnExists("sp_knowledge_point", "sub_chapter_id", "ALTER TABLE sp_knowledge_point ADD COLUMN sub_chapter_id BIGINT");
 
-        seedDemoAccounts();
+        // Data migration: sp_unit → sp_chapter, sp_lesson → sp_sub_chapter
+        try {
+            Integer chapterCount = jdbcTemplate.queryForObject("SELECT COUNT(*) FROM sp_chapter", Integer.class);
+            if (chapterCount != null && chapterCount == 0) {
+                log.info("sp_chapter 为空，尝试从 sp_unit/sp_lesson 迁移数据...");
+                // Backfill subject_id on courses (match by category = subject name)
+                jdbcTemplate.execute("UPDATE sp_course c JOIN sp_subject s ON c.category = s.name SET c.subject_id = s.id WHERE c.subject_id IS NULL");
+                // Create placeholder courses for subjects without one
+                jdbcTemplate.execute("INSERT IGNORE INTO sp_course (id, subject_id, title, category, status, created_at, updated_at) " +
+                    "SELECT s.id + 7000, s.id, CONCAT(s.name, ' - 课程'), s.name, '已发布', NOW(), NOW() FROM sp_subject s " +
+                    "WHERE NOT EXISTS (SELECT 1 FROM sp_course c WHERE c.subject_id = s.id)");
+                // Migrate units to chapters
+                jdbcTemplate.execute("INSERT IGNORE INTO sp_chapter (id, course_id, title, description, sort_order, prerequisite_chapter_id, created_at, updated_at) " +
+                    "SELECT u.id, COALESCE((SELECT c.id FROM sp_course c WHERE c.subject_id = u.subject_id LIMIT 1), u.subject_id + 7000), " +
+                    "u.name, u.description, u.sort_order, u.prerequisite_unit_id, NOW(), NOW() FROM sp_unit u");
+                // Migrate lessons to sub_chapters
+                jdbcTemplate.execute("INSERT IGNORE INTO sp_sub_chapter (id, chapter_id, title, sort_order, type, video_url, duration, content, status) " +
+                    "SELECT l.id, l.unit_id, l.name, l.sort_order, l.type, l.video_url, l.duration, l.content, 'published' FROM sp_lesson l");
+                log.info("数据迁移完成");
+            }
+        } catch (Exception e) {
+            log.warn("数据迁移失败（可能旧表不存在）: {}", e.getMessage());
+        }
     }
 
     private void ensureColumnExists(String tableName, String columnName, String alterSql) {
@@ -239,7 +270,6 @@ public class SchemaInitializer {
         c1.setStatus("已发布");
         c1.setTotalHours(48);
         c1.setTargetAudience("零基础或有一定编程基础的本科生/研究生");
-        c1.setChaptersJson("[{\"title\":\"第1章 AI概述与发展历程\",\"description\":\"从图灵测试到GPT：人工智能的前世今生\"},{\"title\":\"第2章 机器学习基础\",\"description\":\"监督学习、无监督学习、强化学习\"},{\"title\":\"第3章 深度学习实践\",\"description\":\"神经网络、CNN、RNN、Transformer\"},{\"title\":\"第4章 自然语言处理\",\"description\":\"文本分类、情感分析、大语言模型\"},{\"title\":\"第5章 计算机视觉\",\"description\":\"图像识别、目标检测、图像生成\"},{\"title\":\"第6章 AI伦理与未来\",\"description\":\"AI安全、偏见、就业影响与社会责任\"}]");
         c1.setSubjectId(1004L);
         c1.setBackground("人工智能技术的快速发展对教育领域产生了深远影响");
         c1.setTarget("建立完整的AI知识框架，掌握Python工具链进行项目实战");
@@ -260,7 +290,6 @@ public class SchemaInitializer {
         c2.setStatus("已发布");
         c2.setTotalHours(36);
         c2.setTargetAudience("有Python基础和高等数学基础的学习者");
-        c2.setChaptersJson("[{\"title\":\"第1章 数学基础\",\"description\":\"线性代数、概率论、微积分回顾\"},{\"title\":\"第2章 线性模型\",\"description\":\"线性回归、逻辑回归\"},{\"title\":\"第3章 决策树与集成学习\",\"description\":\"ID3/C4.5/随机森林/XGBoost\"},{\"title\":\"第4章 支持向量机\",\"description\":\"最大间隔、核技巧、SVM变种\"},{\"title\":\"第5章 聚类与降维\",\"description\":\"K-Means/DBSCAN/PCA/t-SNE\"}]");
         c2.setSubjectId(1004L);
         c2.setCreatedBy(admin.getId());
         c2.setCreatedAt(LocalDateTime.now().minusDays(20));
@@ -278,7 +307,6 @@ public class SchemaInitializer {
         c3.setStatus("已发布");
         c3.setTotalHours(42);
         c3.setTargetAudience("已掌握ML基础知识的研究生/工程师");
-        c3.setChaptersJson("[{\"title\":\"第1章 PyTorch快速上手\",\"description\":\"张量运算、自动求导、数据管道\"},{\"title\":\"第2卷积神经网络\",\"description\":\"LeNet/AlexNet/VGG/ResNet/EfficientNet\"},{\"title\":\"第3章 循环网络与序列建模\",\"description\":\"RNN/LSTM/GRU/Seq2Seq\"},{\"title\":\"第4章 Attention与Transformer\",\"description\":\"Self-Attention/BERT/GPT架构解析\"},{\"title\":\"第5章 模型训练与优化\",\"description\":\"学习率调度、正则化、混合精度\"},{\"title\":\"第6章 模型部署与服务化\",\"description\":\"ONNX/TensorRT/服务化架构\"}]");
         c3.setSubjectId(1004L);
         c3.setCreatedBy(admin.getId());
         c3.setCreatedAt(LocalDateTime.now().minusDays(10));

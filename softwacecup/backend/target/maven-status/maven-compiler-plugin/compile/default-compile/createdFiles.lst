@@ -3,6 +3,7 @@ com\iflytek\smartprep\service\AgentService.class
 com\iflytek\smartprep\dto\BilibiliSearchResult.class
 com\iflytek\smartprep\domain\User.class
 com\iflytek\smartprep\config\LoginUser$LoginUserBuilder.class
+com\iflytek\smartprep\mapper\ChapterResourceMapper.class
 com\iflytek\smartprep\domain\Course.class
 com\iflytek\smartprep\dto\QuizResult$QuestionGrading.class
 com\iflytek\smartprep\domain\StudyDuration.class
@@ -19,6 +20,7 @@ com\iflytek\smartprep\dto\KnowledgeMapNode.class
 com\iflytek\smartprep\service\GamificationService$1.class
 com\iflytek\smartprep\rag\util\DocumentChunker$ChapterSection.class
 com\iflytek\smartprep\service\AdaptiveQuizService$2.class
+com\iflytek\smartprep\mapper\ChapterMapper.class
 com\iflytek\smartprep\service\impl\ProfileServiceImpl$1.class
 com\iflytek\smartprep\domain\QuestionBankItem.class
 com\iflytek\smartprep\config\RoleCheckInterceptor.class
@@ -28,7 +30,9 @@ com\iflytek\smartprep\dto\QuizResult$QuestionGrading$QuestionGradingBuilder.clas
 com\iflytek\smartprep\controller\RAGController.class
 com\iflytek\smartprep\service\agent\Agent.class
 com\iflytek\smartprep\rag\service\RAGService$DocumentStats.class
+com\iflytek\smartprep\controller\GraphController.class
 com\iflytek\smartprep\dto\AdminCourseCreateRequest$ChapterItem.class
+com\iflytek\smartprep\mapper\CourseQuestionMapper.class
 com\iflytek\smartprep\mapper\CourseScheduleMapper.class
 com\iflytek\smartprep\domain\UserBadge.class
 com\iflytek\smartprep\mapper\ExerciseMapper.class
@@ -38,10 +42,12 @@ com\iflytek\smartprep\service\GamificationService.class
 com\iflytek\smartprep\service\impl\StudyPathServiceImpl$2.class
 com\iflytek\smartprep\config\LoginUser.class
 com\iflytek\smartprep\dto\TutorStreamEvent$TutorStreamEventBuilder.class
+com\iflytek\smartprep\domain\SubChapter.class
 com\iflytek\smartprep\service\VideoImportPipeline$GenerationResult.class
 com\iflytek\smartprep\controller\ProfileController.class
 com\iflytek\smartprep\service\impl\AssessmentServiceImpl$1.class
 com\iflytek\smartprep\mapper\StudyPathMapper.class
+com\iflytek\smartprep\mapper\CourseAnnouncementMapper.class
 com\iflytek\smartprep\controller\TeacherToolController.class
 com\iflytek\smartprep\service\agent\CodingAgent.class
 com\iflytek\smartprep\domain\CourseSchedule.class
@@ -51,6 +57,7 @@ com\iflytek\smartprep\controller\AnalyticsController.class
 com\iflytek\smartprep\mapper\QaHistoryMapper.class
 com\iflytek\smartprep\service\TutorService.class
 com\iflytek\smartprep\mapper\StudentAbilityMapper.class
+com\iflytek\smartprep\domain\CourseQuestion.class
 com\iflytek\smartprep\controller\AgentController.class
 com\iflytek\smartprep\dto\StudyPathRequest.class
 com\iflytek\smartprep\mapper\SubjectMapper.class
@@ -58,6 +65,7 @@ com\iflytek\smartprep\domain\UserXp.class
 com\iflytek\smartprep\SmartPrepApplication.class
 com\iflytek\smartprep\mapper\CourseMapper.class
 com\iflytek\smartprep\dto\QuizGenerateRequest$QuizGenerateRequestBuilder.class
+com\iflytek\smartprep\service\BaiduSearchService.class
 com\iflytek\smartprep\controller\CommonController.class
 com\iflytek\smartprep\domain\AssignmentSubmission.class
 com\iflytek\smartprep\service\agent\QuestionBankAgent.class
@@ -78,7 +86,9 @@ com\iflytek\smartprep\service\impl\AssessmentServiceImpl.class
 com\iflytek\smartprep\domain\KnowledgePoint.class
 com\iflytek\smartprep\dto\TutorAnswer$TutorAnswerBuilder.class
 com\iflytek\smartprep\domain\QaHistory.class
+com\iflytek\smartprep\mapper\CourseAnswerMapper.class
 com\iflytek\smartprep\rag\model\RetrievalResult.class
+com\iflytek\smartprep\service\CourseQaService.class
 com\iflytek\smartprep\service\AssessmentService.class
 com\iflytek\smartprep\dto\AdminUserCreateRequest.class
 com\iflytek\smartprep\dto\RegisterRequest.class
@@ -94,6 +104,7 @@ com\iflytek\smartprep\controller\GamificationController.class
 com\iflytek\smartprep\service\AgentService$1.class
 com\iflytek\smartprep\service\CourseService.class
 com\iflytek\smartprep\controller\AdminController.class
+com\iflytek\smartprep\mapper\SubChapterMapper.class
 com\iflytek\smartprep\dto\LoginResponse$LoginResponseBuilder.class
 com\iflytek\smartprep\controller\QaHistoryController.class
 com\iflytek\smartprep\service\agent\SyllabusAgent.class
@@ -120,11 +131,14 @@ com\iflytek\smartprep\domain\StudentProfile.class
 com\iflytek\smartprep\rag\util\DocumentChunker$PageContent.class
 com\iflytek\smartprep\controller\AssignmentController.class
 com\iflytek\smartprep\config\JwtTokenProvider.class
+com\iflytek\smartprep\domain\ChapterResource.class
 com\iflytek\smartprep\controller\GlobalExceptionHandler.class
+com\iflytek\smartprep\service\ChapterService.class
 com\iflytek\smartprep\domain\ExamQuestion.class
 com\iflytek\smartprep\dto\BilibiliImportRequest.class
 com\iflytek\smartprep\domain\KnowledgeDoc.class
 com\iflytek\smartprep\service\StudyPathService.class
+com\iflytek\smartprep\domain\CourseAnswer.class
 com\iflytek\smartprep\service\CourseScheduleService.class
 com\iflytek\smartprep\dto\LoginRequest.class
 com\iflytek\smartprep\rag\util\DocumentParser$ParseResult.class
@@ -163,10 +177,14 @@ com\iflytek\smartprep\mapper\StudyDurationMapper.class
 com\iflytek\smartprep\dto\QuizSubmission.class
 com\iflytek\smartprep\service\impl\StudyPathServiceImpl.class
 com\iflytek\smartprep\dto\QuizResult$AbilityChange.class
+com\iflytek\smartprep\service\impl\CourseQaServiceImpl.class
 com\iflytek\smartprep\mapper\WrongQuestionMapper.class
 com\iflytek\smartprep\dto\AdminCourseUpdateRequest.class
 com\iflytek\smartprep\controller\KnowledgeGraphController.class
+com\iflytek\smartprep\controller\ChapterController.class
 com\iflytek\smartprep\service\QaHistoryService.class
+com\iflytek\smartprep\domain\CourseAnnouncement.class
+com\iflytek\smartprep\controller\CourseQaController.class
 com\iflytek\smartprep\service\LearningAnalyticsService.class
 com\iflytek\smartprep\domain\TaskCompletion.class
 com\iflytek\smartprep\dto\ApiResponse.class
@@ -195,6 +213,7 @@ com\iflytek\smartprep\dto\DashboardStats$DashboardStatsBuilder.class
 com\iflytek\smartprep\service\ProfileService.class
 com\iflytek\smartprep\service\agent\MediaAgent.class
 com\iflytek\smartprep\domain\LearningActivity.class
+com\iflytek\smartprep\config\Neo4jConfig.class
 com\iflytek\smartprep\domain\ExerciseAttempt.class
 com\iflytek\smartprep\domain\Assignment.class
 com\iflytek\smartprep\dto\KnowledgeMapRequest$KnowledgeMapRequestBuilder.class
@@ -223,9 +242,11 @@ com\iflytek\smartprep\mapper\ClassMemberMapper.class
 com\iflytek\smartprep\domain\StudentAbility.class
 com\iflytek\smartprep\dto\TutorAnswer.class
 com\iflytek\smartprep\domain\LessonProgress.class
+com\iflytek\smartprep\service\impl\ChapterServiceImpl.class
 com\iflytek\smartprep\service\impl\ResourceServiceImpl.class
 com\iflytek\smartprep\mapper\StudentProfileMapper.class
 com\iflytek\smartprep\mapper\AssignmentSubmissionMapper.class
+com\iflytek\smartprep\domain\Chapter.class
 com\iflytek\smartprep\controller\StudyPathController.class
 com\iflytek\smartprep\domain\WrongQuestion.class
 com\iflytek\smartprep\mapper\UserStreakMapper.class

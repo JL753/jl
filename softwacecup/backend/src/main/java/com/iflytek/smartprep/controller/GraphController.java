@@ -30,17 +30,18 @@ public class GraphController {
         Set<String> nodeIds = new HashSet<>();
 
         try (Session session = neo4jDriver.session()) {
-            // 查询所有 Entity 节点
+            // 查询所有 Entity 节点，使用节点自身的 id 属性（MySQL原始ID）而非Neo4j内部ID
             Result nodeResult = session.run(
-                "MATCH (n) " +
-                "OPTIONAL MATCH (n)-[r]-(m) " +
-                "RETURN n, collect(DISTINCT {type: type(r), target: id(m), targetName: m.name}) as relations"
+                "MATCH (n:Entity) " +
+                "OPTIONAL MATCH (n)-[r:DEPENDS_ON]->(m:Entity) " +
+                "RETURN n, collect(DISTINCT {targetId: m.id, targetName: m.name}) as relations"
             );
             while (nodeResult.hasNext()) {
                 Record record = nodeResult.next();
                 var node = record.get("n").asNode();
-                String nodeId = String.valueOf(node.id());
-                if (!nodeIds.add(nodeId)) continue;
+                // 使用节点自身的 id 属性，确保与前端 progress API 的 knowledgePointId 匹配
+                String nodeId = node.containsKey("id") ? node.get("id").asString("") : String.valueOf(node.id());
+                if (nodeId.isEmpty() || !nodeIds.add(nodeId)) continue;
 
                 Map<String, Object> nodeMap = new HashMap<>();
                 nodeMap.put("id", nodeId);
@@ -52,14 +53,18 @@ public class GraphController {
                 nodeMap.put("color", node.containsKey("color") ? node.get("color").asString("#334155") : "#334155");
                 nodes.add(nodeMap);
 
-                // 边
+                // 只保留 DEPENDS_ON 边（Entity→Entity）
                 var relations = record.get("relations");
                 if (!relations.isNull()) {
                     for (var rel : relations.asList(org.neo4j.driver.Value::asMap)) {
+                        Object target = rel.get("targetId");
+                        if (target == null) continue;
+                        String targetId = String.valueOf(target);
+                        if ("null".equals(targetId) || targetId.isEmpty()) continue;
                         Map<String, Object> edgeMap = new HashMap<>();
                         edgeMap.put("source", nodeId);
-                        edgeMap.put("target", String.valueOf(rel.get("target")));
-                        edgeMap.put("type", rel.get("type") != null ? rel.get("type").toString() : "RELATED_TO");
+                        edgeMap.put("target", targetId);
+                        edgeMap.put("type", "DEPENDS_ON");
                         edges.add(edgeMap);
                     }
                 }
