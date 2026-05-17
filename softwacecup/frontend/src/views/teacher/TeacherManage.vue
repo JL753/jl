@@ -249,7 +249,7 @@
         </el-form-item>
         <el-form-item label="题库名称"><el-input v-model="questionForm.bankName" /></el-form-item>
         <el-form-item label="题目内容"><el-input v-model="questionForm.content" type="textarea" :rows="3" placeholder="请输入题目完整内容，支持LaTeX公式如 $$x^2$$" /></el-form-item>
-        
+
         <el-row :gutter="12">
           <el-col :span="12">
             <el-form-item label="一级分类"><el-select v-model="questionForm.type" style="width:100%"><el-option label="单选题" value="single" /><el-option label="多选题" value="multi" /><el-option label="判断题" value="judge" /><el-option label="填空题" value="fill" /><el-option label="简答题" value="short" /></el-select></el-form-item>
@@ -295,13 +295,35 @@
         <el-button type="primary" @click="saveQuestion">{{ editingQuestion ? '保存' : '添加' }}</el-button>
       </template>
     </el-dialog>
+
+    <!-- ====== Course Creation Section ====== -->
+    <div class="glass-card" style="margin-top: 20px">
+      <h2>创建课程</h2>
+      <div class="form-grid" style="display: grid; gap: 12px; margin-top: 12px;">
+        <select v-model="courseForm.subjectId" class="form-input">
+          <option :value="null">选择学科</option>
+          <option v-for="s in subjects" :key="s.id" :value="s.id">{{ s.name }}</option>
+        </select>
+        <input v-model="courseForm.title" placeholder="课程名称" class="form-input" />
+        <input v-model="courseForm.coverImage" placeholder="封面图片URL" class="form-input" />
+        <textarea v-model="courseForm.description" placeholder="课程描述" class="form-textarea" rows="3"></textarea>
+        <textarea v-model="courseForm.background" placeholder="课程背景" class="form-textarea" rows="2"></textarea>
+        <textarea v-model="courseForm.target" placeholder="教学目标" class="form-textarea" rows="2"></textarea>
+        <textarea v-model="courseForm.principle" placeholder="设计原则" class="form-textarea" rows="2"></textarea>
+        <input v-model="courseForm.tag" placeholder="标签" class="form-input" />
+        <input v-model="courseForm.price" placeholder="价格" class="form-input" />
+        <input v-model.number="courseForm.totalHours" type="number" placeholder="总课时" class="form-input" />
+        <button class="glass-btn active" @click="saveCourse" :disabled="!courseForm.title">保存课程</button>
+      </div>
+    </div>
   </div>
 </template>
 
 <script setup>
-import { ref, computed, reactive } from 'vue'
+import { ref, computed, reactive, onMounted } from 'vue'
 import { ElMessage, ElMessageBox } from 'element-plus'
 import { WarningFilled, UploadFilled } from '@element-plus/icons-vue'
+import { apiSubjects, apiCreateCourse } from '../../api/index.js'
 
 const searchKeyword = ref('')
 const filterCategory = ref('')
@@ -357,6 +379,26 @@ const filteredQuestions = computed(() => {
 
 const newBank = reactive({ name: '', type: 'mixed', category: 'java', difficulty: 3, description: '' })
 const questionForm = reactive({ bankId: '', bankName: '', content: '', type: 'single', category2: '', category3: '', difficulty: 3, answer: '', explanation: '', optionA: '', optionB: '', optionC: '' })
+
+// Course creation form
+const subjects = ref([])
+const courseForm = reactive({
+  subjectId: null, title: '', coverImage: '', description: '',
+  background: '', target: '', principle: '',
+  tag: '', price: '免费', totalHours: 0, status: '已发布'
+})
+
+onMounted(async () => {
+  const res = await apiSubjects()
+  subjects.value = res.data || []
+})
+
+async function saveCourse() {
+  await apiCreateCourse(courseForm)
+  ElMessage.success('课程创建成功')
+  courseForm.title = ''; courseForm.description = ''; courseForm.background = ''
+  courseForm.target = ''; courseForm.principle = ''
+}
 
 const addBank = () => {
   if (!newBank.name) { ElMessage.warning('请输入题库名称'); return }
@@ -506,4 +548,16 @@ function typeColor(t) { return { single: '', multi: 'warning', judge: 'info', fi
   .toolbar { flex-direction: column; align-items: stretch; }
   .questions-drawer { width: 98vw; height: 92vh; }
 }
+
+/* Course creation form styles */
+.glass-card {
+  background: rgba(255,255,255,0.06); backdrop-filter: blur(12px);
+  border: 1px solid rgba(255,255,255,0.1); border-radius: 12px; padding: 20px;
+}
+.glass-card h2 { color: #1e293b; font-size: 18px; margin: 0 0 4px; }
+.glass-btn { padding: 8px 16px; border-radius: 8px; border: 1px solid rgba(255,255,255,0.15); background: rgba(255,255,255,0.08); backdrop-filter: blur(8px); color: #e2e8f0; cursor: pointer; font-family: inherit; font-size: 13px; }
+.glass-btn.active { background: rgba(59,130,246,0.3); border-color: rgba(59,130,246,0.4); }
+.glass-btn.active:disabled { opacity: 0.4; cursor: not-allowed; }
+.form-input, .form-textarea { padding: 8px; border-radius: 6px; border: 1px solid rgba(255,255,255,0.08); background: rgba(255,255,255,0.04); color: #f1f5f9; font-size: 13px; font-family: inherit; outline: none; width: 100%; box-sizing: border-box; }
+.form-textarea { resize: vertical; }
 </style>
