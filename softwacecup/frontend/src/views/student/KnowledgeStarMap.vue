@@ -162,20 +162,18 @@ onMounted(async () => {
         return String(pid) === String(node.id)
       })
       const mastery = prog?.mastery !== undefined ? prog.mastery : 0
-      let itemStyle = { color: 'rgba(255,255,255,0.15)' } // gray = not started
-      if (mastery >= 80) {
-        itemStyle = { color: '#fbbf24', borderColor: '#f59e0b', borderWidth: 2 }
-      } else if (mastery >= 60) {
-        itemStyle = { color: '#10b981', borderColor: '#34d399', borderWidth: 2 }
-      } else if (mastery > 0) {
-        itemStyle = { color: '#3b82f6', borderColor: '#60a5fa', borderWidth: 2 }
-      }
+      // color by mastery: 精通=金, 已掌握=绿, 学习中=蓝, 未学习=灰
+      let color = '#334155' // gray = 未学习
+      if (mastery >= 80) color = '#fbbf24'       // gold = 精通
+      else if (mastery >= 60) color = '#10b981'   // green = 已掌握
+      else if (mastery > 0) color = '#3b82f6'     // blue = 学习中
       return {
-        ...node,
         name: node.name || node.label || node.title || '知识点',
+        value: node.name,
         mastery,
-        itemStyle,
-        symbolSize: Math.max(20, (node.weight || node.importance || 1) * 10),
+        symbolSize: 28 + mastery * 0.2,
+        itemStyle: { color },
+        label: { show: true },
       }
     })
 
@@ -209,7 +207,7 @@ onMounted(async () => {
         edges: edges,
         force: { repulsion: 400, edgeLength: 150, friction: 0.1, gravity: 0.03 },
         label: { show: true, position: 'bottom', color: '#cbd5e1', fontSize: 11, distance: 6 },
-        lineStyle: { color: 'rgba(148,163,184,0.25)', width: 1.2, curveness: 0.25 },
+        lineStyle: { color: '#64748b', width: 1.2, curveness: 0.25, opacity: 1 },
         emphasis: { focus: 'adjacency', lineStyle: { width: 2, color: '#60d9fa' } },
         edgeSymbol: ['none', 'none'],
         edgeLabel: { show: false },
@@ -356,7 +354,7 @@ async function loadPuzzleTab() {
 }
 
 .dot-gray {
-  background: rgba(255, 255, 255, 0.15);
+  background: #334155;
 }
 
 .dot-blue {
