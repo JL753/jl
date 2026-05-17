@@ -141,9 +141,12 @@ onMounted(async () => {
       apiKnowledgeGraphProgress(),
     ])
 
-    const rawNodes = (graphRes.data?.data?.nodes || graphRes.data?.nodes || [])
-    const rawEdges = (graphRes.data?.data?.edges || graphRes.data?.edges || [])
-    const progressList = (progressRes.data?.data || progressRes.data || [])
+    // API 响应已由http拦截器解包为 {success, data: {nodes, edges}}
+    const payload = graphRes?.data || graphRes || {}
+    const rawNodes = payload.nodes || []
+    const rawEdges = payload.edges || []
+    const progressList = progressRes?.data || progressRes || []
+    console.log('星图数据:', rawNodes.length, '节点,', rawEdges.length, '边')
 
     nodes.value = rawNodes.map(node => {
       const prog = progressList.find(p => {
@@ -380,8 +383,13 @@ async function loadPuzzleTab() {
 
 .chart-container {
   width: 100%;
-  height: calc(100vh - 176px);
+  height: 480px;
   min-height: 400px;
+}
+.path-chart {
+  width: 100%;
+  height: 360px;
+  min-height: 300px;
 }
 
 /* Detail Popup */
