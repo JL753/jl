@@ -108,10 +108,10 @@
 <script setup>
 import { ref, onMounted, onUnmounted, nextTick, watch } from 'vue'
 import { useRouter } from 'vue-router'
-import * as echarts from 'echarts'
 import { apiKnowledgeGraphFull, apiKnowledgeGraphProgress, apiKnowledgeGraphNextRecommended } from '../../api/index.js'
 
 const router = useRouter()
+let echarts = null
 const chartRef = ref(null)
 let chartInstance = null
 const selectedNode = ref(null)
@@ -131,6 +131,16 @@ function masteryColor(mastery) {
   if (mastery >= 60) return '#10b981'
   if (mastery > 0) return '#3b82f6'
   return 'rgba(255,255,255,0.15)'
+}
+
+async function ensureEcharts() {
+  if (echarts && echarts.init) return true
+  try {
+    if (window.echarts) { echarts = window.echarts; return true }
+    const mod = await import('echarts')
+    echarts = mod.default || mod
+    return !!(echarts && echarts.init)
+  } catch { return false }
 }
 
 onMounted(async () => {
@@ -188,6 +198,11 @@ onMounted(async () => {
       return
     }
 
+    if (!(await ensureEcharts())) {
+      console.warn('ECharts load failed')
+      loading.value = false
+      return
+    }
     chartInstance = echarts.init(chartRef.value)
     chartInstance.setOption({
       backgroundColor: 'transparent',
@@ -280,7 +295,7 @@ async function loadPathTab() {
   } catch {} finally { pathLoading.value = false }
 }
 
-function initPathChart() {
+async function initPathChart() {
   const nodeMap = {}
   nodes.value.forEach(n => { nodeMap[n.id] = { ...n, children: [] } })
   links.value.forEach(l => {
@@ -288,7 +303,8 @@ function initPathChart() {
   })
   const roots = nodes.value.filter(n => !links.value.some(l => l.target === n.id))
 
-  if (typeof echarts !== 'undefined') {
+  await ensureEcharts()
+  if (echarts && echarts.init && pathChartRef.value) {
     const chart = echarts.init(pathChartRef.value)
     chart.setOption({
       tooltip: { trigger: 'item' },
