@@ -66,6 +66,24 @@ public class SchemaInitializer {
         jdbcTemplate.execute("CREATE TABLE IF NOT EXISTS sp_wrong_question (id BIGINT PRIMARY KEY, user_id BIGINT, exam_record_id BIGINT, exam_question_id BIGINT, question_title TEXT, my_answer TEXT, correct_answer TEXT, analysis TEXT, created_at DATETIME)");
         jdbcTemplate.execute("CREATE TABLE IF NOT EXISTS sp_course (id BIGINT PRIMARY KEY, title VARCHAR(255), category VARCHAR(128), description TEXT, cover_image VARCHAR(512), price VARCHAR(64), tag VARCHAR(64), status VARCHAR(32), total_hours INT, target_audience VARCHAR(255), chapters_json LONGTEXT, created_by BIGINT, created_at DATETIME, updated_at DATETIME)");
         jdbcTemplate.execute("CREATE TABLE IF NOT EXISTS sp_operation_log (id BIGINT AUTO_INCREMENT PRIMARY KEY, user_id BIGINT, username VARCHAR(128), action VARCHAR(128), target VARCHAR(255), details TEXT, ip_address VARCHAR(64), created_at DATETIME)");
+        jdbcTemplate.execute("CREATE TABLE IF NOT EXISTS sp_chapter (id BIGINT PRIMARY KEY, course_id BIGINT NOT NULL, title VARCHAR(256) NOT NULL, description TEXT, sort_order INT DEFAULT 0, prerequisite_chapter_id BIGINT, created_at DATETIME, updated_at DATETIME)");
+        jdbcTemplate.execute("CREATE TABLE IF NOT EXISTS sp_sub_chapter (id BIGINT PRIMARY KEY, chapter_id BIGINT NOT NULL, title VARCHAR(256) NOT NULL, description TEXT, sort_order INT DEFAULT 0, type VARCHAR(32) DEFAULT 'doc', video_url VARCHAR(512), duration INT, content LONGTEXT, cover_url VARCHAR(512), status VARCHAR(32) DEFAULT 'published', user_id BIGINT)");
+        jdbcTemplate.execute("CREATE TABLE IF NOT EXISTS sp_chapter_resource (id BIGINT PRIMARY KEY, course_id BIGINT NOT NULL, chapter_id BIGINT NOT NULL, type VARCHAR(32), title VARCHAR(256) NOT NULL, description TEXT, url VARCHAR(512), size VARCHAR(32), created_at DATETIME, updated_at DATETIME)");
+        jdbcTemplate.execute("CREATE TABLE IF NOT EXISTS sp_course_announcement (id BIGINT PRIMARY KEY, course_id BIGINT NOT NULL, type VARCHAR(32) DEFAULT '普通公告', title VARCHAR(256) NOT NULL, content TEXT, created_at DATETIME, updated_at DATETIME)");
+        jdbcTemplate.execute("CREATE TABLE IF NOT EXISTS sp_course_question (id BIGINT PRIMARY KEY, course_id BIGINT NOT NULL, user_id BIGINT NOT NULL, title VARCHAR(256) NOT NULL, content TEXT, created_at DATETIME, updated_at DATETIME)");
+        jdbcTemplate.execute("CREATE TABLE IF NOT EXISTS sp_course_answer (id BIGINT PRIMARY KEY, question_id BIGINT NOT NULL, user_id BIGINT, content TEXT NOT NULL, is_ai TINYINT(1) DEFAULT 0, created_at DATETIME, updated_at DATETIME)");
+
+        // Ensure sp_course has new columns
+        ensureColumnExists("sp_course", "subject_id", "ALTER TABLE sp_course ADD COLUMN subject_id BIGINT AFTER id");
+        ensureColumnExists("sp_course", "background", "ALTER TABLE sp_course ADD COLUMN background VARCHAR(512)");
+        ensureColumnExists("sp_course", "target", "ALTER TABLE sp_course ADD COLUMN target VARCHAR(512)");
+        ensureColumnExists("sp_course", "principle", "ALTER TABLE sp_course ADD COLUMN principle VARCHAR(512)");
+
+        // Ensure sp_lesson_progress has sub_chapter_id
+        ensureColumnExists("sp_lesson_progress", "sub_chapter_id", "ALTER TABLE sp_lesson_progress ADD COLUMN sub_chapter_id BIGINT");
+        // Ensure sp_knowledge_point has sub_chapter_id
+        ensureColumnExists("sp_knowledge_point", "sub_chapter_id", "ALTER TABLE sp_knowledge_point ADD COLUMN sub_chapter_id BIGINT");
+
         seedDemoAccounts();
     }
 
@@ -222,6 +240,10 @@ public class SchemaInitializer {
         c1.setTotalHours(48);
         c1.setTargetAudience("零基础或有一定编程基础的本科生/研究生");
         c1.setChaptersJson("[{\"title\":\"第1章 AI概述与发展历程\",\"description\":\"从图灵测试到GPT：人工智能的前世今生\"},{\"title\":\"第2章 机器学习基础\",\"description\":\"监督学习、无监督学习、强化学习\"},{\"title\":\"第3章 深度学习实践\",\"description\":\"神经网络、CNN、RNN、Transformer\"},{\"title\":\"第4章 自然语言处理\",\"description\":\"文本分类、情感分析、大语言模型\"},{\"title\":\"第5章 计算机视觉\",\"description\":\"图像识别、目标检测、图像生成\"},{\"title\":\"第6章 AI伦理与未来\",\"description\":\"AI安全、偏见、就业影响与社会责任\"}]");
+        c1.setSubjectId(1004L);
+        c1.setBackground("人工智能技术的快速发展对教育领域产生了深远影响");
+        c1.setTarget("建立完整的AI知识框架，掌握Python工具链进行项目实战");
+        c1.setPrinciple("理论+实验结合，循序渐进的教学设计");
         c1.setCreatedBy(admin.getId());
         c1.setCreatedAt(LocalDateTime.now().minusDays(30));
         c1.setUpdatedAt(LocalDateTime.now());
@@ -239,6 +261,7 @@ public class SchemaInitializer {
         c2.setTotalHours(36);
         c2.setTargetAudience("有Python基础和高等数学基础的学习者");
         c2.setChaptersJson("[{\"title\":\"第1章 数学基础\",\"description\":\"线性代数、概率论、微积分回顾\"},{\"title\":\"第2章 线性模型\",\"description\":\"线性回归、逻辑回归\"},{\"title\":\"第3章 决策树与集成学习\",\"description\":\"ID3/C4.5/随机森林/XGBoost\"},{\"title\":\"第4章 支持向量机\",\"description\":\"最大间隔、核技巧、SVM变种\"},{\"title\":\"第5章 聚类与降维\",\"description\":\"K-Means/DBSCAN/PCA/t-SNE\"}]");
+        c2.setSubjectId(1004L);
         c2.setCreatedBy(admin.getId());
         c2.setCreatedAt(LocalDateTime.now().minusDays(20));
         c2.setUpdatedAt(LocalDateTime.now());
@@ -256,6 +279,7 @@ public class SchemaInitializer {
         c3.setTotalHours(42);
         c3.setTargetAudience("已掌握ML基础知识的研究生/工程师");
         c3.setChaptersJson("[{\"title\":\"第1章 PyTorch快速上手\",\"description\":\"张量运算、自动求导、数据管道\"},{\"title\":\"第2卷积神经网络\",\"description\":\"LeNet/AlexNet/VGG/ResNet/EfficientNet\"},{\"title\":\"第3章 循环网络与序列建模\",\"description\":\"RNN/LSTM/GRU/Seq2Seq\"},{\"title\":\"第4章 Attention与Transformer\",\"description\":\"Self-Attention/BERT/GPT架构解析\"},{\"title\":\"第5章 模型训练与优化\",\"description\":\"学习率调度、正则化、混合精度\"},{\"title\":\"第6章 模型部署与服务化\",\"description\":\"ONNX/TensorRT/服务化架构\"}]");
+        c3.setSubjectId(1004L);
         c3.setCreatedBy(admin.getId());
         c3.setCreatedAt(LocalDateTime.now().minusDays(10));
         c3.setUpdatedAt(LocalDateTime.now());
