@@ -59,7 +59,7 @@ export const apiLessonExercises = (lessonId) => http.get(`/lessons/${lessonId}/e
 export const apiCompleteLesson = (lessonId) => http.post(`/progress/lesson/${lessonId}/complete`)
 export const apiLessonProgress = (lessonId) => http.get(`/progress/lesson/${lessonId}`)
 export const apiCourseProgress = (subjectId) => http.get(`/progress/course/${subjectId}`)
-export const apiSubjectTree = () => http.get('/course/tree')
+export const apiSubjectTree = (courseId) => http.get('/course/tree', { params: { courseId } })
 export const apiLessonKnowledgePoints = (lessonId) => http.get(`/lessons/${lessonId}/knowledge-points`)
 export const apiAbilityEvaluate = () => http.post('/ability/evaluate')
 export const apiAbilityLatest = () => http.get('/ability/latest')
@@ -110,7 +110,7 @@ export const apiGraphSearchResource = (nodeName, subjectName = '') => http.post(
 
 // ==================== 学习数据采集 ====================
 export const apiExerciseSubmit = (data) => http.post('/exercise/submit', data)
-export const apiStudyHeartbeat = (lessonId, seconds) => http.post('/study/heartbeat', { lessonId, seconds })
+export const apiStudyHeartbeat = (subChapterId, seconds) => http.post('/study/heartbeat', { subChapterId, seconds })
 
 // ==================== AI 虚拟人伴学 ====================
 /** 流式 AI 对话（Unity 虚拟人专用，SSE） */
@@ -147,3 +147,40 @@ export const apiTTS = (text) => {
     body: JSON.stringify({ text })
   })
 }
+
+// ==================== v3 课程章节体系 ====================
+export const apiCourseChapters = (courseId) => http.get(`/courses/${courseId}/chapters`)
+export const apiSubChapterDetail = (subChapterId) => http.get(`/sub-chapters/${subChapterId}`)
+export const apiCreateChapter = (data) => http.post('/chapters', data)
+export const apiUpdateChapter = (id, data) => http.put(`/chapters/${id}`, data)
+export const apiDeleteChapter = (id) => http.delete(`/chapters/${id}`)
+export const apiCreateSubChapter = (data) => http.post('/sub-chapters', data)
+export const apiUpdateSubChapter = (id, data) => http.put(`/sub-chapters/${id}`, data)
+export const apiDeleteSubChapter = (id) => http.delete(`/sub-chapters/${id}`)
+
+export const apiChapterResources = (chapterId) => http.get(`/chapters/${chapterId}/resources`)
+export const apiAddChapterResource = (chapterId, data) => http.post(`/chapters/${chapterId}/resources`, data)
+export const apiDeleteResource = (id) => http.delete(`/resources/${id}`)
+export const apiCourseResources = (courseId) => http.get(`/courses/${courseId}/resources`)
+
+export const apiCourseAnnouncements = (courseId) => http.get(`/courses/${courseId}/announcements`)
+export const apiCreateAnnouncement = (courseId, data) => http.post(`/courses/${courseId}/announcements`, data)
+
+// ==================== v3 课程Q&A ====================
+export const apiCourseQuestions = (courseId, page = 1, pageSize = 20) =>
+  http.get(`/courses/${courseId}/questions`, { params: { page, pageSize } })
+export const apiAskQuestion = (courseId, data) => http.post(`/courses/${courseId}/questions`, data)
+export const apiQuestionAnswers = (questionId) => http.get(`/questions/${questionId}/answers`)
+export const apiPostAnswer = (questionId, data) => http.post(`/questions/${questionId}/answers`, data)
+export const apiAiAnswer = (questionId) => http.post(`/questions/${questionId}/ai-answer`)
+
+// ==================== v3 课程CRUD ====================
+export const apiCoursesBySubject = (subjectId) => http.get(`/subjects/${subjectId}/courses`)
+export const apiCourseDetail = (courseId) => http.get(`/courses/${courseId}`)
+export const apiCreateCourse = (data) => http.post('/courses', data)
+export const apiUpdateCourse = (id, data) => http.put(`/courses/${id}`, data)
+
+// ==================== v3 进度（适配SubChapter） ====================
+export const apiSubChapterProgress = (subChapterId) => http.get(`/progress/sub-chapter/${subChapterId}`)
+export const apiCompleteSubChapter = (subChapterId) => http.post(`/progress/sub-chapter/${subChapterId}/complete`)
+export const apiCourseProgress = (courseId) => http.get(`/progress/course/${courseId}`)
