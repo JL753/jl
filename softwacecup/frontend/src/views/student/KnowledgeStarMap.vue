@@ -26,17 +26,7 @@
       </div>
 
       <template v-else>
-        <div class="debug-info" style="color:#60d9fa;font-size:12px;margin-bottom:8px;">
-          {{ nodes.length }} 个知识点 · {{ links.length }} 条依赖
-        </div>
-        <!-- Chart Container -->
-        <div ref="chartRef" class="chart-container">
-          <div v-if="nodes.length > 0 && !chartInstance" class="node-fallback" style="display:flex;flex-wrap:wrap;gap:6px;padding:12px;">
-            <span v-for="n in nodes.slice(0,40)" :key="n.id"
-              style="padding:4px 10px;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);border-radius:6px;font-size:11px;cursor:pointer;color:rgba(255,255,255,0.6);"
-              @click="selectedNode = n; showDetail = true">{{ n.name }}</span>
-          </div>
-        </div>
+        <div ref="chartRef" class="chart-container"></div>
 
         <!-- Node Detail Popup -->
         <transition name="popup-fade">
@@ -165,7 +155,6 @@ onMounted(async () => {
     const rawNodes = payload.nodes || []
     const rawEdges = payload.edges || []
     const progressList = progressRes?.data || progressRes || []
-    console.log('星图数据:', rawNodes.length, '节点,', rawEdges.length, '边')
 
     nodes.value = rawNodes.map(node => {
       const prog = progressList.find(p => {
@@ -206,17 +195,11 @@ onMounted(async () => {
       console.warn('chartRef still null after load')
       return
     }
-    const rect = chartRef.value.getBoundingClientRect()
-    console.log('Chart container size:', rect.width, 'x', rect.height)
-
-    const ok = await ensureEcharts()
-    console.log('ensureEcharts:', ok, 'hasInit:', !!echarts?.init)
-    if (!ok || !echarts?.init) { loading.value = false; return }
+    if (!(await ensureEcharts())) { loading.value = false; return }
     chartInstance = echarts.init(chartRef.value)
-    console.log('chartInstance:', !!chartInstance)
     chartInstance.resize()
     chartInstance.setOption({
-      backgroundColor: 'transparent',
+      tooltip: { formatter: (p) => p.dataType === 'node' ? `<b>${p.data.name}</b><br/>掌握度: ${p.data.mastery || 0}%` : '' },
       series: [{
         type: 'graph',
         layout: 'force',
@@ -224,27 +207,10 @@ onMounted(async () => {
         draggable: true,
         data: nodes.value,
         edges: edges,
-        force: {
-          repulsion: 300,
-          edgeLength: 120,
-          friction: 0.1,
-          gravity: 0.05,
-        },
-        label: {
-          show: true,
-          position: 'bottom',
-          color: 'rgba(255,255,255,0.6)',
-          fontSize: 11,
-        },
-        lineStyle: {
-          color: 'rgba(255,255,255,0.12)',
-          width: 1,
-          curveness: 0.3,
-        },
-        emphasis: {
-          focus: 'adjacency',
-          lineStyle: { width: 2 },
-        },
+        force: { repulsion: 400, edgeLength: 150, friction: 0.1, gravity: 0.03 },
+        label: { show: true, position: 'bottom', color: '#cbd5e1', fontSize: 11, distance: 6 },
+        lineStyle: { color: 'rgba(148,163,184,0.25)', width: 1.2, curveness: 0.25 },
+        emphasis: { focus: 'adjacency', lineStyle: { width: 2, color: '#60d9fa' } },
         edgeSymbol: ['none', 'none'],
         edgeLabel: { show: false },
       }],
@@ -410,9 +376,8 @@ async function loadPuzzleTab() {
 
 .chart-container {
   width: 100%;
-  height: 480px;
-  min-height: 400px;
-  background: rgba(255,0,0,0.1);
+  height: 520px;
+  min-height: 420px;
 }
 .path-chart {
   width: 100%;
