@@ -196,7 +196,11 @@ async function loadRecommendations(lessonId) {
 }
 
 function handleEnter() {
-  auth.isLoggedIn ? router.push('/student/dashboard') : auth.openLoginModal('/student/dashboard')
+  if (auth.isLoggedIn) {
+    router.push('/student/dashboard')
+  } else {
+    auth.openLoginModal('/student/dashboard')
+  }
 }
 function quickEnter(role) {
   auth.openLoginModal(role === 'student' ? '/student/dashboard' : '/teacher/dashboard')
@@ -204,7 +208,13 @@ function quickEnter(role) {
 function scrollToSubjects() {
   subjectsAnchor.value?.scrollIntoView({ behavior: 'smooth', block: 'start' })
 }
-function goContinue() { if (lastLesson.value) router.push(`/lessons/${lastLesson.value.lessonId}`) }
+function goContinue() {
+  if (lastLesson.value?.lessonId) {
+    router.push(`/student/lessons/${lastLesson.value.lessonId}`)
+  } else {
+    router.push('/student/subjects')
+  }
+}
 function goSubjects() {
   router.push(auth.isLoggedIn ? '/student/subjects' : '/subjects')
 }
