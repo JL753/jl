@@ -23,8 +23,9 @@ public class VideoImportPipeline {
     private static final Logger log = LoggerFactory.getLogger(VideoImportPipeline.class);
     private final BilibiliService bilibiliService;
     private final LLMClient llmClient;
-    private final LessonMapper lessonMapper;
-    private final UnitMapper unitMapper;
+    private final SubChapterMapper subChapterMapper;
+    private final ChapterMapper chapterMapper;
+    private final CourseMapper courseMapper;
     private final SubjectMapper subjectMapper;
     private final ExerciseMapper exerciseMapper;
     private final KnowledgePointMapper knowledgePointMapper;
@@ -62,7 +63,7 @@ public class VideoImportPipeline {
                 item.setLessonName(meta.getTitle());
 
                 Long subjectId = null;
-                Long unitId = null;
+                Long chapterId = null;
                 String content = null;
                 List<Exercise> exercises = null;
                 List<String> kpNames = null;
@@ -70,12 +71,12 @@ public class VideoImportPipeline {
                 if (autoGenerate) {
                     ClassificationResult cr = classifyVideo(meta);
                     subjectId = cr.subjectId;
-                    unitId = cr.unitId;
-                    if (unitId == null) {
-                        unitId = createUnit(subjectId, cr.unitName);
+                    chapterId = cr.chapterId;
+                    if (chapterId == null) {
+                        chapterId = createChapter(subjectId, cr.subjectName, cr.chapterName);
                     }
                     item.setSubjectName(cr.subjectName);
-                    item.setUnitName(cr.unitName);
+                    item.setUnitName(cr.chapterName);
 
                     GenerationResult gr = generateContent(meta);
                     if (gr != null) {
@@ -87,26 +88,26 @@ public class VideoImportPipeline {
                 }
 
                 long now = System.currentTimeMillis();
-                Lesson lesson = new Lesson();
-                lesson.setId(now);
-                lesson.setUnitId(unitId);
-                lesson.setName(meta.getTitle());
-                lesson.setType("video");
-                lesson.setVideoUrl(videoUrl);
-                lesson.setContent(content);
-                lesson.setDuration(meta.getDuration());
-                lesson.setStatus("draft");
-                lesson.setSortOrder(0);
-                lesson.setUserId(userId);
-                lesson.setCoverUrl(meta.getCoverUrl());
-                lessonMapper.insert(lesson);
+                SubChapter sc = new SubChapter();
+                sc.setId(now);
+                sc.setChapterId(chapterId);
+                sc.setTitle(meta.getTitle());
+                sc.setType("video");
+                sc.setVideoUrl(videoUrl);
+                sc.setContent(content);
+                sc.setDuration(meta.getDuration());
+                sc.setStatus("published");
+                sc.setSortOrder(0);
+                sc.setUserId(userId);
+                sc.setCoverUrl(meta.getCoverUrl());
+                subChapterMapper.insert(sc);
 
-                item.setLessonId(lesson.getId());
+                item.setLessonId(sc.getId());
 
                 if (exercises != null) {
                     for (Exercise ex : exercises) {
                         ex.setId(System.currentTimeMillis() + (int)(Math.random() * 1000));
-                        ex.setLessonId(lesson.getId());
+                        ex.setLessonId(sc.getId());
                         exerciseMapper.insert(ex);
                     }
                 }
@@ -116,7 +117,7 @@ public class VideoImportPipeline {
                         KnowledgePoint kp = new KnowledgePoint();
                         kp.setId(System.currentTimeMillis() + (int)(Math.random() * 1000));
                         kp.setName(kpName);
-                        kp.setSubChapterId(lesson.getId());
+                        kp.setSubChapterId(sc.getId());
                         kp.setDescription("");
                         knowledgePointMapper.insert(kp);
                     }
@@ -141,10 +142,15 @@ public class VideoImportPipeline {
             StringBuilder treeStr = new StringBuilder();
             for (Subject s : subjects) {
                 treeStr.append("学科[").append(s.getId()).append("]: ").append(s.getName()).append("\n");
-                List<Unit> units = unitMapper.selectList(
-                        new LambdaQueryWrapper<Unit>().eq(Unit::getSubjectId, s.getId()));
-                for (Unit u : units) {
-                    treeStr.append("  单元[").append(u.getId()).append("]: ").append(u.getName()).append("\n");
+                List<Course> courses = courseMapper.selectList(
+                        new LambdaQueryWrapper<Course>().eq(Course::getSubjectId, s.getId()));
+                for (Course c : courses) {
+                    treeStr.append("  课程[").append(c.getId()).append("]: ").append(c.getTitle()).append("\n");
+                    List<Chapter> chapters = chapterMapper.selectList(
+                            new LambdaQueryWrapper<Chapter>().eq(Chapter::getCourseId, c.getId()));
+                    for (Chapter ch : chapters) {
+                        treeStr.append("    章节[").append(ch.getId()).append("]: ").append(ch.getTitle()).append("\n");
+                    }
                 }
             }
 
@@ -152,9 +158,9 @@ public class VideoImportPipeline {
             String desc = meta.getDescription() != null && meta.getDescription().length() > 200
                     ? meta.getDescription().substring(0, 200) : meta.getDescription() != null ? meta.getDescription() : "";
 
-            String systemPrompt = "你是课程分类助手。根据给定的学科/单元结构，将视频归入最合适的单元。\n"
-                    + "返回JSON格式: {\"subjectId\": 数字, \"subjectName\": \"学科名\", \"unitId\": 数字, \"unitName\": \"单元名\", \"confidence\": 0.0-1.0, \"reason\": \"理由\"}\n"
-                    + "如果找不到匹配的单元，unitId填null，unitName填建议的新单元名称。";
+            String systemPrompt = "你是课程分类助手。根据给定的学科/课程/章节结构，将视频归入最合适的章节。\n"
+                    + "返回JSON格式: {\"subjectId\": 数字, \"subjectName\": \"学科名\", \"chapterId\": 数字, \"chapterName\": \"章节名\", \"confidence\": 0.0-1.0, \"reason\": \"理由\"}\n"
+                    + "如果找不到匹配的章节，chapterId填null，chapterName填建议的新章节名称。";
 
             String userPrompt = "现有课程结构:\n" + treeStr + "\n"
                     + "视频标题: " + meta.getTitle() + "\n"
@@ -165,8 +171,8 @@ public class VideoImportPipeline {
             if (node != null) {
                 result.subjectId = node.has("subjectId") && !node.get("subjectId").isNull() ? node.path("subjectId").asLong() : null;
                 result.subjectName = node.path("subjectName").asText("");
-                result.unitId = node.has("unitId") && !node.get("unitId").isNull() ? node.path("unitId").asLong() : null;
-                result.unitName = node.path("unitName").asText("");
+                result.chapterId = node.has("chapterId") && !node.get("chapterId").isNull() ? node.path("chapterId").asLong() : null;
+                result.chapterName = node.path("chapterName").asText("");
                 result.confidence = node.path("confidence").asDouble(0.5);
             }
         } catch (Exception e) {
@@ -237,25 +243,46 @@ public class VideoImportPipeline {
         return result;
     }
 
-    private Long createUnit(Long subjectId, String unitName) {
-        if (unitName == null || unitName.isBlank()) {
-            unitName = "新建单元";
+    private Long createChapter(Long subjectId, String subjectName, String chapterName) {
+        if (chapterName == null || chapterName.isBlank()) {
+            chapterName = "新建章节";
         }
-        Unit unit = new Unit();
-        unit.setId(System.currentTimeMillis());
-        unit.setSubjectId(subjectId);
-        unit.setName(unitName);
-        unit.setDescription("");
-        unit.setSortOrder(999);
-        unitMapper.insert(unit);
-        return unit.getId();
+        // Find or create a Course under this Subject
+        Course course = null;
+        if (subjectId != null) {
+            List<Course> courses = courseMapper.selectList(
+                    new LambdaQueryWrapper<Course>().eq(Course::getSubjectId, subjectId).last("LIMIT 1"));
+            if (!courses.isEmpty()) course = courses.get(0);
+        }
+        if (course == null) {
+            course = new Course();
+            course.setId(System.currentTimeMillis());
+            course.setSubjectId(subjectId);
+            course.setTitle(subjectName != null ? subjectName : "默认课程");
+            course.setDescription("");
+            course.setStatus("已发布");
+            course.setCreatedAt(java.time.LocalDateTime.now());
+            course.setUpdatedAt(java.time.LocalDateTime.now());
+            courseMapper.insert(course);
+        }
+        // Create chapter
+        Chapter chapter = new Chapter();
+        chapter.setId(System.currentTimeMillis() + 1);
+        chapter.setCourseId(course.getId());
+        chapter.setTitle(chapterName);
+        chapter.setDescription("");
+        chapter.setSortOrder(999);
+        chapter.setCreatedAt(java.time.LocalDateTime.now());
+        chapter.setUpdatedAt(java.time.LocalDateTime.now());
+        chapterMapper.insert(chapter);
+        return chapter.getId();
     }
 
     private static class ClassificationResult {
         Long subjectId;
         String subjectName;
-        Long unitId;
-        String unitName;
+        Long chapterId;
+        String chapterName;
         double confidence;
     }
 

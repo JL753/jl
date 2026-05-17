@@ -12,4 +12,5 @@ public class KnowledgePoint {
     private String description;
     private Integer difficultyLevel;
     private String tags;
+    private Integer sortOrder;
 }
