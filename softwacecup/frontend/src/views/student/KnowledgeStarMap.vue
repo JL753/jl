@@ -202,10 +202,14 @@ onMounted(async () => {
     }
 
     await nextTick()
+    // 等一帧确保容器已完成layout
+    await new Promise(r => setTimeout(r, 100))
     if (!chartRef.value) {
       loading.value = false
       return
     }
+    const rect = chartRef.value.getBoundingClientRect()
+    console.log('Chart container size:', rect.width, 'x', rect.height)
 
     if (!(await ensureEcharts())) {
       console.warn('ECharts load failed')
@@ -213,6 +217,7 @@ onMounted(async () => {
       return
     }
     chartInstance = echarts.init(chartRef.value)
+    chartInstance.resize()
     chartInstance.setOption({
       backgroundColor: 'transparent',
       series: [{
