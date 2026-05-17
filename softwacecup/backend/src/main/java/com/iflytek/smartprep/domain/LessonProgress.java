@@ -9,7 +9,7 @@ import java.time.LocalDateTime;
 public class LessonProgress {
     private Long id;
     private Long userId;
-    private Long lessonId;
+    private Long subChapterId;
     private String status;
     private LocalDateTime completedAt;
 }

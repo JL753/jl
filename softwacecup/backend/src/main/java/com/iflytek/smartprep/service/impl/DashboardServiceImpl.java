@@ -80,7 +80,7 @@ public class DashboardServiceImpl implements DashboardService {
           .orderByDesc(LessonProgress::getCompletedAt).last("LIMIT 1"));
     }
     if (lastInProgress != null) {
-      Lesson lesson = lessonMapper.selectById(lastInProgress.getLessonId());
+      Lesson lesson = lessonMapper.selectById(lastInProgress.getSubChapterId());
       if (lesson != null) {
         Unit unit = unitMapper.selectById(lesson.getUnitId());
         Subject subject = unit != null ? subjectMapper.selectById(unit.getSubjectId()) : null;
@@ -97,7 +97,7 @@ public class DashboardServiceImpl implements DashboardService {
     // AI推荐路径：基于最近课时找后续课时（同单元 → 同学科 → 全库）
     List<Map<String, Object>> recommendedPath = new ArrayList<>();
     if (lastInProgress != null) {
-      Lesson currentLesson = lessonMapper.selectById(lastInProgress.getLessonId());
+      Lesson currentLesson = lessonMapper.selectById(lastInProgress.getSubChapterId());
       if (currentLesson != null) {
         // 策略1：同单元后续课时
         if (currentLesson.getUnitId() != null) {

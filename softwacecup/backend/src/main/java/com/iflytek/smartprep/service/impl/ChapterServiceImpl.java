@@ -79,7 +79,7 @@ public class ChapterServiceImpl implements ChapterService {
 
         List<KnowledgePoint> kps = kpMapper.selectList(
                 new LambdaQueryWrapper<KnowledgePoint>()
-                        .eq(KnowledgePoint::getLessonId, subChapterId));
+                        .eq(KnowledgePoint::getSubChapterId, subChapterId));
         detail.put("knowledgePoints", kps.stream().map(kp -> {
             Map<String, Object> kpNode = new LinkedHashMap<>();
             kpNode.put("id", kp.getId());

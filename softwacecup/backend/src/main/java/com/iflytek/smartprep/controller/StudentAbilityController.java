@@ -47,7 +47,7 @@ public class StudentAbilityController {
                         .eq(LessonProgress::getUserId, userId)
                         .eq(LessonProgress::getStatus, "completed"));
         for (LessonProgress lp : allCompleted) {
-            Lesson lesson = lessonMapper.selectById(lp.getLessonId());
+            Lesson lesson = lessonMapper.selectById(lp.getSubChapterId());
             if (lesson != null && lesson.getUnitId() != null) {
                 coveredUnits.add(lesson.getUnitId());
                 Unit unit = unitMapper.selectById(lesson.getUnitId());

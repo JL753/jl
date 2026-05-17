@@ -144,7 +144,7 @@ public class ChapterController {
         LessonProgress lp = lessonProgressMapper.selectOne(
                 new LambdaQueryWrapper<LessonProgress>()
                         .eq(LessonProgress::getUserId, userId)
-                        .eq(LessonProgress::getLessonId, id));
+                        .eq(LessonProgress::getSubChapterId, id));
         return ApiResponse.ok(lp != null ? lp : new LessonProgress());
     }
 
@@ -154,12 +154,12 @@ public class ChapterController {
         LessonProgress lp = lessonProgressMapper.selectOne(
                 new LambdaQueryWrapper<LessonProgress>()
                         .eq(LessonProgress::getUserId, userId)
-                        .eq(LessonProgress::getLessonId, id));
+                        .eq(LessonProgress::getSubChapterId, id));
         if (lp == null) {
             lp = new LessonProgress();
             lp.setId(System.currentTimeMillis());
             lp.setUserId(userId);
-            lp.setLessonId(id);
+            lp.setSubChapterId(id);
             lp.setStatus("completed");
             lp.setCompletedAt(LocalDateTime.now());
             lessonProgressMapper.insert(lp);
@@ -190,7 +190,7 @@ public class ChapterController {
                 new LambdaQueryWrapper<LessonProgress>()
                         .eq(LessonProgress::getUserId, userId)
                         .eq(LessonProgress::getStatus, "completed")
-                        .in(LessonProgress::getLessonId, lessonIds)) : 0;
+                        .in(LessonProgress::getSubChapterId, lessonIds)) : 0;
         Map<String, Object> result = new HashMap<>();
         result.put("total", total);
         result.put("completed", completed);

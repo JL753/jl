@@ -7,7 +7,7 @@ import lombok.Data;
 @TableName("sp_knowledge_point")
 public class KnowledgePoint {
     private Long id;
-    private Long lessonId;
+    private Long subChapterId;
     private String name;
     private String description;
     private Integer difficultyLevel;

@@ -116,7 +116,7 @@ public class VideoImportPipeline {
                         KnowledgePoint kp = new KnowledgePoint();
                         kp.setId(System.currentTimeMillis() + (int)(Math.random() * 1000));
                         kp.setName(kpName);
-                        kp.setLessonId(lesson.getId());
+                        kp.setSubChapterId(lesson.getId());
                         kp.setDescription("");
                         knowledgePointMapper.insert(kp);
                     }

@@ -96,7 +96,7 @@ public class LearningDataController {
         try {
             // 找到课时关联的知识点
             List<KnowledgePoint> kps = kpMapper.selectList(
-                    new LambdaQueryWrapper<KnowledgePoint>().eq(KnowledgePoint::getLessonId, lesson.getId()));
+                    new LambdaQueryWrapper<KnowledgePoint>().eq(KnowledgePoint::getSubChapterId, lesson.getId()));
             double delta = correct > 0 ? 0.15 : 0.05;
             for (KnowledgePoint kp : kps) {
                 UserKpMastery existing = kpMasteryMapper.selectOne(

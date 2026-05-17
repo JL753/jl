@@ -34,7 +34,7 @@ public class KnowledgeGraphServiceImpl implements KnowledgeGraphService {
             node.put("name", kp.getName());
             node.put("difficultyLevel", kp.getDifficultyLevel());
             node.put("tags", kp.getTags());
-            node.put("lessonId", kp.getLessonId());
+            node.put("lessonId", kp.getSubChapterId());
             return node;
         }).collect(Collectors.toList());
 
