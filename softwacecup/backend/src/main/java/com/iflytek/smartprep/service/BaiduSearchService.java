@@ -61,34 +61,19 @@ public class BaiduSearchService {
                 if (!response.isSuccessful() || response.body() == null) return results;
                 String body = response.body().string();
                 JsonNode root = objectMapper.readTree(body);
-                // 解析搜索结果
-                JsonNode searchResults = root.path("results");
+                // 解析搜索结果: references 数组
+                JsonNode searchResults = root.path("references");
+                if (!searchResults.isArray()) searchResults = root.path("results");
                 if (searchResults.isArray()) {
                     for (JsonNode item : searchResults) {
                         Map<String, String> result = new HashMap<>();
                         result.put("title", item.path("title").asText(""));
                         result.put("url", item.path("url").asText(""));
-                        result.put("snippet", item.path("snippet").asText("").substring(0, Math.min(200, item.path("snippet").asText("").length())));
+                        String snippet = item.path("snippet").asText("");
+                        if (snippet.isEmpty()) snippet = item.path("content").asText("");
+                        result.put("snippet", snippet.substring(0, Math.min(200, snippet.length())));
                         results.add(result);
                         if (results.size() >= 5) break;
-                    }
-                }
-                // 备用解析: choices[0].message.content
-                if (results.isEmpty()) {
-                    JsonNode choices = root.path("choices");
-                    if (choices.isArray() && choices.size() > 0) {
-                        String content = choices.get(0).path("message").path("content").asText("");
-                        // 从AI回复中提取链接
-                        String[] lines = content.split("\n");
-                        for (String line : lines) {
-                            if (line.contains("http") && results.size() < 5) {
-                                Map<String, String> result = new HashMap<>();
-                                result.put("title", line.replaceAll("https?://\\S+", "").trim());
-                                result.put("url", line.replaceAll(".*?(https?://\\S+).*", "$1"));
-                                result.put("snippet", "");
-                                results.add(result);
-                            }
-                        }
                     }
                 }
             }
