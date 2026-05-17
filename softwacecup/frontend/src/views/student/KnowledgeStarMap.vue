@@ -196,16 +196,14 @@ onMounted(async () => {
     }))
     links.value = edges
 
-    if (nodes.value.length === 0) {
-      loading.value = false
-      return
-    }
+    // 先关闭loading让chart-container DOM渲染出来
+    loading.value = false
+    if (nodes.value.length === 0) return
 
     await nextTick()
-    // 等一帧确保容器已完成layout
     await new Promise(r => setTimeout(r, 100))
     if (!chartRef.value) {
-      loading.value = false
+      console.warn('chartRef still null after load')
       return
     }
     const rect = chartRef.value.getBoundingClientRect()
