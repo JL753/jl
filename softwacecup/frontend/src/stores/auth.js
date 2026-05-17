@@ -27,8 +27,8 @@ export const useAuthStore = defineStore('auth', {
     },
 
     async fetchMe() {
-      const data = await apiMe()
-      this.user = data.user || data
+      const res = await apiMe()
+      this.user = res.data || res.user || res
     },
 
     async updateMe(form) {

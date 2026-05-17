@@ -24,7 +24,7 @@
           <template v-else>
             <div class="hero-left">
               <p class="hero-tagline">自适应学习路径 · 实时学情追踪</p>
-              <h1 class="hero-greet">欢迎回来，{{ auth.user?.username }}</h1>
+              <h1 class="hero-greet">欢迎回来，{{ auth.user?.displayName || auth.user?.username }}</h1>
               <p class="hero-stat">
                 已连续学习 <strong>{{ streakDays }}</strong> 天 · 掌握 <strong>{{ masteredKps }}</strong> 个知识点
               </p>
@@ -125,7 +125,7 @@ import { ref, computed, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 import { useAuthStore } from '../stores/auth'
 import TopNavBar from '../components/TopNavBar.vue'
-import { apiSubjects, apiAbilityLatest, apiRecommendResources, apiGamificationStreak } from '../api/index.js'
+import { apiSubjects, apiAbilityLatest, apiRecommendResources, apiGamificationStreak, apiMe } from '../api/index.js'
 
 const auth = useAuthStore()
 const router = useRouter()
@@ -160,6 +160,10 @@ async function loadSubjects() {
 }
 
 async function loadAuthData() {
+  // 有token但无user时先fetchMe恢复登录态
+  if (auth.token && !auth.user) {
+    try { await auth.fetchMe() } catch {}
+  }
   if (!auth.isLoggedIn) return
   try {
     const [abilityRes, streakRes] = await Promise.allSettled([
