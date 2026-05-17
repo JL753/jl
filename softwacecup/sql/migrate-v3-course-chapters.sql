@@ -3,6 +3,9 @@
 -- 迁移路径: sp_unit→sp_chapter, sp_lesson→sp_sub_chapter
 -- 新增: sp_chapter_resource, sp_course_announcement, sp_course_question, sp_course_answer
 -- ============================================
+--
+-- 注意: DDL 语句在 MySQL 中会自动提交，事务主要保护数据迁移步骤
+START TRANSACTION;
 
 -- ============================================
 -- 1. 为 sp_course 添加新字段（安全添加，已存在则跳过）
@@ -65,6 +68,7 @@ CREATE TABLE IF NOT EXISTS sp_chapter (
   sort_order INT DEFAULT 0 COMMENT '排序',
   prerequisite_chapter_id BIGINT COMMENT '前置章节ID',
   created_at DATETIME,
+  updated_at DATETIME,
   INDEX idx_chapter_course (course_id)
 );
 
@@ -85,6 +89,7 @@ CREATE TABLE IF NOT EXISTS sp_sub_chapter (
   cover_url VARCHAR(512) COMMENT '封面图',
   status VARCHAR(32) DEFAULT 'published' COMMENT '状态',
   user_id BIGINT COMMENT '创建者',
+  updated_at DATETIME,
   INDEX idx_subchapter_chapter (chapter_id)
 );
 
@@ -102,6 +107,7 @@ CREATE TABLE IF NOT EXISTS sp_chapter_resource (
   url VARCHAR(512) COMMENT '资源地址',
   size VARCHAR(32) COMMENT '文件大小',
   created_at DATETIME,
+  updated_at DATETIME,
   INDEX idx_res_course (course_id),
   INDEX idx_res_chapter (chapter_id)
 );
@@ -117,7 +123,9 @@ CREATE TABLE IF NOT EXISTS sp_course_announcement (
   title VARCHAR(256) NOT NULL COMMENT '公告标题',
   content TEXT COMMENT '公告内容',
   created_at DATETIME,
-  INDEX idx_ann_course (course_id)
+  updated_at DATETIME,
+  INDEX idx_ann_course (course_id),
+  INDEX idx_ann_created (created_at)
 );
 
 
@@ -131,8 +139,10 @@ CREATE TABLE IF NOT EXISTS sp_course_question (
   title VARCHAR(256) NOT NULL COMMENT '问题标题',
   content TEXT COMMENT '问题内容',
   created_at DATETIME,
+  updated_at DATETIME,
   INDEX idx_q_course (course_id),
-  INDEX idx_q_user (user_id)
+  INDEX idx_q_user (user_id),
+  INDEX idx_q_created (created_at)
 );
 
 
@@ -146,7 +156,9 @@ CREATE TABLE IF NOT EXISTS sp_course_answer (
   content TEXT NOT NULL COMMENT '回答内容',
   is_ai TINYINT(1) DEFAULT 0 COMMENT '是否AI生成',
   created_at DATETIME,
-  INDEX idx_answer_question (question_id)
+  updated_at DATETIME,
+  INDEX idx_answer_question (question_id),
+  INDEX idx_answer_created (created_at)
 );
 
 
@@ -156,9 +168,12 @@ CREATE TABLE IF NOT EXISTS sp_course_answer (
 -- ============================================
 
 -- 8.1 为没有 Course 的学科创建占位 Course
+SET @base_id = (SELECT COALESCE(MAX(id), 10000) FROM sp_course);
+SET @rownum = 0;
+
 INSERT IGNORE INTO sp_course (id, subject_id, title, category, description, status, created_at, updated_at)
 SELECT
-  s.id + 7000 AS id,
+  @base_id + (@rownum := @rownum + 1) AS id,
   s.id AS subject_id,
   CONCAT(s.name, ' - 课程') AS title,
   s.name AS category,
@@ -184,7 +199,7 @@ SELECT
   u.id AS id,
   COALESCE(
     (SELECT c.id FROM sp_course c WHERE c.subject_id = u.subject_id LIMIT 1),
-    u.subject_id + 7000
+    @base_id + u.subject_id
   ) AS course_id,
   u.name AS title,
   u.description,
@@ -344,9 +359,20 @@ SET @drop_rr = IF(@rr_keep_col > 0 AND @rr_has_data > 0,
 );
 PREPARE stmt FROM @drop_rr; EXECUTE stmt; DEALLOCATE PREPARE stmt;
 
+-- 确保新列有索引
+SET @idx_rr = (SELECT COUNT(*) FROM information_schema.STATISTICS
+  WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = 'sp_resource_recommendation' AND INDEX_NAME = 'idx_rr_subchapter');
+SET @create_idx_rr = IF(@idx_rr = 0,
+  'ALTER TABLE sp_resource_recommendation ADD INDEX idx_rr_subchapter (sub_chapter_id)',
+  'SELECT 1 AS skipped_idx_rr_subchapter'
+);
+PREPARE stmt FROM @create_idx_rr; EXECUTE stmt; DEALLOCATE PREPARE stmt;
+
 
 -- ============================================
 -- 11. 旧表清理（确认迁移数据完整后方可取消注释执行）
 -- ============================================
 -- DROP TABLE IF EXISTS sp_lesson;
 -- DROP TABLE IF EXISTS sp_unit;
+
+COMMIT;
