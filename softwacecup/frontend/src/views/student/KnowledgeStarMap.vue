@@ -167,7 +167,9 @@ onMounted(async () => {
       if (mastery >= 80) color = '#fbbf24'       // gold = 精通
       else if (mastery >= 60) color = '#10b981'   // green = 已掌握
       else if (mastery > 0) color = '#3b82f6'     // blue = 学习中
+      const id = node.id || node.knowledgePointId || node.kpId
       return {
+        id: String(id),
         name: node.name || node.label || node.title || '知识点',
         value: node.name,
         mastery,
@@ -178,8 +180,8 @@ onMounted(async () => {
     })
 
     const edges = rawEdges.map(e => ({
-      source: e.source || e.from,
-      target: e.target || e.to,
+      source: String(e.source || e.from),
+      target: String(e.target || e.to),
     }))
     links.value = edges
 
