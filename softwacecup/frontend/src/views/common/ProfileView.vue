@@ -182,7 +182,14 @@ async function saveProfile() {
 }
 
 function goToLastStudy() {
-  if (lastStudy.value?.lessonId) router.push(`/student/lessons/${lastStudy.value.lessonId}`)
+  const ls = lastStudy.value
+  if (ls?.courseId && ls?.lessonId) {
+    router.push(`/student/courses/${ls.courseId}?sc=${ls.lessonId}`)
+  } else if (ls?.courseId) {
+    router.push(`/student/courses/${ls.courseId}`)
+  } else {
+    router.push('/student/subjects')
+  }
 }
 </script>
 

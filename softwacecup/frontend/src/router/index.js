@@ -11,8 +11,6 @@ const routes = [
   // 学科目录（登录前可浏览）
   { path: '/subjects', name: 'subjects', component: () => import('../views/common/SubjectCatalog.vue') },
   { path: '/subjects/:id', name: 'subject-detail', component: () => import('../views/common/CourseDetail.vue') },
-  { path: '/lessons/:id', name: 'lesson-view', component: () => import('../views/common/LessonView.vue') },
-
   // 学生端
   {
     path: '/student',
@@ -24,10 +22,9 @@ const routes = [
       { path: 'subjects', name: 'student-subjects', component: () => import('../views/common/SubjectCatalog.vue') },
       { path: 'subjects/:id', name: 'student-subject-detail', component: () => import('../views/common/CourseDetail.vue') },
       { path: 'courses/:id', name: 'student-course', component: () => import('../views/student/CourseView.vue') },
-      { path: 'lessons/:id', name: 'student-lesson', component: () => import('../views/student/CourseView.vue') },
       { path: 'knowledge-map', name: 'student-knowledge-map', component: () => import('../views/student/KnowledgeStarMap.vue') },
-      { path: 'companion', name: 'companion', component: () => import('../views/student/AICompanionView.vue') },
-      { path: 'companion-immersive', name: 'companion-immersive', component: () => import('../views/student/AICompanionImmersive.vue') },
+      { path: 'companion', name: 'companion', component: () => import('../views/student/AICompanionImmersive.vue') },
+      { path: 'companion-immersive', redirect: '/student/companion' },
       { path: 'profile', name: 'student-profile', component: () => import('../views/common/ProfileView.vue') },
       { path: 'community', name: 'student-community', component: () => import('../views/student/CommunityView.vue') },
     ]

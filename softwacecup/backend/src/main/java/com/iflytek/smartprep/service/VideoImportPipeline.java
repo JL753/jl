@@ -31,6 +31,142 @@ public class VideoImportPipeline {
     private final KnowledgePointMapper knowledgePointMapper;
     private final ObjectMapper objectMapper = new ObjectMapper();
 
+    /**
+     * 合集导入：整个合集 = 1 门 Course，每个视频 = 1 个 SubChapter（无 Chapter）
+     */
+    public BilibiliImportResult importPlaylist(List<String> bvids, String courseName, boolean autoGenerate, Long userId) {
+        BilibiliImportResult result = new BilibiliImportResult();
+        result.setResults(new ArrayList<>());
+
+        if (bvids.isEmpty()) return result;
+
+        // 1. 用第一个视频确定学科
+        String firstBvid = bvids.get(0);
+        String firstBaseBvid = extractBaseBvid(firstBvid);
+        int firstPageNum = 1;
+        if (firstBvid.contains("_p")) {
+            try { firstPageNum = Integer.parseInt(firstBvid.substring(firstBvid.indexOf("_p") + 2)); } catch (Exception ignored) {}
+        }
+        BilibiliVideoMeta firstMeta = bilibiliService.parseVideoWithPage(firstBaseBvid, firstPageNum);
+        if (firstMeta == null) {
+            firstMeta = new BilibiliVideoMeta();
+            firstMeta.setTitle(courseName != null ? courseName : "合集");
+        }
+
+        ClassificationResult cr = classifyVideo(firstMeta);
+        Long subjectId = cr.subjectId;
+        if (subjectId == null) {
+            Subject fallback = subjectMapper.selectOne(
+                    new LambdaQueryWrapper<Subject>().eq(Subject::getName, "我的导入"));
+            if (fallback == null) {
+                List<Subject> subjects = subjectMapper.selectList(null);
+                if (!subjects.isEmpty()) fallback = subjects.get(0);
+            }
+            if (fallback != null) subjectId = fallback.getId();
+        }
+
+        // 2. 创建 Course
+        if (courseName == null || courseName.isBlank()) {
+            courseName = firstMeta.getTitle() != null ? firstMeta.getTitle() : "新建课程";
+        }
+        Course course = new Course();
+        course.setId(System.currentTimeMillis());
+        course.setSubjectId(subjectId);
+        course.setTitle(courseName);
+        course.setDescription("");
+        course.setStatus("已发布");
+        course.setCreatedAt(java.time.LocalDateTime.now());
+        course.setUpdatedAt(java.time.LocalDateTime.now());
+        courseMapper.insert(course);
+
+        // 3. 遍历每个视频，生成SubChapter
+        int sortOrder = 0;
+        for (String bvid : bvids) {
+            BilibiliImportResult.BilibiliImportResultItem item =
+                    new BilibiliImportResult.BilibiliImportResultItem();
+            item.setBvid(bvid);
+
+            try {
+                String baseBvid = extractBaseBvid(bvid);
+                int pageNum = 1;
+                if (bvid.contains("_p")) {
+                    try { pageNum = Integer.parseInt(bvid.substring(bvid.indexOf("_p") + 2)); } catch (Exception ignored) {}
+                }
+                BilibiliVideoMeta meta = bilibiliService.parseVideoWithPage(baseBvid, pageNum);
+                if (meta == null) {
+                    meta = new BilibiliVideoMeta();
+                    meta.setTitle("视频 " + (sortOrder + 1));
+                }
+
+                item.setLessonName(meta.getTitle());
+                String content = null;
+                List<Exercise> exercises = null;
+                List<String> kpNames = null;
+
+                if (autoGenerate) {
+                    GenerationResult gr = generateContent(meta);
+                    if (gr != null) {
+                        content = gr.content;
+                        exercises = gr.exercises;
+                        kpNames = gr.knowledgePoints;
+                    }
+                    item.setGenerated(true);
+                }
+
+                long now = System.currentTimeMillis() + sortOrder;
+                String videoUrl = "https://www.bilibili.com/video/" + baseBvid;
+                if (pageNum > 1) videoUrl += "?p=" + pageNum;
+
+                SubChapter sc = new SubChapter();
+                sc.setId(now);
+                sc.setChapterId(null);
+                sc.setCourseId(course.getId());
+                sc.setTitle(meta.getTitle());
+                sc.setType("video");
+                sc.setVideoUrl(videoUrl);
+                sc.setContent(content);
+                sc.setDuration(meta.getDuration());
+                sc.setStatus("published");
+                sc.setSortOrder(sortOrder);
+                sc.setUserId(userId);
+                sc.setCoverUrl(meta.getCoverUrl());
+                subChapterMapper.insert(sc);
+
+                item.setLessonId(sc.getId());
+
+                if (exercises != null) {
+                    for (Exercise ex : exercises) {
+                        ex.setId(System.currentTimeMillis() + (int)(Math.random() * 1000));
+                        ex.setLessonId(sc.getId());
+                        exerciseMapper.insert(ex);
+                    }
+                }
+                if (kpNames != null) {
+                    for (String kpName : kpNames) {
+                        KnowledgePoint kp = new KnowledgePoint();
+                        kp.setId(System.currentTimeMillis() + (int)(Math.random() * 1000));
+                        kp.setName(kpName);
+                        kp.setLessonId(sc.getId());
+                        kp.setDescription("");
+                        knowledgePointMapper.insert(kp);
+                    }
+                }
+            } catch (Exception e) {
+                log.error("合集视频导入失败 bvid={}: {}", bvid, e.getMessage());
+                item.setError("导入失败: " + e.getMessage());
+            }
+            result.getResults().add(item);
+            sortOrder++;
+        }
+
+        return result;
+    }
+
+    private String extractBaseBvid(String bvid) {
+        if (bvid.contains("_p")) return bvid.substring(0, bvid.indexOf("_p"));
+        return bvid;
+    }
+
     public BilibiliImportResult importVideos(List<String> bvids, boolean autoGenerate, Long userId) {
         BilibiliImportResult result = new BilibiliImportResult();
         result.setResults(new ArrayList<>());
@@ -117,7 +253,7 @@ public class VideoImportPipeline {
                         KnowledgePoint kp = new KnowledgePoint();
                         kp.setId(System.currentTimeMillis() + (int)(Math.random() * 1000));
                         kp.setName(kpName);
-                        kp.setSubChapterId(sc.getId());
+                        kp.setLessonId(sc.getId());
                         kp.setDescription("");
                         knowledgePointMapper.insert(kp);
                     }
@@ -159,8 +295,9 @@ public class VideoImportPipeline {
                     ? meta.getDescription().substring(0, 200) : meta.getDescription() != null ? meta.getDescription() : "";
 
             String systemPrompt = "你是课程分类助手。根据给定的学科/课程/章节结构，将视频归入最合适的章节。\n"
-                    + "返回JSON格式: {\"subjectId\": 数字, \"subjectName\": \"学科名\", \"chapterId\": 数字, \"chapterName\": \"章节名\", \"confidence\": 0.0-1.0, \"reason\": \"理由\"}\n"
-                    + "如果找不到匹配的章节，chapterId填null，chapterName填建议的新章节名称。";
+                    + "返回JSON格式: {\"subjectId\": 数字或null, \"subjectName\": \"学科名\", \"chapterId\": 数字或null, \"chapterName\": \"章节名\", \"confidence\": 0.0-1.0, \"reason\": \"理由\"}\n"
+                    + "重要：如果视频内容与所有学科都不匹配（如纯娱乐、生活vlog等），subjectId填null，confidence填0.1。\n"
+                    + "如果勉强能匹配但不自信，confidence填0.3以下。只有明确匹配才给0.6以上的confidence。";
 
             String userPrompt = "现有课程结构:\n" + treeStr + "\n"
                     + "视频标题: " + meta.getTitle() + "\n"
@@ -174,16 +311,25 @@ public class VideoImportPipeline {
                 result.chapterId = node.has("chapterId") && !node.get("chapterId").isNull() ? node.path("chapterId").asLong() : null;
                 result.chapterName = node.path("chapterName").asText("");
                 result.confidence = node.path("confidence").asDouble(0.5);
+                // 低置信度视为无法归类
+                if (result.confidence < 0.5) {
+                    result.subjectId = null;
+                }
             }
         } catch (Exception e) {
             log.warn("AI分类失败: {}", e.getMessage());
         }
 
         if (result.subjectId == null) {
-            List<Subject> subjects = subjectMapper.selectList(null);
-            if (!subjects.isEmpty()) {
-                result.subjectId = subjects.get(0).getId();
-                result.subjectName = subjects.get(0).getName();
+            Subject fallback = subjectMapper.selectOne(
+                    new LambdaQueryWrapper<Subject>().eq(Subject::getName, "我的导入"));
+            if (fallback == null) {
+                List<Subject> subjects = subjectMapper.selectList(null);
+                if (!subjects.isEmpty()) fallback = subjects.get(0);
+            }
+            if (fallback != null) {
+                result.subjectId = fallback.getId();
+                result.subjectName = fallback.getName();
             }
         }
 

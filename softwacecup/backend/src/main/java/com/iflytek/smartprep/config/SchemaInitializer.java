@@ -17,6 +17,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Component;
+import jakarta.annotation.PostConstruct;
 
 import java.time.LocalDateTime;
 import java.util.LinkedHashMap;
@@ -47,7 +48,7 @@ public class SchemaInitializer {
     private final AssessmentService assessmentService;
     private final ObjectMapper objectMapper;
 
-    // @PostConstruct
+    @PostConstruct
     public void init() {
         // v3 表始终创建（独立于旧的 v1/v2 门控）
         ensureV3Tables();
@@ -77,17 +78,25 @@ public class SchemaInitializer {
     private void ensureV3Tables() {
         // Create v3 tables
         jdbcTemplate.execute("CREATE TABLE IF NOT EXISTS sp_chapter (id BIGINT PRIMARY KEY, course_id BIGINT NOT NULL, title VARCHAR(256) NOT NULL, description TEXT, sort_order INT DEFAULT 0, prerequisite_chapter_id BIGINT, created_at DATETIME, updated_at DATETIME)");
-        jdbcTemplate.execute("CREATE TABLE IF NOT EXISTS sp_sub_chapter (id BIGINT PRIMARY KEY, chapter_id BIGINT NOT NULL, title VARCHAR(256) NOT NULL, description TEXT, sort_order INT DEFAULT 0, type VARCHAR(32) DEFAULT 'doc', video_url VARCHAR(512), duration INT, content LONGTEXT, cover_url VARCHAR(512), status VARCHAR(32) DEFAULT 'published', user_id BIGINT)");
+        jdbcTemplate.execute("CREATE TABLE IF NOT EXISTS sp_sub_chapter (id BIGINT PRIMARY KEY, chapter_id BIGINT NULL, title VARCHAR(256) NOT NULL, description TEXT, sort_order INT DEFAULT 0, type VARCHAR(32) DEFAULT 'doc', video_url VARCHAR(512), duration INT, content LONGTEXT, cover_url VARCHAR(512), status VARCHAR(32) DEFAULT 'published', user_id BIGINT, course_id BIGINT NULL)");
         jdbcTemplate.execute("CREATE TABLE IF NOT EXISTS sp_chapter_resource (id BIGINT PRIMARY KEY, course_id BIGINT NOT NULL, chapter_id BIGINT NOT NULL, type VARCHAR(32), title VARCHAR(256) NOT NULL, description TEXT, url VARCHAR(512), size VARCHAR(32), created_at DATETIME, updated_at DATETIME)");
         jdbcTemplate.execute("CREATE TABLE IF NOT EXISTS sp_course_announcement (id BIGINT PRIMARY KEY, course_id BIGINT NOT NULL, type VARCHAR(32) DEFAULT '普通公告', title VARCHAR(256) NOT NULL, content TEXT, created_at DATETIME, updated_at DATETIME)");
         jdbcTemplate.execute("CREATE TABLE IF NOT EXISTS sp_course_question (id BIGINT PRIMARY KEY, course_id BIGINT NOT NULL, user_id BIGINT NOT NULL, title VARCHAR(256) NOT NULL, content TEXT, created_at DATETIME, updated_at DATETIME)");
         jdbcTemplate.execute("CREATE TABLE IF NOT EXISTS sp_course_answer (id BIGINT PRIMARY KEY, question_id BIGINT NOT NULL, user_id BIGINT, content TEXT NOT NULL, is_ai TINYINT(1) DEFAULT 0, created_at DATETIME, updated_at DATETIME)");
+
+        // 确保“我的导入”学科存在
+        jdbcTemplate.execute("INSERT IGNORE INTO sp_subject (id, name, icon, color, description, sort_order) " +
+                "VALUES (9999, '我的导入', '📥', '#f59e0b', '未能自动归类的视频合集', 999)");
 
         // Ensure sp_course has new columns
         ensureColumnExists("sp_course", "subject_id", "ALTER TABLE sp_course ADD COLUMN subject_id BIGINT AFTER id");
         ensureColumnExists("sp_course", "background", "ALTER TABLE sp_course ADD COLUMN background VARCHAR(512)");
         ensureColumnExists("sp_course", "target", "ALTER TABLE sp_course ADD COLUMN target VARCHAR(512)");
         ensureColumnExists("sp_course", "principle", "ALTER TABLE sp_course ADD COLUMN principle VARCHAR(512)");
+
+        // Ensure sub_chapter has course_id for playlist imports, and chapter_id can be null
+        ensureColumnExists("sp_sub_chapter", "course_id", "ALTER TABLE sp_sub_chapter ADD COLUMN course_id BIGINT AFTER chapter_id");
+        try { jdbcTemplate.execute("ALTER TABLE sp_sub_chapter MODIFY COLUMN chapter_id BIGINT NULL"); } catch (Exception e) { /* already nullable */ }
 
         // Ensure dependent tables have sub_chapter_id
         ensureColumnExists("sp_lesson_progress", "sub_chapter_id", "ALTER TABLE sp_lesson_progress ADD COLUMN sub_chapter_id BIGINT");

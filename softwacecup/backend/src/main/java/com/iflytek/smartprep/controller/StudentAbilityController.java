@@ -23,8 +23,9 @@ public class StudentAbilityController {
     private final LessonProgressMapper progressMapper;
     private final UserKpMasteryMapper kpMasteryMapper;
     private final UserStreakMapper streakMapper;
-    private final UnitMapper unitMapper;
-    private final LessonMapper lessonMapper;
+    private final SubChapterMapper subChapterMapper;
+    private final ChapterMapper chapterMapper;
+    private final CourseMapper courseMapper;
     private final SubjectMapper subjectMapper;
     private final ExerciseAttemptMapper exerciseAttemptMapper;
     private final StudyDurationMapper studyDurationMapper;
@@ -35,30 +36,30 @@ public class StudentAbilityController {
         Long userId = LoginUserHolder.get().getUserId();
         LocalDate today = LocalDate.now();
 
-        // === 1. 知识广度：覆盖学科比例 × 覆盖单元比例 ===
+        // === 1. 知识广度：覆盖学科比例 × 覆盖课程比例 ===
         long totalSubjects = subjectMapper.selectCount(null);
-        List<Unit> allUnits = unitMapper.selectList(null);
-        long totalUnits = allUnits.size();
+        long totalCourses = courseMapper.selectCount(null);
 
-        java.util.Set<Long> coveredUnits = new java.util.HashSet<>();
         java.util.Set<Long> coveredSubjects = new java.util.HashSet<>();
+        java.util.Set<Long> coveredCourses = new java.util.HashSet<>();
         List<LessonProgress> allCompleted = progressMapper.selectList(
                 new LambdaQueryWrapper<LessonProgress>()
                         .eq(LessonProgress::getUserId, userId)
                         .eq(LessonProgress::getStatus, "completed"));
         for (LessonProgress lp : allCompleted) {
-            Lesson lesson = lessonMapper.selectById(lp.getSubChapterId());
-            if (lesson != null && lesson.getUnitId() != null) {
-                coveredUnits.add(lesson.getUnitId());
-                Unit unit = unitMapper.selectById(lesson.getUnitId());
-                if (unit != null && unit.getSubjectId() != null) {
-                    coveredSubjects.add(unit.getSubjectId());
-                }
+            SubChapter sc = subChapterMapper.selectById(lp.getSubChapterId());
+            if (sc == null || sc.getChapterId() == null) continue;
+            Chapter chapter = chapterMapper.selectById(sc.getChapterId());
+            if (chapter == null || chapter.getCourseId() == null) continue;
+            coveredCourses.add(chapter.getCourseId());
+            Course course = courseMapper.selectById(chapter.getCourseId());
+            if (course != null && course.getSubjectId() != null) {
+                coveredSubjects.add(course.getSubjectId());
             }
         }
         double subjectRatio = totalSubjects > 0 ? (double) coveredSubjects.size() / totalSubjects : 0;
-        double unitRatio = totalUnits > 0 ? (double) coveredUnits.size() / totalUnits : 0;
-        int breadth = (int) (subjectRatio * unitRatio * 100);
+        double courseRatio = totalCourses > 0 ? (double) coveredCourses.size() / totalCourses : 0;
+        int breadth = (int) (subjectRatio * courseRatio * 100);
 
         // === 2. 知识深度：avg(UserKpMastery.mastery) ===
         List<UserKpMastery> masteries = kpMasteryMapper.selectList(
@@ -93,17 +94,17 @@ public class StudentAbilityController {
         int avgMinutesPerDay = totalSeconds / 60 / Math.max(1, 7);
         int activity = Math.min(100, streakDays * 10 + Math.min(avgMinutesPerDay / 5, 50));
 
-        // === 5. 知识迁移：跨lesson练习题正确率 ===
-        java.util.Set<Long> attemptLessons = new java.util.HashSet<>();
+        // === 5. 知识迁移：跨子章节练习题正确率 ===
+        java.util.Set<Long> attemptSubChapters = new java.util.HashSet<>();
         int crossCorrect = 0, crossTotal = 0;
         for (ExerciseAttempt a : attempts) {
-            if (a.getLessonId() != null) attemptLessons.add(a.getLessonId());
+            if (a.getLessonId() != null) attemptSubChapters.add(a.getLessonId());
             if (a.getLessonId() != null) { crossTotal++; if (a.getCorrect() != null && a.getCorrect() > 0) crossCorrect++; }
         }
         int transfer = crossTotal > 0 ? (int) (crossCorrect * 100.0 / crossTotal) : 20;
-        // 跨章节加分：多lesson
-        if (attemptLessons.size() > 2) {
-            transfer = Math.min(95, transfer + (attemptLessons.size() - 2) * 3);
+        // 跨子章节加分
+        if (attemptSubChapters.size() > 2) {
+            transfer = Math.min(95, transfer + (attemptSubChapters.size() - 2) * 3);
         }
 
         // === 6. 学习韧性：错题复习率×50 + 重试正确率×50 ===

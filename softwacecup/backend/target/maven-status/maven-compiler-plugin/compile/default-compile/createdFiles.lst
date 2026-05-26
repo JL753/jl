@@ -103,6 +103,7 @@ com\iflytek\smartprep\controller\DashboardController.class
 com\iflytek\smartprep\controller\GamificationController.class
 com\iflytek\smartprep\service\AgentService$1.class
 com\iflytek\smartprep\service\CourseService.class
+com\iflytek\smartprep\service\impl\KnowledgeGraphSyncService.class
 com\iflytek\smartprep\controller\AdminController.class
 com\iflytek\smartprep\mapper\SubChapterMapper.class
 com\iflytek\smartprep\dto\LoginResponse$LoginResponseBuilder.class

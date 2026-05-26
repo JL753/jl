@@ -125,7 +125,7 @@ import { ref, computed, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 import { useAuthStore } from '../stores/auth'
 import TopNavBar from '../components/TopNavBar.vue'
-import { apiSubjects, apiAbilityLatest, apiRecommendResources, apiGamificationStreak, apiMe } from '../api/index.js'
+import { apiSubjects, apiAbilityLatest, apiGamificationStreak, apiMe } from '../api/index.js'
 
 const auth = useAuthStore()
 const router = useRouter()
@@ -180,7 +180,6 @@ async function loadAuthData() {
           lessonId: d.lastLesson.lessonId || d.lastLesson.lesson_id || d.lastLesson.id,
           progress: d.lastLesson.progress || 0,
         }
-        loadRecommendations(lastLesson.value.lessonId)
       }
     }
     if (streakRes.status === 'fulfilled') {
@@ -190,14 +189,6 @@ async function loadAuthData() {
   } catch {}
 }
 
-async function loadRecommendations(lessonId) {
-  try {
-    const res = await apiRecommendResources(lessonId)
-    const data = res.data || {}
-    const list = data.resources || data.recommendations || data.list || []
-    recommendations.value = list.slice(0, 4)
-  } catch { recommendations.value = [] }
-}
 
 function handleEnter() {
   if (auth.isLoggedIn) {
@@ -213,11 +204,7 @@ function scrollToSubjects() {
   subjectsAnchor.value?.scrollIntoView({ behavior: 'smooth', block: 'start' })
 }
 function goContinue() {
-  if (lastLesson.value?.lessonId) {
-    router.push(`/student/lessons/${lastLesson.value.lessonId}`)
-  } else {
-    router.push('/student/subjects')
-  }
+  router.push('/student/subjects')
 }
 function goSubjects() {
   router.push(auth.isLoggedIn ? '/student/subjects' : '/subjects')

@@ -177,6 +177,7 @@ C:\Users\ZWC\Desktop\软件杯大赛\softwacecup\backend\src\main\java\com\iflyt
 C:\Users\ZWC\Desktop\软件杯大赛\softwacecup\backend\src\main\java\com\iflytek\smartprep\service\impl\CourseQaServiceImpl.java
 C:\Users\ZWC\Desktop\软件杯大赛\softwacecup\backend\src\main\java\com\iflytek\smartprep\service\impl\CourseServiceImpl.java
 C:\Users\ZWC\Desktop\软件杯大赛\softwacecup\backend\src\main\java\com\iflytek\smartprep\service\agent\Agent.java
+C:\Users\ZWC\Desktop\软件杯大赛\softwacecup\backend\src\main\java\com\iflytek\smartprep\service\impl\KnowledgeGraphSyncService.java
 C:\Users\ZWC\Desktop\软件杯大赛\softwacecup\backend\src\main\java\com\iflytek\smartprep\domain\KnowledgePoint.java
 C:\Users\ZWC\Desktop\软件杯大赛\softwacecup\backend\src\main\java\com\iflytek\smartprep\domain\LearningActivity.java
 C:\Users\ZWC\Desktop\软件杯大赛\softwacecup\backend\src\main\java\com\iflytek\smartprep\mapper\SubChapterMapper.java

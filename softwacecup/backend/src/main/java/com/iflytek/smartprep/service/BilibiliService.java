@@ -60,6 +60,32 @@ public class BilibiliService {
         return fetchFromPage(bvid);
     }
 
+    /** 解析多P视频的指定分P，pageNum从1开始 */
+    public BilibiliVideoMeta parseVideoWithPage(String bvid, int pageNum) {
+        if (pageNum <= 1) return parseVideo("https://www.bilibili.com/video/" + bvid);
+        // 先获取视频全量信息（含pages数组）
+        BilibiliVideoMeta video = fetchFromApi(bvid);
+        if (video == null) {
+            video = fetchFromPage(bvid);
+        }
+        if (video == null) return null;
+
+        // 获取分P列表
+        List<BilibiliVideoMeta> pages = fetchVideoPages(bvid);
+        if (pages.isEmpty() && video.getCid() != null && video.getCid() > 0) {
+            pages.add(video); // 单P视频
+        }
+        if (pageNum <= pages.size()) {
+            BilibiliVideoMeta page = pages.get(pageNum - 1);
+            // 继承视频级别的描述、标签、作者等
+            page.setDescription(video.getDescription());
+            if (page.getTags() == null || page.getTags().isEmpty()) page.setTags(video.getTags());
+            if (page.getAuthorName() == null) page.setAuthorName(video.getAuthorName());
+            return page;
+        }
+        return video;
+    }
+
     private BilibiliVideoMeta fetchFromApi(String bvid) {
         try {
             Request request = new Request.Builder()
@@ -344,6 +370,72 @@ public class BilibiliService {
             return new String(bytes, java.nio.charset.StandardCharsets.UTF_8);
         } catch (Exception e) {
             return new String(bytes, java.nio.charset.Charset.forName("GBK"));
+        }
+    }
+
+    /**
+     * 抓取B站视频的真实字幕/CC字幕
+     */
+    public String fetchSubtitles(String bvid) {
+        try {
+            // 1. 获取视频的cid和字幕列表
+            String playerApi = "https://api.bilibili.com/x/player/v2?bvid=" + bvid;
+            Request req = new Request.Builder()
+                    .url(playerApi)
+                    .addHeader("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36")
+                    .addHeader("Referer", "https://www.bilibili.com")
+                    .get().build();
+            try (Response resp = httpClient.newCall(req).execute()) {
+                if (!resp.isSuccessful() || resp.body() == null) return null;
+                JsonNode root = objectMapper.readTree(resp.body().string());
+                JsonNode subtitleNode = root.path("data").path("subtitle");
+                if (subtitleNode.isMissingNode()) return null;
+
+                JsonNode subtitles = subtitleNode.path("subtitles");
+                if (!subtitles.isArray() || subtitles.size() == 0) return null;
+
+                // 优先选中文简体字幕，其次中文，最后第一个
+                String subtitleUrl = null;
+                for (JsonNode s : subtitles) {
+                    String lang = s.path("lan_doc").asText("");
+                    if (lang.contains("中文") || lang.contains("简体")) {
+                        subtitleUrl = s.path("subtitle_url").asText("");
+                        if (!subtitleUrl.isEmpty()) break;
+                    }
+                }
+                if (subtitleUrl == null || subtitleUrl.isEmpty()) {
+                    subtitleUrl = subtitles.get(0).path("subtitle_url").asText("");
+                }
+                if (subtitleUrl == null || subtitleUrl.isEmpty()) return null;
+
+                // 2. 下载字幕JSON
+                String url = subtitleUrl.startsWith("//") ? "https:" + subtitleUrl : subtitleUrl;
+                if (!url.startsWith("http")) url = "https:" + url;
+                Request subReq = new Request.Builder()
+                        .url(url)
+                        .addHeader("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36")
+                        .get().build();
+                try (Response subResp = httpClient.newCall(subReq).execute()) {
+                    if (!subResp.isSuccessful() || subResp.body() == null) return null;
+                    JsonNode subRoot = objectMapper.readTree(subResp.body().string());
+                    JsonNode body = subRoot.path("body");
+                    if (!body.isArray()) return null;
+
+                    StringBuilder sb = new StringBuilder();
+                    for (JsonNode item : body) {
+                        double from = item.path("from").asDouble(0);
+                        String content = item.path("content").asText("");
+                        if (content.isEmpty()) continue;
+                        int mins = (int) from / 60;
+                        int secs = (int) from % 60;
+                        sb.append(String.format("[%02d:%02d] %s\n", mins, secs, content));
+                    }
+                    return sb.length() > 0 ? sb.toString() : null;
+                }
+            }
+        } catch (Exception e) {
+            log.warn("获取B站字幕失败 for bvid={}: {}", bvid, e.getMessage());
+            return null;
         }
     }
 

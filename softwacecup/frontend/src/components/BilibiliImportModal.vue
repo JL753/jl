@@ -83,8 +83,12 @@
               <div class="im-video-meta">{{ formatDuration(v.duration) }}</div>
             </div>
           </div>
+          <div v-if="isPlaylistMode" class="im-course-name-row">
+            <label class="im-label">课程名称（将作为合集名称创建一门新课）</label>
+            <input v-model="playlistCourseName" class="im-course-input" placeholder="输入课程名称..." />
+          </div>
           <button class="im-btn primary" @click="doImportSelected" :disabled="importing || selectedBvids.length === 0">
-            {{ importing ? '导入中...' : '一键导入全部 ' + selectedBvids.length + ' 个视频' }}
+            {{ importing ? '导入中...' : '导入为课程 · ' + selectedBvids.length + ' 个视频' }}
           </button>
         </div>
       </div>
@@ -107,7 +111,7 @@
 
 <script setup>
 import { ref } from 'vue'
-import { apiBilibiliParse, apiBilibiliSearch, apiBilibiliPlaylist, apiBilibiliImport } from '../api'
+import { apiBilibiliParse, apiBilibiliSearch, apiBilibiliPlaylist, apiBilibiliImport, apiBilibiliImportPlaylist } from '../api'
 
 const props = defineProps({ visible: Boolean })
 const emit = defineEmits(['close'])
@@ -129,6 +133,8 @@ const searchTotal = ref(0)
 const playlistUrl = ref('')
 const parsingPlaylist = ref(false)
 const playlistItems = ref([])
+const playlistCourseName = ref('')
+const isPlaylistMode = ref(false)
 
 // Shared
 const selectedBvids = ref([])
@@ -179,11 +185,17 @@ async function parsePlaylist() {
   playlistItems.value = []
   importResults.value = []
   selectedBvids.value = []
+  playlistCourseName.value = ''
+  isPlaylistMode.value = false
 
   try {
     const res = await apiBilibiliPlaylist(playlistUrl.value.trim())
     playlistItems.value = res.data || []
-    selectedBvids.value = playlistItems.value.map(v => v.bvid)
+    if (playlistItems.value.length > 0) {
+      isPlaylistMode.value = true
+      playlistCourseName.value = playlistItems.value[0].title || ''
+      selectedBvids.value = playlistItems.value.map(v => v.bvid)
+    }
   } catch (e) { /* ignore */ }
   parsingPlaylist.value = false
 }
@@ -192,7 +204,12 @@ async function doImport() {
   if (selectedBvids.value.length === 0) return
   importing.value = true
   try {
-    const res = await apiBilibiliImport(selectedBvids.value, true)
+    let res
+    if (isPlaylistMode.value && playlistCourseName.value.trim()) {
+      res = await apiBilibiliImportPlaylist(selectedBvids.value, playlistCourseName.value.trim(), true)
+    } else {
+      res = await apiBilibiliImport(selectedBvids.value, true)
+    }
     importResults.value = res.data?.results || []
   } catch (e) { /* ignore */ }
   importing.value = false
@@ -259,6 +276,14 @@ function onImgError(e) {
 .im-btn.primary { background: linear-gradient(135deg,#3b82f6,#2563eb); color: #fff; }
 .im-btn:disabled { opacity: 0.4; cursor: not-allowed; }
 .im-search-row { display: flex; gap: 8px; margin-bottom: 16px; }
+.im-course-name-row { margin-bottom: 16px; }
+.im-label { display: block; font-size: 11px; color: rgba(255,255,255,0.4); margin-bottom: 6px; }
+.im-course-input {
+  width: 100%; padding: 10px; border-radius: 8px; border: 1px solid rgba(255,255,255,0.1);
+  background: rgba(255,255,255,0.04); color: #e2e8f0; font-size: 13px; font-family: inherit;
+  outline: none; box-sizing: border-box;
+}
+.im-course-input:focus { border-color: rgba(96,217,250,0.3); }
 .im-search-input {
   flex: 1; padding: 10px; border-radius: 8px; border: 1px solid rgba(255,255,255,0.1);
   background: rgba(255,255,255,0.04); color: #e2e8f0; font-size: 12px; font-family: inherit; outline: none;

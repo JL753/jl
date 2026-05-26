@@ -33,10 +33,10 @@
         <div class="header-left">
           <span class="ai-icon">AI</span>
           <div class="header-info">
-            <h2 class="header-title">沉浸伴学 · 小慧</h2>
+            <h2 class="header-title">AI 学习助手 · 小慧</h2>
             <span class="header-status" v-if="unityLoaded">在线 · 3D 虚拟人已就绪</span>
             <span class="header-status muted" v-else-if="!unityLoadFailed">3D 虚拟人加载中...</span>
-            <span class="header-status muted" v-else>文字对话模式</span>
+            <span class="header-status muted" v-else>随时为你解答</span>
           </div>
         </div>
         <button class="clear-btn" @click="clearConversation">

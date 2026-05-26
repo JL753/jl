@@ -49,6 +49,9 @@ public class GraphController {
                 nodeMap.put("type", node.containsKey("type") ? node.get("type").asString("Entity") : "Entity");
                 nodeMap.put("mastery", node.containsKey("mastery") ? node.get("mastery").asDouble(0) : 0);
                 nodeMap.put("subjectId", node.containsKey("subjectId") ? node.get("subjectId").asString("") : "");
+                nodeMap.put("courseId", node.containsKey("courseId") ? node.get("courseId").asString("") : "");
+                nodeMap.put("chapterId", node.containsKey("chapterId") ? node.get("chapterId").asString("") : "");
+                nodeMap.put("subChapterId", node.containsKey("subChapterId") ? node.get("subChapterId").asString("") : "");
                 nodeMap.put("lessonId", node.containsKey("lessonId") ? node.get("lessonId").asString("") : "");
                 nodeMap.put("color", node.containsKey("color") ? node.get("color").asString("#334155") : "#334155");
                 nodes.add(nodeMap);

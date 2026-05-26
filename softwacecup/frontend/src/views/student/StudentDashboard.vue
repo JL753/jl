@@ -38,7 +38,7 @@
       <div v-if="!isNewUser && continueCourse" class="continue-card glass-card">
         <div class="cc-label">继续上次学习</div>
         <div class="cc-name">{{ continueCourse.courseName || continueCourse.name || '未命名课程' }}</div>
-        <div class="cc-meta">{{ continueCourse.unitName || '' }} · 已完成 {{ continueCourse.progress || 0 }}%</div>
+        <div class="cc-meta">{{ continueCourse.chapterName || continueCourse.unitName || '' }} · 已完成 {{ continueCourse.progress || 0 }}%</div>
         <div class="cc-bar"><div class="cc-bar-fill" :style="{ width: (continueCourse.progress || 0) + '%' }"></div></div>
         <button class="cc-btn" @click="goContinue">继续学习</button>
       </div>
@@ -65,7 +65,8 @@
       <div class="path-label">AI 推荐学习路径</div>
       <div v-if="pathSteps.length > 0" class="path-steps">
         <div v-for="(step, i) in pathSteps" :key="i" class="path-step"
-          :class="{ done: step.status === 'done', active: step.status === 'active' }">
+          :class="{ done: step.status === 'done', active: step.status === 'active' }"
+          @click="goPathStep(step)">
           <div class="step-num">第 {{ i + 1 }} 步</div>
           <div class="step-name">{{ step.name }}</div>
           <div class="step-tag">{{ step.status === 'done' ? '已掌握' : step.status === 'active' ? '进行中' : '待学习' }}</div>
@@ -121,18 +122,26 @@ const dimValues = computed(() => dimensions.map(d => d.value))
 onMounted(async () => {
   try {
     // 先触发评估，确保用最新真实数据生成六维图
-    await apiAbilityEvaluate().catch(() => {})
+    const evalRes = await apiAbilityEvaluate().catch((e) => { console.warn('[Dashboard] ability evaluate failed:', e.message) })
+    console.log('[Dashboard] ability evaluate result:', evalRes)
+
     const [dashRes, abilityRes, streakRes] = await Promise.all([
-      apiStudentDashboard(),
-      apiAbilityLatest().catch(() => ({ data: null })),
-      apiGamificationStreak().catch(() => ({ data: {} }))
+      apiStudentDashboard().catch((e) => { console.error('[Dashboard] studentDashboard API failed:', e.message); return { data: {} } }),
+      apiAbilityLatest().catch((e) => { console.warn('[Dashboard] ability latest failed:', e.message); return { data: null } }),
+      apiGamificationStreak().catch((e) => { console.warn('[Dashboard] streak failed:', e.message); return { data: {} } })
     ])
+    console.log('[Dashboard] dashRes:', dashRes)
+    console.log('[Dashboard] abilityRes:', abilityRes)
+
     const d = dashRes.data || {}
+    console.log('[Dashboard] dashboard data:', { continueLearning: d.continueLearning, lastLesson: d.lastLesson, recommendedPath: d.recommendedPath })
+
     userInfo.value = { name: d.userName || d.name || '同学', streak: streakRes.data?.streak || 0 }
     stats.value = { lessons: d.weeklyLessons || 0, exercises: d.weeklyExercises || 0, accuracy: d.accuracy || 0 }
 
     // Ability data
     const ability = abilityRes.data
+    console.log('[Dashboard] ability data:', ability, 'isAllZero:', ability ? isAllZero(ability) : 'no data')
     if (ability && !isAllZero(ability)) {
       isNewUser.value = false
       dimensions[0].value = ability.breadthScore || 0
@@ -146,25 +155,32 @@ onMounted(async () => {
       initRadarChart()
     } else {
       isNewUser.value = true
+      console.log('[Dashboard] showing new user state')
     }
 
     // Continue learning
     if (d.continueLearning) {
+      console.log('[Dashboard] setting continueCourse from continueLearning:', d.continueLearning)
       continueCourse.value = d.continueLearning
     } else if (d.lastLesson) {
+      console.log('[Dashboard] setting continueCourse from lastLesson:', d.lastLesson)
       continueCourse.value = {
-        courseName: d.lastCourseName || d.lastLesson.courseName,
-        unitName: d.lastUnitName,
-        lessonName: d.lastLesson.name,
+        courseName: d.lastCourseName || d.lastLesson.courseName || '',
+        chapterName: d.lastChapterName || d.lastLesson.chapterName || '',
+        subChapterTitle: d.lastLesson.name || d.lastLesson.subChapterTitle || '',
         progress: d.lastLesson.progress || 0,
-        lessonId: d.lastLesson.id
+        courseId: d.lastLesson.courseId || d.lastLesson.id,
+        subChapterId: d.lastLesson.subChapterId || d.lastLesson.lessonId
       }
+    } else {
+      console.log('[Dashboard] no continueLearning or lastLesson data')
     }
 
     if (d.recommendedPath?.length) {
       pathSteps.value = d.recommendedPath
     }
   } catch (e) {
+    console.error('[Dashboard] onMounted error:', e)
     isNewUser.value = true
   }
 })
@@ -207,9 +223,23 @@ async function initRadarChart() {
 
 function goContinue() {
   const c = continueCourse.value
-  if (c?.lessonId) router.push(`/student/lessons/${c.lessonId}`)
-  else if (c?.id) router.push(`/student/courses/${c.id}`)
-  else router.push('/student/subjects')
+  if (c?.courseId && c?.subChapterId) {
+    router.push(`/student/courses/${c.courseId}?sc=${c.subChapterId}`)
+  } else if (c?.courseId) {
+    router.push(`/student/courses/${c.courseId}`)
+  } else if (c?.subChapterId) {
+    router.push(`/student/courses/0?sc=${c.subChapterId}`)
+  } else {
+    router.push('/student/subjects')
+  }
+}
+
+function goPathStep(step) {
+  if (step.courseId && step.subChapterId) {
+    router.push(`/student/courses/${step.courseId}?sc=${step.subChapterId}`)
+  } else if (step.courseId) {
+    router.push(`/student/courses/${step.courseId}`)
+  }
 }
 </script>
 
@@ -286,7 +316,8 @@ function goContinue() {
 .path-card { padding: 20px; margin-bottom: 16px; }
 .path-label { font-size: 10px; text-transform: uppercase; letter-spacing: 1px; color: rgba(255,255,255,0.35); margin-bottom: 12px; }
 .path-steps { display: flex; gap: 12px; overflow-x: auto; }
-.path-step { min-width: 160px; padding: 12px; border-radius: 8px; background: rgba(255,255,255,0.02); border: 1px solid rgba(255,255,255,0.06); }
+.path-step { min-width: 160px; padding: 12px; border-radius: 8px; background: rgba(255,255,255,0.02); border: 1px solid rgba(255,255,255,0.06); cursor: pointer; transition: background 0.15s; }
+.path-step:hover { background: rgba(255,255,255,0.05); }
 .path-step.done { background: rgba(34,197,94,0.06); border-color: rgba(34,197,94,0.15); }
 .path-step.active { background: rgba(59,130,246,0.08); border-color: rgba(59,130,246,0.2); }
 .step-num { font-size: 10px; color: rgba(255,255,255,0.3); }

@@ -84,4 +84,31 @@ public class BilibiliController {
 
         return ApiResponse.ok(result);
     }
+
+    @PostMapping("/import-playlist")
+    @RequireRole({"teacher", "admin", "student"})
+    public ApiResponse<BilibiliImportResult> importPlaylist(@RequestBody BilibiliImportRequest request) {
+        if (request.getBvids() == null || request.getBvids().isEmpty()) {
+            return ApiResponse.fail("请选择至少一个视频");
+        }
+        String role = LoginUserHolder.get().getRole();
+        Long userId = "student".equals(role) ? LoginUserHolder.get().getUserId() : null;
+        BilibiliImportResult result = videoImportPipeline.importPlaylist(
+                request.getBvids(), request.getCourseName(), request.isAutoGenerate(), userId);
+        return ApiResponse.ok(result);
+    }
+
+    @PostMapping("/subtitles")
+    @RequireRole({"teacher", "admin", "student"})
+    public ApiResponse<String> subtitles(@RequestBody Map<String, String> body) {
+        String bvid = body.get("bvid");
+        if (bvid == null || bvid.isBlank()) {
+            return ApiResponse.fail("请提供bvid");
+        }
+        String subtitles = bilibiliService.fetchSubtitles(bvid);
+        if (subtitles == null || subtitles.isEmpty()) {
+            return ApiResponse.fail("该视频无字幕或字幕获取失败");
+        }
+        return ApiResponse.ok(subtitles);
+    }
 }

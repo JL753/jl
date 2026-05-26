@@ -52,18 +52,10 @@ export const apiPortal = () => http.get('/common/portal')
 
 // ==================== 知域 v2 API ====================
 export const apiSubjects = () => http.get('/subjects')
-export const apiSubjectUnits = (subjectId) => http.get(`/subjects/${subjectId}/units`)
-export const apiUnitLessons = (unitId) => http.get(`/units/${unitId}/lessons`)
-export const apiLessonDetail = (lessonId) => http.get(`/lessons/${lessonId}`)
-export const apiLessonExercises = (lessonId) => http.get(`/lessons/${lessonId}/exercises`)
-export const apiCompleteLesson = (lessonId) => http.post(`/progress/lesson/${lessonId}/complete`)
-export const apiLessonProgress = (lessonId) => http.get(`/progress/lesson/${lessonId}`)
 export const apiSubjectTree = (courseId) => http.get('/course/tree', { params: { courseId } })
-export const apiLessonKnowledgePoints = (lessonId) => http.get(`/lessons/${lessonId}/knowledge-points`)
 export const apiAbilityEvaluate = () => http.post('/ability/evaluate')
 export const apiAbilityLatest = () => http.get('/ability/latest')
 export const apiAbilityHistory = () => http.get('/ability/history')
-export const apiRecommendResources = (lessonId) => http.post(`/lessons/${lessonId}/recommend-resources`)
 export const apiMyClasses = () => http.get('/classes/my')
 export const apiJoinClass = (inviteCode) => http.post('/classes/join', { inviteCode })
 export const apiCreateClass = (data) => http.post('/classes', data)
@@ -98,9 +90,11 @@ export const apiPrerequisiteChain = (kpId) => http.get(`/knowledge-graph/prerequ
 
 // ==================== B站视频导入 ====================
 export const apiBilibiliParse = (url) => http.post('/bilibili/parse', { url })
+export const apiBilibiliSubtitles = (bvid) => http.post('/bilibili/subtitles', { bvid })
 export const apiBilibiliSearch = (keyword, page = 1, pageSize = 10) => http.post('/bilibili/search', { keyword, page, pageSize })
 export const apiBilibiliPlaylist = (url) => http.post('/bilibili/playlist', { url })
 export const apiBilibiliImport = (bvids, autoGenerate = true) => http.post('/bilibili/import', { bvids, autoGenerate })
+export const apiBilibiliImportPlaylist = (bvids, courseName, autoGenerate = true) => http.post('/bilibili/import-playlist', { bvids, courseName, autoGenerate })
 export const apiMyImports = () => http.get('/lessons/my-imports')
 
 // ==================== Neo4j 知识图谱 ====================

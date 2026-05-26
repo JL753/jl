@@ -19,6 +19,10 @@ public class KnowledgeGraphServiceImpl implements KnowledgeGraphService {
     private final KpDependencyMapper depMapper;
     private final UserKpMasteryMapper masteryMapper;
     private final ExerciseMapper exerciseMapper;
+    private final SubChapterMapper subChapterMapper;
+    private final ChapterMapper chapterMapper;
+    private final CourseMapper courseMapper;
+    private final SubjectMapper subjectMapper;
 
     private static final double MASTERY_THRESHOLD = 0.6;
     private static final double K_FACTOR = 0.15; // ELO update factor
@@ -28,28 +32,128 @@ public class KnowledgeGraphServiceImpl implements KnowledgeGraphService {
         List<KnowledgePoint> allKps = kpMapper.selectList(null);
         List<KpDependency> allDeps = depMapper.selectList(null);
 
-        List<Map<String, Object>> nodes = allKps.stream().map(kp -> {
-            Map<String, Object> node = new HashMap<>();
-            node.put("id", kp.getId());
-            node.put("name", kp.getName());
-            node.put("difficultyLevel", kp.getDifficultyLevel());
-            node.put("tags", kp.getTags());
-            node.put("lessonId", kp.getSubChapterId());
-            return node;
-        }).collect(Collectors.toList());
+        List<Map<String, Object>> nodes = new ArrayList<>();
+        List<Map<String, Object>> edges = new ArrayList<>();
 
-        List<Map<String, Object>> edges = allDeps.stream().map(dep -> {
-            Map<String, Object> edge = new HashMap<>();
-            edge.put("from", dep.getDependsOnKpId());
-            edge.put("to", dep.getKpId());
-            edge.put("relationType", "depends_on");
-            return edge;
-        }).collect(Collectors.toList());
+        // Track unique entities to avoid duplicates
+        java.util.Set<Long> addedSubChapterIds = new java.util.HashSet<>();
+        java.util.Set<Long> addedChapterIds = new java.util.HashSet<>();
+        java.util.Set<Long> addedCourseIds = new java.util.HashSet<>();
+        java.util.Set<Long> addedSubjectIds = new java.util.HashSet<>();
+
+        // KnowledgePoint nodes + walk up to SubChapter → Chapter → Course → Subject
+        for (KnowledgePoint kp : allKps) {
+            Long subChapterId = kp.getLessonId();
+            Long courseId = null;
+
+            // Walk up the hierarchy to find courseId and build nodes
+            if (subChapterId != null) {
+                SubChapter sc = subChapterMapper.selectById(subChapterId);
+                if (sc != null) {
+                    // KP → SubChapter edge
+                    if (addedSubChapterIds.add(sc.getId())) {
+                        Map<String, Object> scNode = new HashMap<>();
+                        scNode.put("id", "sc_" + sc.getId());
+                        scNode.put("type", "sub_chapter");
+                        scNode.put("name", sc.getTitle());
+                        scNode.put("subChapterId", sc.getId());
+                        nodes.add(scNode);
+                    }
+                    edges.add(edge("kp_" + kp.getId(), "sc_" + sc.getId(), "belongs_to"));
+
+                    if (sc.getChapterId() != null) {
+                        Chapter chapter = chapterMapper.selectById(sc.getChapterId());
+                        if (chapter != null) {
+                            courseId = chapter.getCourseId();
+                            // Add courseId to SubChapter node
+                            updateNodeField(nodes, "sc_" + sc.getId(), "courseId", courseId);
+
+                            // SubChapter → Chapter edge
+                            if (addedChapterIds.add(chapter.getId())) {
+                                Map<String, Object> chNode = new HashMap<>();
+                                chNode.put("id", "ch_" + chapter.getId());
+                                chNode.put("type", "chapter");
+                                chNode.put("name", chapter.getTitle());
+                                chNode.put("chapterId", chapter.getId());
+                                chNode.put("courseId", courseId);
+                                nodes.add(chNode);
+                            }
+                            edges.add(edge("sc_" + sc.getId(), "ch_" + chapter.getId(), "contains"));
+
+                            if (courseId != null) {
+                                Course course = courseMapper.selectById(courseId);
+                                if (course != null) {
+                                    // Chapter → Course edge
+                                    if (addedCourseIds.add(course.getId())) {
+                                        Map<String, Object> cNode = new HashMap<>();
+                                        cNode.put("id", "c_" + course.getId());
+                                        cNode.put("type", "course");
+                                        cNode.put("name", course.getTitle());
+                                        cNode.put("courseId", course.getId());
+                                        nodes.add(cNode);
+                                    }
+                                    edges.add(edge("ch_" + chapter.getId(), "c_" + course.getId(), "contains"));
+
+                                    if (course.getSubjectId() != null) {
+                                        Subject subject = subjectMapper.selectById(course.getSubjectId());
+                                        if (subject != null) {
+                                            // Course → Subject edge
+                                            if (addedSubjectIds.add(subject.getId())) {
+                                                Map<String, Object> sNode = new HashMap<>();
+                                                sNode.put("id", "s_" + subject.getId());
+                                                sNode.put("type", "subject");
+                                                sNode.put("name", subject.getName());
+                                                sNode.put("subjectId", subject.getId());
+                                                nodes.add(sNode);
+                                            }
+                                            edges.add(edge("c_" + course.getId(), "s_" + subject.getId(), "contains"));
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+
+            Map<String, Object> kpNode = new HashMap<>();
+            kpNode.put("id", "kp_" + kp.getId());
+            kpNode.put("type", "knowledge_point");
+            kpNode.put("name", kp.getName());
+            kpNode.put("difficultyLevel", kp.getDifficultyLevel());
+            kpNode.put("tags", kp.getTags());
+            kpNode.put("subChapterId", subChapterId);
+            kpNode.put("lessonId", subChapterId);
+            kpNode.put("courseId", courseId);
+            nodes.add(kpNode);
+        }
+
+        // DEPENDS_ON edges (between knowledge points)
+        for (KpDependency dep : allDeps) {
+            edges.add(edge("kp_" + dep.getDependsOnKpId(), "kp_" + dep.getKpId(), "depends_on"));
+        }
 
         Map<String, Object> result = new HashMap<>();
         result.put("nodes", nodes);
         result.put("edges", edges);
         return result;
+    }
+
+    private Map<String, Object> edge(String from, String to, String relationType) {
+        Map<String, Object> edge = new HashMap<>();
+        edge.put("from", from);
+        edge.put("to", to);
+        edge.put("relationType", relationType);
+        return edge;
+    }
+
+    private void updateNodeField(List<Map<String, Object>> nodes, String nodeId, String key, Object value) {
+        for (Map<String, Object> node : nodes) {
+            if (nodeId.equals(node.get("id"))) {
+                node.put(key, value);
+                return;
+            }
+        }
     }
 
     @Override

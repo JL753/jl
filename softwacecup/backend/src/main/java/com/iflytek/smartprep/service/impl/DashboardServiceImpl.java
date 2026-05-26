@@ -32,8 +32,9 @@ public class DashboardServiceImpl implements DashboardService {
   private final ObjectMapper objectMapper;
   private final StudentAbilityMapper studentAbilityMapper;
   private final LessonProgressMapper lessonProgressMapper;
-  private final LessonMapper lessonMapper;
-  private final UnitMapper unitMapper;
+  private final SubChapterMapper subChapterMapper;
+  private final ChapterMapper chapterMapper;
+  private final CourseMapper courseMapper;
   private final SubjectMapper subjectMapper;
 
   @Override public DashboardStats teacherDashboard() { return stats("教师端总览", countUsers("teacher"), countUsers("student")); }
@@ -64,14 +65,14 @@ public class DashboardServiceImpl implements DashboardService {
     // 计算学习时长（完成课时 × 平均时长估算）
     int weeklyHours = weeklyLessons > 0 ? Math.max(1, weeklyLessons * 45 / 60) : 0;
 
-    // 继续学习：优先找进行中的课时，否则取最近完成的课时推荐下一个
+    // 继续学习：优先找进行中的子章节，否则取最近完成的子章节推荐下一个
     Map<String, Object> continueLearning = null;
     LessonProgress lastInProgress = lessonProgressMapper.selectOne(
       new LambdaQueryWrapper<LessonProgress>()
         .eq(LessonProgress::getUserId, userId)
         .ne(LessonProgress::getStatus, "completed")
         .orderByDesc(LessonProgress::getId).last("LIMIT 1"));
-    // fallback: 最近完成的课时
+    // fallback: 最近完成的子章节
     if (lastInProgress == null) {
       lastInProgress = lessonProgressMapper.selectOne(
         new LambdaQueryWrapper<LessonProgress>()
@@ -80,65 +81,100 @@ public class DashboardServiceImpl implements DashboardService {
           .orderByDesc(LessonProgress::getCompletedAt).last("LIMIT 1"));
     }
     if (lastInProgress != null) {
-      Lesson lesson = lessonMapper.selectById(lastInProgress.getSubChapterId());
-      if (lesson != null) {
-        Unit unit = unitMapper.selectById(lesson.getUnitId());
-        Subject subject = unit != null ? subjectMapper.selectById(unit.getSubjectId()) : null;
+      SubChapter sc = subChapterMapper.selectById(lastInProgress.getSubChapterId());
+      if (sc != null) {
+        String chapterName = "";
+        String courseName = "";
+        Long courseId = null;
+        if (sc.getChapterId() != null) {
+          Chapter chapter = chapterMapper.selectById(sc.getChapterId());
+          if (chapter != null) {
+            chapterName = chapter.getTitle();
+            courseId = chapter.getCourseId();
+            Course course = courseMapper.selectById(courseId);
+            if (course != null) {
+              courseName = course.getTitle();
+            }
+          }
+        }
         continueLearning = row(
-          "lessonId", lesson.getId(),
-          "courseName", subject != null ? subject.getName() : "",
-          "unitName", unit != null ? unit.getName() : "",
-          "lessonName", lesson.getName(),
+          "courseId", courseId,
+          "subChapterId", sc.getId(),
+          "courseName", courseName,
+          "chapterName", chapterName,
+          "subChapterTitle", sc.getTitle(),
           "progress", "completed".equals(lastInProgress.getStatus()) ? 100 : 50
         );
       }
     }
 
-    // AI推荐路径：基于最近课时找后续课时（同单元 → 同学科 → 全库）
+    // AI推荐路径：基于子章节找后续（同Chapter → 同Course → 同Subject → 全库）
     List<Map<String, Object>> recommendedPath = new ArrayList<>();
     if (lastInProgress != null) {
-      Lesson currentLesson = lessonMapper.selectById(lastInProgress.getSubChapterId());
-      if (currentLesson != null) {
-        // 策略1：同单元后续课时
-        if (currentLesson.getUnitId() != null) {
-          List<Lesson> unitLessons = lessonMapper.selectList(
-            new LambdaQueryWrapper<Lesson>()
-              .eq(Lesson::getUnitId, currentLesson.getUnitId())
-              .orderByAsc(Lesson::getSortOrder));
-          appendNextLessons(unitLessons, currentLesson.getId(), recommendedPath, 4);
+      SubChapter currentSc = subChapterMapper.selectById(lastInProgress.getSubChapterId());
+      if (currentSc != null) {
+        Long chapterId = currentSc.getChapterId();
+        Long currentCourseId = null;
+        if (chapterId != null) {
+          Chapter ch = chapterMapper.selectById(chapterId);
+          if (ch != null) currentCourseId = ch.getCourseId();
         }
-        // 策略2：同单元不够，从该学科其他单元找
-        if (recommendedPath.size() < 4 && currentLesson.getUnitId() != null) {
-          Unit unit = unitMapper.selectById(currentLesson.getUnitId());
-          if (unit != null) {
-            List<Unit> allUnits = unitMapper.selectList(
-              new LambdaQueryWrapper<Unit>()
-                .eq(Unit::getSubjectId, unit.getSubjectId())
-                .orderByAsc(Unit::getSortOrder));
-            for (Unit u : allUnits) {
-              if (u.getId().equals(currentLesson.getUnitId())) continue;
-              List<Lesson> otherLessons = lessonMapper.selectList(
-                new LambdaQueryWrapper<Lesson>()
-                  .eq(Lesson::getUnitId, u.getId())
-                  .orderByAsc(Lesson::getSortOrder));
-              for (Lesson l : otherLessons) {
-                if (recommendedPath.size() >= 4) break;
-                recommendedPath.add(row("name", l.getName(), "status", "pending", "lessonId", l.getId()));
-              }
+        // 策略1：同Chapter后续SubChapter
+        if (chapterId != null) {
+          List<SubChapter> chapterScs = subChapterMapper.selectList(
+            new LambdaQueryWrapper<SubChapter>()
+              .eq(SubChapter::getChapterId, chapterId)
+              .orderByAsc(SubChapter::getSortOrder));
+          appendNextSubChapters(chapterScs, currentSc.getId(), currentCourseId, recommendedPath, 4);
+        }
+        // 策略2：同Course其他Chapter的第一个SubChapter
+        if (recommendedPath.size() < 4 && chapterId != null) {
+          Chapter chapter = chapterMapper.selectById(chapterId);
+          if (chapter != null) {
+            List<Chapter> courseChapters = chapterMapper.selectList(
+              new LambdaQueryWrapper<Chapter>()
+                .eq(Chapter::getCourseId, chapter.getCourseId())
+                .orderByAsc(Chapter::getSortOrder));
+            for (Chapter ch : courseChapters) {
+              if (ch.getId().equals(chapterId)) continue;
               if (recommendedPath.size() >= 4) break;
+              SubChapter firstSc = subChapterMapper.selectOne(
+                new LambdaQueryWrapper<SubChapter>()
+                  .eq(SubChapter::getChapterId, ch.getId())
+                  .orderByAsc(SubChapter::getSortOrder).last("LIMIT 1"));
+              if (firstSc != null) {
+                recommendedPath.add(row("name", firstSc.getTitle(), "status", "pending", "subChapterId", firstSc.getId(), "courseId", chapter.getCourseId()));
+              }
             }
           }
         }
-        // 策略3：还不够，从任意学科取
+        // 策略3：同Subject其他Course
+        if (recommendedPath.size() < 4 && chapterId != null) {
+          Chapter chapter = chapterMapper.selectById(chapterId);
+          if (chapter != null) {
+            Course course = courseMapper.selectById(chapter.getCourseId());
+            if (course != null) {
+              List<Course> subjectCourses = courseMapper.selectList(
+                new LambdaQueryWrapper<Course>()
+                  .eq(Course::getSubjectId, course.getSubjectId())
+                  .orderByAsc(Course::getId));
+              for (Course c : subjectCourses) {
+                if (c.getId().equals(course.getId())) continue;
+                if (recommendedPath.size() >= 4) break;
+                recommendedPath.add(row("name", c.getTitle(), "status", "pending", "courseId", c.getId()));
+              }
+            }
+          }
+        }
+        // 策略4：任意其他Course
         if (recommendedPath.size() < 4) {
-          List<Lesson> allLessons = lessonMapper.selectList(
-            new LambdaQueryWrapper<Lesson>().orderByAsc(Lesson::getSortOrder).last("LIMIT 20"));
-          for (Lesson l : allLessons) {
+          List<Course> allCourses = courseMapper.selectList(
+            new LambdaQueryWrapper<Course>().orderByAsc(Course::getId).last("LIMIT 20"));
+          for (Course c : allCourses) {
             if (recommendedPath.size() >= 4) break;
-            if (l.getId().equals(currentLesson.getId())) continue;
-            boolean alreadyIn = recommendedPath.stream().anyMatch(r -> r.get("lessonId").equals(l.getId()));
+            boolean alreadyIn = recommendedPath.stream().anyMatch(r -> r.get("courseId") != null && r.get("courseId").equals(c.getId()));
             if (!alreadyIn) {
-              recommendedPath.add(row("name", l.getName(), "status", "pending", "lessonId", l.getId()));
+              recommendedPath.add(row("name", c.getTitle(), "status", "pending", "courseId", c.getId()));
             }
           }
         }
@@ -333,13 +369,13 @@ public class DashboardServiceImpl implements DashboardService {
     return row("recordId", r.getId(), "score", nz(r.getScore()), "review", txt(r.getReview()), "message", "批改完成");
   }
 
-  private void appendNextLessons(List<Lesson> lessons, Long currentId, List<Map<String,Object>> target, int max) {
+  private void appendNextSubChapters(List<SubChapter> subChapters, Long currentId, Long courseId, List<Map<String,Object>> target, int max) {
     boolean found = false;
-    for (Lesson l : lessons) {
+    for (SubChapter sc : subChapters) {
       if (found && target.size() < max) {
-        target.add(row("name", l.getName(), "status", "pending", "lessonId", l.getId()));
+        target.add(row("name", sc.getTitle(), "status", "pending", "subChapterId", sc.getId(), "courseId", courseId));
       }
-      if (l.getId().equals(currentId)) found = true;
+      if (sc.getId().equals(currentId)) found = true;
     }
   }
 

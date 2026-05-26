@@ -54,11 +54,13 @@ public class SubjectCourseController {
             String chapterName = "";
             String courseName = "";
             String subjectName = "";
+            Long courseId = null;
             if (first.getChapterId() != null) {
                 Chapter chapter = chapterMapper.selectById(first.getChapterId());
                 if (chapter != null) {
                     chapterName = chapter.getTitle();
-                    Course course = courseMapper.selectById(chapter.getCourseId());
+                    courseId = chapter.getCourseId();
+                    Course course = courseMapper.selectById(courseId);
                     if (course != null) {
                         courseName = course.getTitle();
                         Subject subject = subjectMapper.selectById(course.getSubjectId());
@@ -80,6 +82,7 @@ public class SubjectCourseController {
             item.put("subjectName", subjectName);
             item.put("courseName", courseName);
             item.put("chapterName", chapterName);
+            item.put("courseId", courseId);
             item.put("lessonCount", subs.size());
             item.put("firstSubChapterId", first.getId());
             item.put("coverUrl", first.getCoverUrl() != null ? first.getCoverUrl() : "");

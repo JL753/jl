@@ -20,7 +20,7 @@
     <div v-if="isStudent && myImports.length > 0" class="my-imports">
       <h2 class="section-title">我的导入视频</h2>
       <div class="imports-row">
-        <div v-for="imp in myImports" :key="imp.bvid" class="import-card glass-card" @click="$router.push('/student/lessons/' + imp.firstLessonId)">
+        <div v-for="imp in myImports" :key="imp.bvid" class="import-card glass-card" @click="$router.push('/student/courses/' + imp.courseId + '?sc=' + imp.firstSubChapterId)">
           <div class="import-cover">
             <img v-if="imp.coverUrl" :src="imp.coverUrl" class="import-cover-img" @error="e => e.target.style.display='none'" />
             <div v-if="!imp.coverUrl" class="import-cover-placeholder">{{ imp.title?.charAt(0) || 'V' }}</div>

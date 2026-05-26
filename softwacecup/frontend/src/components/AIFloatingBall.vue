@@ -84,7 +84,7 @@ const navMap = [
   { keywords: ['学习工坊', '工作台', '研习', 'workspace'], path: '/student/workspace' },
   { keywords: ['课程', '课程平台'], path: '/student/courses' },
   { keywords: ['学习分析', '分析报告'], path: '/student/analytics' },
-  { keywords: ['深度研习', '沉浸学习', '沉浸', '3d模型'], path: '/student/immersive' },
+  { keywords: ['深度研习', '沉浸学习', '沉浸', '3d模型'], path: '/student/companion' },
   { keywords: ['问答广场', '社区', '问答'], path: '/student/community' },
   { keywords: ['考试', '开始考试'], path: '/student/exam' },
   { keywords: ['教学助手', '备课'], path: '/teacher/assistant' },
@@ -93,7 +93,7 @@ const navMap = [
   { keywords: ['用户管理', '账号管理'], path: '/admin/users' },
   { keywords: ['系统设置', '设置'], path: '/admin/settings' },
   { keywords: ['个人信息', '个人资料', '个人中心'], student: '/student/profile', teacher: '/teacher/profile', admin: '/admin/profile' },
-  { keywords: ['沉浸伴学', '3d伴学', '虚拟人', '虚拟教师'], path: '/student/companion-immersive' },
+  { keywords: ['沉浸伴学', '3d伴学', '虚拟人', '虚拟教师'], path: '/student/companion' },
 ]
 
 const tryNavigate = (text) => {
@@ -146,7 +146,7 @@ const sendMessage = async () => {
   try {
     const history = messages.value.slice(-6).map(m => ({ role: m.role, content: m.content }))
     const res = await apiAskTutor({ question: text, history })
-    const answer = res?.answer || res?.data?.answer || res?.message || '抱歉，我暂时无法回答这个问题。'
+    const answer = res?.data?.markdown || res?.data?.answer || res?.message || '抱歉，我暂时无法回答这个问题。'
     messages.value.push({
       role: 'assistant',
       content: answer,

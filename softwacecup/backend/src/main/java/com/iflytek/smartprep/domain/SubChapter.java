@@ -7,6 +7,7 @@ import lombok.Data;
 public class SubChapter {
     private Long id;
     private Long chapterId;
+    private Long courseId;
     private String title;
     private String description;
     private Integer sortOrder;

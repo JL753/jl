@@ -25,13 +25,45 @@ public class ChapterServiceImpl implements ChapterService {
                         .eq(Chapter::getCourseId, courseId)
                         .orderByAsc(Chapter::getSortOrder));
 
-        if (chapters.isEmpty()) return List.of();
+        List<SubChapter> allSubChapters = new ArrayList<>();
 
-        List<Long> chapterIds = chapters.stream().map(Chapter::getId).collect(Collectors.toList());
-        List<SubChapter> allSubChapters = subChapterMapper.selectList(
+        if (!chapters.isEmpty()) {
+            List<Long> chapterIds = chapters.stream().map(Chapter::getId).collect(Collectors.toList());
+            allSubChapters.addAll(subChapterMapper.selectList(
+                    new LambdaQueryWrapper<SubChapter>()
+                            .in(SubChapter::getChapterId, chapterIds)
+                            .orderByAsc(SubChapter::getSortOrder)));
+        }
+
+        // 也查询直接挂在课程下的子章节（chapterId=null, courseId=courseId）
+        List<SubChapter> orphanSubs = subChapterMapper.selectList(
                 new LambdaQueryWrapper<SubChapter>()
-                        .in(SubChapter::getChapterId, chapterIds)
+                        .isNull(SubChapter::getChapterId)
+                        .eq(SubChapter::getCourseId, courseId)
                         .orderByAsc(SubChapter::getSortOrder));
+        allSubChapters.addAll(orphanSubs);
+
+        // 如果没有章节但有孤儿子章节，创建一个虚拟章节节点
+        if (chapters.isEmpty() && !orphanSubs.isEmpty()) {
+            Map<String, Object> virtualCh = new LinkedHashMap<>();
+            virtualCh.put("id", 0L);
+            virtualCh.put("title", "视频列表");
+            virtualCh.put("description", "");
+            virtualCh.put("sortOrder", 0);
+            virtualCh.put("subChapters", orphanSubs.stream().map(sc -> {
+                Map<String, Object> scNode = new LinkedHashMap<>();
+                scNode.put("id", sc.getId());
+                scNode.put("title", sc.getTitle());
+                scNode.put("type", sc.getType());
+                scNode.put("videoUrl", sc.getVideoUrl());
+                scNode.put("duration", sc.getDuration());
+                scNode.put("sortOrder", sc.getSortOrder());
+                return scNode;
+            }).collect(Collectors.toList()));
+            return List.of(virtualCh);
+        }
+
+        if (chapters.isEmpty()) return List.of();
 
         return chapters.stream().map(ch -> {
             Map<String, Object> chNode = new LinkedHashMap<>();
@@ -41,7 +73,7 @@ public class ChapterServiceImpl implements ChapterService {
             chNode.put("sortOrder", ch.getSortOrder());
 
             List<SubChapter> chSubs = allSubChapters.stream()
-                    .filter(sc -> sc.getChapterId().equals(ch.getId()))
+                    .filter(sc -> ch.getId().equals(sc.getChapterId()))
                     .collect(Collectors.toList());
 
             List<Map<String, Object>> subNodes = chSubs.stream().map(sc -> {
@@ -79,7 +111,7 @@ public class ChapterServiceImpl implements ChapterService {
 
         List<KnowledgePoint> kps = kpMapper.selectList(
                 new LambdaQueryWrapper<KnowledgePoint>()
-                        .eq(KnowledgePoint::getSubChapterId, subChapterId));
+                        .eq(KnowledgePoint::getLessonId, subChapterId));
         detail.put("knowledgePoints", kps.stream().map(kp -> {
             Map<String, Object> kpNode = new LinkedHashMap<>();
             kpNode.put("id", kp.getId());

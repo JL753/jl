@@ -7,4 +7,5 @@ import java.util.List;
 public class BilibiliImportRequest {
     private List<String> bvids;
     private boolean autoGenerate = true;
+    private String courseName;
 }

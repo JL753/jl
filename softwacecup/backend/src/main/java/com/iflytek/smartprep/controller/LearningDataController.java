@@ -24,7 +24,7 @@ public class LearningDataController {
     private final LessonProgressMapper progressMapper;
     private final UserStreakMapper streakMapper;
     private final KnowledgePointMapper kpMapper;
-    private final LessonMapper lessonMapper;
+    private final SubChapterMapper subChapterMapper;
 
     /**
      * 练习题作答提交
@@ -33,7 +33,7 @@ public class LearningDataController {
     @PostMapping("/exercise/submit")
     public ApiResponse<String> submitExercise(@RequestBody Map<String, Object> body) {
         Long userId = LoginUserHolder.get().getUserId();
-        Long lessonId = toLong(body.get("lessonId"));
+        Long subChapterId = toLong(body.get("subChapterId"));
         Long exerciseId = toLong(body.get("exerciseId"));
         int difficulty = toInt(body.get("difficulty"), 1);
         int correct = toInt(body.get("correct"), 0);
@@ -41,7 +41,7 @@ public class LearningDataController {
         ExerciseAttempt attempt = new ExerciseAttempt();
         attempt.setId(System.currentTimeMillis());
         attempt.setUserId(userId);
-        attempt.setLessonId(lessonId);
+        attempt.setLessonId(subChapterId);
         attempt.setExerciseId(exerciseId);
         attempt.setDifficulty(Math.max(1, Math.min(5, difficulty)));
         attempt.setCorrect(correct);
@@ -49,10 +49,10 @@ public class LearningDataController {
         exerciseAttemptMapper.insert(attempt);
 
         // 更新知识点掌握度
-        if (lessonId != null) {
-            Lesson lesson = lessonMapper.selectById(lessonId);
-            if (lesson != null) {
-                updateKpMastery(userId, lesson, correct);
+        if (subChapterId != null) {
+            SubChapter subChapter = subChapterMapper.selectById(subChapterId);
+            if (subChapter != null) {
+                updateKpMastery(userId, subChapterId, correct);
             }
         }
 
@@ -66,7 +66,7 @@ public class LearningDataController {
     @PostMapping("/study/heartbeat")
     public ApiResponse<String> heartbeat(@RequestBody Map<String, Object> body) {
         Long userId = LoginUserHolder.get().getUserId();
-        Long lessonId = toLong(body.get("lessonId"));
+        Long subChapterId = toLong(body.get("subChapterId"));
         int seconds = toInt(body.get("seconds"), 30);
         LocalDate today = LocalDate.now();
 
@@ -75,7 +75,7 @@ public class LearningDataController {
                 new LambdaQueryWrapper<StudyDuration>()
                         .eq(StudyDuration::getUserId, userId)
                         .eq(StudyDuration::getStudyDate, today)
-                        .eq(StudyDuration::getLessonId, lessonId));
+                        .eq(StudyDuration::getLessonId, subChapterId));
         if (existing != null) {
             existing.setDurationSeconds(existing.getDurationSeconds() + seconds);
             studyDurationMapper.updateById(existing);
@@ -83,7 +83,7 @@ public class LearningDataController {
             StudyDuration sd = new StudyDuration();
             sd.setId(System.currentTimeMillis());
             sd.setUserId(userId);
-            sd.setLessonId(lessonId);
+            sd.setLessonId(subChapterId);
             sd.setStudyDate(today);
             sd.setDurationSeconds(seconds);
             studyDurationMapper.insert(sd);
@@ -92,11 +92,11 @@ public class LearningDataController {
         return ApiResponse.ok("ok");
     }
 
-    private void updateKpMastery(Long userId, Lesson lesson, int correct) {
+    private void updateKpMastery(Long userId, Long subChapterId, int correct) {
         try {
-            // 找到课时关联的知识点
+            // 找到子章节关联的知识点
             List<KnowledgePoint> kps = kpMapper.selectList(
-                    new LambdaQueryWrapper<KnowledgePoint>().eq(KnowledgePoint::getSubChapterId, lesson.getId()));
+                    new LambdaQueryWrapper<KnowledgePoint>().eq(KnowledgePoint::getLessonId, subChapterId));
             double delta = correct > 0 ? 0.15 : 0.05;
             for (KnowledgePoint kp : kps) {
                 UserKpMastery existing = kpMasteryMapper.selectOne(

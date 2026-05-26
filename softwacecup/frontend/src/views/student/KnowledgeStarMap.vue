@@ -8,12 +8,6 @@
         <span v-else-if="dataSource === 'loading'" class="ds-badge ds-loading">加载中</span>
         <span v-else class="ds-badge ds-mysql">MySQL</span>
       </h2>
-      <div class="map-legend">
-        <span class="legend-item"><span class="dot dot-gray"></span>未学习</span>
-        <span class="legend-item"><span class="dot dot-blue"></span>学习中</span>
-        <span class="legend-item"><span class="dot dot-green"></span>已掌握</span>
-        <span class="legend-item"><span class="dot dot-gold"></span>精通</span>
-      </div>
     </div>
 
     <!-- Tab Bar -->
@@ -39,8 +33,12 @@
             <button class="popup-close" @click="showDetail = false">&times;</button>
             <div class="popup-content">
               <h3 class="popup-title">{{ selectedNode.name || selectedNode.label || '知识点' }}</h3>
-
               <div class="popup-section">
+                <span class="popup-label">类型</span>
+                <span class="popup-value">{{ typeLabel(selectedNode.type) }}</span>
+              </div>
+
+              <div class="popup-section" v-if="selectedNode.type === 'knowledge_point'">
                 <span class="popup-label">掌握度</span>
                 <div class="mastery-bar-wrap">
                   <div class="mastery-bar">
@@ -51,11 +49,6 @@
                   </div>
                   <span class="mastery-text">{{ selectedNode.mastery || 0 }}%</span>
                 </div>
-              </div>
-
-              <div class="popup-section" v-if="selectedNode.练习记录 || selectedNode.practiceCount">
-                <span class="popup-label">练习记录</span>
-                <span class="popup-value">{{ selectedNode.练习记录 || selectedNode.practiceCount || 0 }} 次练习</span>
               </div>
 
               <button
@@ -150,6 +143,17 @@ function masteryColor(mastery) {
   return 'rgba(255,255,255,0.15)'
 }
 
+function typeLabel(type) {
+  const labels = {
+    subject: '学科',
+    course: '课程',
+    chapter: '章节',
+    sub_chapter: '子章节',
+    knowledge_point: '知识点'
+  }
+  return labels[type] || type || '未知'
+}
+
 async function ensureEcharts() {
   if (echarts && echarts.init) return true
   try {
@@ -196,29 +200,33 @@ onMounted(async () => {
         return String(pid) === String(node.id)
       })
       const mastery = prog?.mastery !== undefined ? prog.mastery : 0
-      // Neo4j 提供学科颜色 > 按掌握度着色 > 默认灰
-      const neo4jColor = node.color
-      let color
-      if (mastery >= 80) {
-        color = '#fbbf24'       // gold = 精通
-      } else if (mastery >= 60) {
-        color = '#10b981'       // green = 已掌握
-      } else if (mastery > 0) {
-        color = '#3b82f6'       // blue = 学习中
-      } else if (neo4jColor && neo4jColor !== '#334155') {
-        color = neo4jColor      // 未学习时用 Neo4j 学科颜色
-      } else {
-        color = '#334155'       // 无学科颜色回退灰色
+      const nodeType = node.type || 'knowledge_point'
+
+      // Type-based size and color
+      const typeConfig = {
+        subject:       { symbolSize: 56, color: '#fbbf24' },  // 金色
+        course:        { symbolSize: 42, color: '#a855f7' },  // 紫色
+        chapter:       { symbolSize: 32, color: '#3b82f6' },  // 蓝色
+        sub_chapter:   { symbolSize: 24, color: '#22d3ee' },  // 青色
+        knowledge_point: {
+          symbolSize: 28 + mastery * 0.2,
+          color: mastery >= 80 ? '#fbbf24' : mastery >= 60 ? '#10b981' : mastery > 0 ? '#3b82f6' : '#334155'
+        }
       }
+      const config = typeConfig[nodeType] || typeConfig.knowledge_point
+
       const id = node.id || node.knowledgePointId || node.kpId
       return {
         id: String(id),
         name: node.name || node.label || node.title || '知识点',
+        type: nodeType,
         value: node.name,
         mastery,
-        symbolSize: 28 + mastery * 0.2,
-        itemStyle: { color },
-        label: { show: true },
+        courseId: node.courseId,
+        subChapterId: node.subChapterId || node.lessonId,
+        symbolSize: typeof config.symbolSize === 'number' ? config.symbolSize : config.symbolSize,
+        itemStyle: { color: typeof config.color === 'string' ? config.color : config.color },
+        label: { show: nodeType === 'subject' || nodeType === 'course' },
       }
     })
 
@@ -242,7 +250,7 @@ onMounted(async () => {
     chartInstance = echarts.init(chartRef.value)
     chartInstance.resize()
     chartInstance.setOption({
-      tooltip: { formatter: (p) => p.dataType === 'node' ? `<b>${p.data.name}</b><br/>掌握度: ${p.data.mastery || 0}%` : '' },
+      tooltip: { formatter: (p) => p.dataType === 'node' ? `<b>${p.data.name}</b><br/>类型: ${typeLabel(p.data.type)}${p.data.type === 'knowledge_point' ? '<br/>掌握度: ' + (p.data.mastery || 0) + '%' : ''}` : '' },
       series: [{
         type: 'graph',
         layout: 'force',
@@ -296,11 +304,14 @@ onUnmounted(() => {
 })
 
 function goToLesson(node) {
-  const lessonId = node.lessonId || node.lesson_id || node.lesson
-  if (lessonId) {
-    router.push(`/student/lessons/${lessonId}`)
+  const courseId = node.courseId
+  const subChapterId = node.subChapterId || node.lessonId || node.id
+  if (courseId && subChapterId) {
+    router.push(`/student/courses/${courseId}?sc=${subChapterId}`)
+  } else if (courseId) {
+    router.push(`/student/courses/${courseId}`)
   } else {
-    router.push('/student/courses')
+    router.push('/student/subjects')
   }
   showDetail.value = false
 }

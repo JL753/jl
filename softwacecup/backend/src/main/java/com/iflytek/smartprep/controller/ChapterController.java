@@ -151,22 +151,41 @@ public class ChapterController {
     @PostMapping("/progress/sub-chapter/{id}/complete")
     public ApiResponse<String> completeSubChapter(@PathVariable Long id) {
         Long userId = LoginUserHolder.get().getUserId();
+        // 尝试按 subChapterId 查找已存在的记录
         LessonProgress lp = lessonProgressMapper.selectOne(
                 new LambdaQueryWrapper<LessonProgress>()
                         .eq(LessonProgress::getUserId, userId)
                         .eq(LessonProgress::getSubChapterId, id));
         if (lp == null) {
-            lp = new LessonProgress();
-            lp.setId(System.currentTimeMillis());
-            lp.setUserId(userId);
+            // 可能旧数据只有 lessonId 没 subChapterId，也查一下
+            lp = lessonProgressMapper.selectOne(
+                    new LambdaQueryWrapper<LessonProgress>()
+                            .eq(LessonProgress::getUserId, userId)
+                            .eq(LessonProgress::getLessonId, id));
+        }
+        if (lp != null) {
+            lp.setLessonId(id);
             lp.setSubChapterId(id);
             lp.setStatus("completed");
             lp.setCompletedAt(LocalDateTime.now());
-            lessonProgressMapper.insert(lp);
+            lessonProgressMapper.updateById(lp);
         } else {
+            lp = new LessonProgress();
+            lp.setId(System.currentTimeMillis());
+            lp.setUserId(userId);
+            lp.setLessonId(id);
+            lp.setSubChapterId(id);
             lp.setStatus("completed");
             lp.setCompletedAt(LocalDateTime.now());
-            lessonProgressMapper.updateById(lp);
+            try {
+                lessonProgressMapper.insert(lp);
+            } catch (Exception e) {
+                // 并发或残留数据导致的重复键，删除后重试
+                lessonProgressMapper.delete(new LambdaQueryWrapper<LessonProgress>()
+                        .eq(LessonProgress::getUserId, userId)
+                        .eq(LessonProgress::getSubChapterId, id));
+                lessonProgressMapper.insert(lp);
+            }
         }
         return ApiResponse.ok("ok");
     }
