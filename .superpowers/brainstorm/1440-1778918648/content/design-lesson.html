@@ -1,0 +1,109 @@
+<h2>设计方案 — 第 4 节：课时学习页（三栏布局）</h2>
+<p class="subtitle">左侧 240px 课程树 + 中间主内容区 + 右侧 320px AI 面板，VS Code 风格</p>
+
+<div class="mockup">
+  <div class="mockup-header">课程页 /student/courses/:id — 三栏布局</div>
+  <div class="mockup-body" style="display:flex;gap:0;padding:0;font-family:system-ui;min-height:500px;">
+
+    <!-- Left: Course Tree (240px) -->
+    <div style="width:220px;background:rgba(8,13,31,0.6);border-right:1px solid rgba(255,255,255,0.06);padding:12px;overflow-y:auto;">
+      <div style="font-size:10px;text-transform:uppercase;letter-spacing:1px;color:rgba(255,255,255,0.3);margin-bottom:8px;">课程导航</div>
+      <div style="margin-bottom:4px;font-size:12px;font-weight:600;cursor:pointer;padding:4px 8px;border-radius:4px;">数据结构与算法</div>
+      <div style="margin-left:8px;">
+        <div style="font-size:11px;color:rgba(255,255,255,0.35);margin:4px 0;padding:2px 8px;">第 1 单元：基础</div>
+        <div style="font-size:11px;padding:3px 8px 3px 16px;border-radius:4px;color:rgba(255,255,255,0.5);">数组与列表 ✓</div>
+        <div style="font-size:11px;padding:3px 8px 3px 16px;border-radius:4px;color:rgba(255,255,255,0.5);">字符串操作 ✓</div>
+        <div style="font-size:11px;color:rgba(255,255,255,0.35);margin:6px 0;padding:2px 8px;">第 2 单元：线性结构</div>
+        <div style="font-size:11px;padding:3px 8px 3px 16px;border-radius:4px;background:rgba(59,130,246,0.12);color:#60d9fa;font-weight:600;">链表 ◷ 当前</div>
+        <div style="font-size:11px;padding:3px 8px 3px 16px;border-radius:4px;color:rgba(255,255,255,0.3);">栈</div>
+        <div style="font-size:11px;padding:3px 8px 3px 16px;border-radius:4px;color:rgba(255,255,255,0.3);">队列</div>
+        <div style="font-size:11px;color:rgba(255,255,255,0.35);margin:6px 0;padding:2px 8px;">第 3 单元：树与图</div>
+        <div style="font-size:11px;padding:3px 8px 3px 16px;border-radius:4px;color:rgba(255,255,255,0.3);">二叉树</div>
+        <div style="font-size:11px;padding:3px 8px 3px 16px;border-radius:4px;color:rgba(255,255,255,0.3);">图论入门</div>
+      </div>
+    </div>
+
+    <!-- Center: Main Content Area -->
+    <div style="flex:1;padding:20px;overflow-y:auto;">
+      <!-- Top bar: Breadcrumb + back -->
+      <div style="font-size:10px;color:rgba(255,255,255,0.3);margin-bottom:8px;">数据结构 / 第 2 单元 / 链表</div>
+
+      <!-- Video area -->
+      <div style="width:100%;height:180px;background:rgba(0,0,0,0.3);border-radius:8px;display:flex;align-items:center;justify-content:center;margin-bottom:16px;border:1px solid rgba(255,255,255,0.06);font-size:12px;color:rgba(255,255,255,0.3);">视频播放器（教师上传 / 占位）</div>
+
+      <!-- Article content -->
+      <div style="font-size:16px;font-weight:700;margin-bottom:8px;">链表（Linked List）</div>
+      <div style="font-size:12px;color:rgba(255,255,255,0.5);line-height:1.7;margin-bottom:16px;">
+        链表是一种线性数据结构，由一系列节点组成。每个节点包含数据域和指向下一个节点的指针。与数组不同，链表中的元素在内存中不必连续存储...
+      </div>
+
+      <!-- Exercise section -->
+      <div style="border-top:1px solid rgba(255,255,255,0.06);padding-top:14px;">
+        <div style="font-weight:600;margin-bottom:10px;">课后练习</div>
+        <div style="background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.06);border-radius:8px;padding:12px;margin-bottom:8px;">
+          <div style="font-size:12px;margin-bottom:6px;">1. 链表与数组的主要区别是什么？</div>
+          <div style="font-size:11px;color:rgba(255,255,255,0.4);">A. 链表不支持随机访问 &nbsp; B. 链表内存连续 &nbsp; C. 数组不支持遍历 &nbsp; D. 没有区别</div>
+        </div>
+        <div style="background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.06);border-radius:8px;padding:12px;margin-bottom:8px;">
+          <div style="font-size:12px;margin-bottom:6px;">2. 在单链表中插入一个节点的时间复杂度是？</div>
+          <div style="font-size:11px;color:rgba(255,255,255,0.4);">A. O(1) 任意位置 &nbsp; B. O(n) 任意位置 &nbsp; C. O(log n) &nbsp; D. O(n^2)</div>
+        </div>
+        <button class="mock-button" style="font-size:11px;">提交答案</button>
+      </div>
+
+      <!-- Bottom nav: prev/next lesson -->
+      <div style="display:flex;justify-content:space-between;margin-top:16px;border-top:1px solid rgba(255,255,255,0.06);padding-top:12px;">
+        <div style="font-size:11px;color:rgba(255,255,255,0.3);">← 上一个：字符串操作</div>
+        <div style="font-size:11px;color:#3b82f6;">下一个：栈 →</div>
+      </div>
+    </div>
+
+    <!-- Right: AI Panel (320px) -->
+    <div style="width:300px;background:rgba(8,13,31,0.6);border-left:1px solid rgba(255,255,255,0.06);display:flex;flex-direction:column;">
+      <!-- Tabs -->
+      <div style="display:flex;border-bottom:1px solid rgba(255,255,255,0.06);">
+        <div style="flex:1;text-align:center;padding:8px;font-size:10px;color:#60d9fa;border-bottom:2px solid #60d9fa;">AI 辅导</div>
+        <div style="flex:1;text-align:center;padding:8px;font-size:10px;color:rgba(255,255,255,0.3);">笔记</div>
+        <div style="flex:1;text-align:center;padding:8px;font-size:10px;color:rgba(255,255,255,0.3);">讨论</div>
+      </div>
+      <!-- Chat area -->
+      <div style="flex:1;padding:12px;overflow-y:auto;font-size:11px;">
+        <div style="margin-bottom:8px;">
+          <div style="font-size:9px;color:rgba(255,255,255,0.3);margin-bottom:2px;">AI 助手</div>
+          <div style="background:rgba(59,130,246,0.1);border-radius:8px;padding:8px;line-height:1.5;color:rgba(255,255,255,0.7);">你好！我是你的 AI 学习助手。我看到你在学习<strong>链表</strong>，有什么问题可以随时问我。</div>
+        </div>
+        <div style="margin-bottom:8px;text-align:right;">
+          <div style="font-size:9px;color:rgba(255,255,255,0.3);margin-bottom:2px;">你</div>
+          <div style="background:rgba(168,85,247,0.1);border-radius:8px;padding:8px;display:inline-block;text-align:left;line-height:1.5;color:rgba(255,255,255,0.7);">链表的反转操作怎么实现？</div>
+        </div>
+        <div style="margin-bottom:8px;">
+          <div style="font-size:9px;color:rgba(255,255,255,0.3);margin-bottom:2px;">AI 助手</div>
+          <div style="background:rgba(59,130,246,0.1);border-radius:8px;padding:8px;line-height:1.5;color:rgba(255,255,255,0.7);">反转链表可以用<strong>迭代法</strong>：用三个指针 prev、curr、next 遍历，每次将 curr.next 指向 prev...需要我画图解释吗？</div>
+        </div>
+      </div>
+      <!-- Input -->
+      <div style="padding:8px;border-top:1px solid rgba(255,255,255,0.06);">
+        <div style="display:flex;gap:6px;">
+          <input class="mock-input" placeholder="问 AI 关于这个课时的问题..." style="flex:1;font-size:11px;">
+          <button class="mock-button" style="font-size:10px;padding:4px 10px;">发送</button>
+        </div>
+        <div style="display:flex;gap:6px;margin-top:6px;">
+          <div style="font-size:9px;padding:2px 8px;border-radius:4px;background:rgba(255,255,255,0.04);color:rgba(255,255,255,0.4);cursor:pointer;">解释这个概念</div>
+          <div style="font-size:9px;padding:2px 8px;border-radius:4px;background:rgba(255,255,255,0.04);color:rgba(255,255,255,0.4);cursor:pointer;">给我出题</div>
+          <div style="font-size:9px;padding:2px 8px;border-radius:4px;background:rgba(255,255,255,0.04);color:rgba(255,255,255,0.4);cursor:pointer;">总结要点</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="section">
+  <h3>三栏细节</h3>
+  <table style="width:100%;font-size:12px;border-collapse:collapse;">
+    <tr><td style="padding:4px 8px;color:rgba(255,255,255,0.5);width:100px;">左侧栏折叠</td><td style="padding:4px 8px;">屏幕 &lt; 1280px 时自动折叠为图标条，点击展开</td></tr>
+    <tr><td style="padding:4px 8px;color:rgba(255,255,255,0.5);">右侧面板 Tab</td><td style="padding:4px 8px;">AI 辅导（默认）/ 笔记（SmartNotesView 嵌入）/ 讨论（CollaborationSpaceView 嵌入）</td></tr>
+    <tr><td style="padding:4px 8px;color:rgba(255,255,255,0.5);">底部导航</td><td style="padding:4px 8px;">上一个 / 下一个课时按钮，快速切换</td></tr>
+    <tr><td style="padding:4px 8px;color:rgba(255,255,255,0.5);">练习提交</td><td style="padding:4px 8px;">提交后即时判断对错 + 显示解析，更新知识掌握度</td></tr>
+    <tr><td style="padding:4px 8px;color:rgba(255,255,255,0.5);">AI 快捷指令</td><td style="padding:4px 8px;">"解释这个概念" / "给我出题" / "总结要点" 三个预设按钮</td></tr>
+  </table>
+</div>

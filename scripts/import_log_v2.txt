@@ -1,0 +1,33 @@
+Login OK
+
+=== PHASE 1: PARSE ===
+[DS1] Parsing...
+[DS1] OK: 173 videos
+[DS2] Parsing...
+[DS2] OK: 194 videos
+[WEB] Parsing...
+[WEB] OK: 200 videos
+[AI] Parsing...
+[AI] OK: 35 videos
+[MATH] Parsing...
+[MATH] OK: 54 videos
+[DB] Parsing...
+[DB] OK: 60 videos
+[OS] Parsing...
+[OS] OK: 158 videos
+[NET] Parsing...
+[NET] OK: 17 videos
+
+=== PHASE 2: IMPORT ===
+
+[1/8] [DS1] 第01周a--前言
+  Total: 173 videos in 6 chunk(s) Start: 17:51:24
+    Chunk 1/6: 30 videos, name='第01周a--前言 (Part 1/6)'
+    OK:30 FAIL:0 Time:662s (11.0m)
+    Chunk 2/6: 30 videos, name='第01周a--前言 (Part 2/6)'
+    OK:29 FAIL:1 Time:522s (8.7m)
+    Chunk 3/6: 30 videos, name='第01周a--前言 (Part 3/6)'
+    OK:28 FAIL:2 Time:540s (9.0m)
+    Chunk 4/6: 30 videos, name='第01周a--前言 (Part 4/6)'
+    OK:30 FAIL:0 Time:507s (8.4m)
+    Chunk 5/6: 30 videos, name='第01周a--前言 (Part 5/6)'

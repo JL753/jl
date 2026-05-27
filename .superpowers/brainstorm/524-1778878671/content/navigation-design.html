@@ -1,0 +1,85 @@
+<h2>导航结构定义</h2>
+<p class="subtitle">顶部导航栏 + 底部标签栏的内容规划</p>
+
+<div class="section">
+  <h3>顶部导航栏（始终可见）</h3>
+  <div style="padding:16px;border-radius:12px;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.06);margin-bottom:16px;">
+    <div style="display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;">
+      <div style="display:flex;align-items:center;gap:8px;">
+        <span style="width:32px;height:32px;border-radius:50%;background:linear-gradient(135deg,#3b82f6,#06b6d4);display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:800;color:white;">知</span>
+        <span style="font-weight:600;">知域</span>
+      </div>
+      <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;">
+        <span style="padding:4px 10px;border-radius:6px;background:rgba(255,255,255,0.04);font-size:11px;">AI 搜索框</span>
+        <span style="font-size:11px;color:rgba(255,255,255,0.4);">|</span>
+        <span style="padding:4px 10px;border-radius:6px;background:rgba(255,255,255,0.04);font-size:11px;">🔔 通知</span>
+        <span style="width:28px;height:28px;border-radius:50%;background:rgba(255,255,255,0.08);display:flex;align-items:center;justify-content:center;font-size:11px;">👤</span>
+      </div>
+    </div>
+  </div>
+  <p style="font-size:12px;color:rgba(255,255,255,0.5);">Logo | AI搜索框 | 通知铃铛 | 用户头像下拉菜单</p>
+</div>
+
+<div class="section">
+  <h3>底部标签栏（学生端）</h3>
+  <p>选择底部标签的排列方式：</p>
+</div>
+
+<div class="options">
+  <div class="option" data-choice="tab-4" onclick="toggleSelect(this)">
+    <div class="letter">A</div>
+    <div class="content">
+      <h3>4 标签</h3>
+      <div style="display:flex;gap:4px;margin-top:6px;">
+        <span style="flex:1;text-align:center;padding:6px 4px;border-radius:6px;background:rgba(59,130,246,0.15);font-size:10px;color:#60a5fa;">🏠 首页</span>
+        <span style="flex:1;text-align:center;padding:6px 4px;border-radius:6px;font-size:10px;color:rgba(255,255,255,0.4);">📚 学科</span>
+        <span style="flex:1;text-align:center;padding:6px 4px;border-radius:6px;font-size:10px;color:rgba(255,255,255,0.4);">🤖 辅导</span>
+        <span style="flex:1;text-align:center;padding:6px 4px;border-radius:6px;font-size:10px;color:rgba(255,255,255,0.4);">👤 我的</span>
+      </div>
+      <p style="font-size:11px;color:rgba(255,255,255,0.4);margin-top:4px;">首页 / 学科 / AI辅导 / 个人中心</p>
+    </div>
+  </div>
+  <div class="option" data-choice="tab-5" onclick="toggleSelect(this)">
+    <div class="letter">B</div>
+    <div class="content">
+      <h3>5 标签</h3>
+      <div style="display:flex;gap:4px;margin-top:6px;">
+        <span style="flex:1;text-align:center;padding:6px 4px;border-radius:6px;background:rgba(59,130,246,0.15);font-size:10px;color:#60a5fa;">🏠 首页</span>
+        <span style="flex:1;text-align:center;padding:6px 4px;border-radius:6px;font-size:10px;color:rgba(255,255,255,0.4);">🗺️ 星图</span>
+        <span style="flex:1;text-align:center;padding:6px 4px;border-radius:6px;font-size:10px;color:rgba(255,255,255,0.4);">📚 学科</span>
+        <span style="flex:1;text-align:center;padding:6px 4px;border-radius:6px;font-size:10px;color:rgba(255,255,255,0.4);">🤖 辅导</span>
+        <span style="flex:1;text-align:center;padding:6px 4px;border-radius:6px;font-size:10px;color:rgba(255,255,255,0.4);">👤 我的</span>
+      </div>
+      <p style="font-size:11px;color:rgba(255,255,255,0.4);margin-top:4px;">首页 / 知识星图 / 学科 / AI辅导 / 个人中心</p>
+    </div>
+  </div>
+</div>
+
+<div class="section">
+  <h3>仪表盘布局预览</h3>
+  <p>学生仪表盘的主内容区布局：</p>
+</div>
+
+<div class="options">
+  <div class="option" data-choice="dash-left" onclick="toggleSelect(this)">
+    <div class="letter">A</div>
+    <div class="content">
+      <h3>左图右列</h3>
+      <p>左侧固定六维雷达图，右侧内容流（继续学习 / AI推荐 / 今日任务）</p>
+    </div>
+  </div>
+  <div class="option" data-choice="dash-grid" onclick="toggleSelect(this)">
+    <div class="letter">B</div>
+    <div class="content">
+      <h3>网格卡片</h3>
+      <p>2列网格布局，六维图作为一张卡片混排在其中</p>
+    </div>
+  </div>
+  <div class="option" data-choice="dash-top" onclick="toggleSelect(this)">
+    <div class="letter">C</div>
+    <div class="content">
+      <h3>顶部通栏+下方流</h3>
+      <p>顶部通栏放六维图+关键指标，下方内容流滚动</p>
+    </div>
+  </div>
+</div>

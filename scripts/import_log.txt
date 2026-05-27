@@ -1,0 +1,36 @@
+Login OK
+
+=== PHASE 1: PARSE ===
+[CS1] Parsing...
+[CS1] OK: 40 videos
+[CS2] Parsing...
+[CS2] OK: 40 videos
+[DS1] Parsing...
+[DS1] OK: 173 videos
+[DS2] Parsing...
+[DS2] OK: 194 videos
+[WEB] Parsing...
+[WEB] OK: 200 videos
+[AI] Parsing...
+[AI] OK: 35 videos
+[MATH] Parsing...
+[MATH] OK: 54 videos
+[DB] Parsing...
+[DB] OK: 60 videos
+[OS] Parsing...
+[OS] OK: 158 videos
+[NET] Parsing...
+[NET] OK: 17 videos
+
+=== PHASE 2: IMPORT ===
+
+[1/10] [CS1] 1. 计算机早期历史-Early Computing
+  Videos: 40 Start: 17:17:06
+  DONE: 40 OK, 0 FAIL | 720s (12.0m)
+
+[2/10] [CS2] 1-组成原理-软硬件概念
+  Videos: 40 Start: 17:29:06
+  DONE: 40 OK, 0 FAIL | 771s (12.8m)
+
+[3/10] [DS1] 第01周a--前言
+  Videos: 173 Start: 17:41:56

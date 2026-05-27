@@ -1,0 +1,112 @@
+<h2>知域 — 分层重构架构总览</h2>
+<p class="subtitle">绿色=保留 · 黄色=重构 · 蓝色=重写 · 紫色=新增</p>
+
+<div style="display:flex; gap:16px; margin-top:8px;">
+
+  <!-- 前端列 -->
+  <div style="flex:1; display:flex; flex-direction:column; gap:8px;">
+    <div style="text-align:center; font-size:11px; color:#94a3b8; text-transform:uppercase; letter-spacing:2px; margin-bottom:4px;">前端 (Vue3)</div>
+
+    <div style="background:rgba(59,130,246,0.15); border:1px solid #3b82f6; border-radius:8px; padding:10px;">
+      <div style="font-size:11px; color:#60a5fa; font-weight:600; margin-bottom:6px;">🔵 完全重写</div>
+      <div style="display:flex; flex-direction:column; gap:4px;">
+        <div style="background:rgba(59,130,246,0.1); border-radius:4px; padding:5px 8px; font-size:11px; color:#e2e8f0;">星图宇宙主题 + 液态玻璃组件库</div>
+        <div style="background:rgba(59,130,246,0.1); border-radius:4px; padding:5px 8px; font-size:11px; color:#e2e8f0;">壁纸切换系统（3静态+2动态）</div>
+        <div style="background:rgba(59,130,246,0.1); border-radius:4px; padding:5px 8px; font-size:11px; color:#e2e8f0;">学科目录 / 课程浏览页</div>
+        <div style="background:rgba(59,130,246,0.1); border-radius:4px; padding:5px 8px; font-size:11px; color:#e2e8f0;">课时学习页（视频+图文+练习）</div>
+        <div style="background:rgba(59,130,246,0.1); border-radius:4px; padding:5px 8px; font-size:11px; color:#e2e8f0;">学生仪表盘（掌握度星图）</div>
+        <div style="background:rgba(59,130,246,0.1); border-radius:4px; padding:5px 8px; font-size:11px; color:#e2e8f0;">教师工作台（班级+作业+内容）</div>
+      </div>
+    </div>
+
+    <div style="background:rgba(168,85,247,0.15); border:1px solid #a855f7; border-radius:8px; padding:10px;">
+      <div style="font-size:11px; color:#c084fc; font-weight:600; margin-bottom:6px;">🟣 新增页面</div>
+      <div style="display:flex; flex-direction:column; gap:4px;">
+        <div style="background:rgba(168,85,247,0.1); border-radius:4px; padding:5px 8px; font-size:11px; color:#e2e8f0;">班级管理 / 学生进度监控</div>
+        <div style="background:rgba(168,85,247,0.1); border-radius:4px; padding:5px 8px; font-size:11px; color:#e2e8f0;">作业布置 / 批改页</div>
+        <div style="background:rgba(168,85,247,0.1); border-radius:4px; padding:5px 8px; font-size:11px; color:#e2e8f0;">掌握度星图可视化</div>
+        <div style="background:rgba(168,85,247,0.1); border-radius:4px; padding:5px 8px; font-size:11px; color:#e2e8f0;">AI 内容审核工作台</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 后端列 -->
+  <div style="flex:1; display:flex; flex-direction:column; gap:8px;">
+    <div style="text-align:center; font-size:11px; color:#94a3b8; text-transform:uppercase; letter-spacing:2px; margin-bottom:4px;">后端 (Spring Boot)</div>
+
+    <div style="background:rgba(34,197,94,0.15); border:1px solid #22c55e; border-radius:8px; padding:10px;">
+      <div style="font-size:11px; color:#4ade80; font-weight:600; margin-bottom:6px;">🟢 完整保留</div>
+      <div style="display:flex; flex-direction:column; gap:4px;">
+        <div style="background:rgba(34,197,94,0.1); border-radius:4px; padding:5px 8px; font-size:11px; color:#e2e8f0;">JWT 认证 / 角色拦截器</div>
+        <div style="background:rgba(34,197,94,0.1); border-radius:4px; padding:5px 8px; font-size:11px; color:#e2e8f0;">LLM Client（DeepSeek）</div>
+        <div style="background:rgba(34,197,94,0.1); border-radius:4px; padding:5px 8px; font-size:11px; color:#e2e8f0;">五类 Agent（讲义/题库/思维导图/媒体/代码）</div>
+        <div style="background:rgba(34,197,94,0.1); border-radius:4px; padding:5px 8px; font-size:11px; color:#e2e8f0;">RAG 服务 + 向量存储</div>
+        <div style="background:rgba(34,197,94,0.1); border-radius:4px; padding:5px 8px; font-size:11px; color:#e2e8f0;">游戏化（XP/徽章/连续学习/排行榜）</div>
+        <div style="background:rgba(34,197,94,0.1); border-radius:4px; padding:5px 8px; font-size:11px; color:#e2e8f0;">自适应测验引擎</div>
+        <div style="background:rgba(34,197,94,0.1); border-radius:4px; padding:5px 8px; font-size:11px; color:#e2e8f0;">AI 辅导（TutorService + RAG）</div>
+      </div>
+    </div>
+
+    <div style="background:rgba(234,179,8,0.15); border:1px solid #eab308; border-radius:8px; padding:10px;">
+      <div style="font-size:11px; color:#facc15; font-weight:600; margin-bottom:6px;">🟡 重构</div>
+      <div style="display:flex; flex-direction:column; gap:4px;">
+        <div style="background:rgba(234,179,8,0.1); border-radius:4px; padding:5px 8px; font-size:11px; color:#e2e8f0;">课程体系（学科→单元→课时→练习）</div>
+        <div style="background:rgba(234,179,8,0.1); border-radius:4px; padding:5px 8px; font-size:11px; color:#e2e8f0;">掌握度追踪（知识点级别）</div>
+        <div style="background:rgba(234,179,8,0.1); border-radius:4px; padding:5px 8px; font-size:11px; color:#e2e8f0;">用户角色（学生 / 教师+管理员）</div>
+      </div>
+    </div>
+
+    <div style="background:rgba(168,85,247,0.15); border:1px solid #a855f7; border-radius:8px; padding:10px;">
+      <div style="font-size:11px; color:#c084fc; font-weight:600; margin-bottom:6px;">🟣 新增 API</div>
+      <div style="display:flex; flex-direction:column; gap:4px;">
+        <div style="background:rgba(168,85,247,0.1); border-radius:4px; padding:5px 8px; font-size:11px; color:#e2e8f0;">班级管理 API</div>
+        <div style="background:rgba(168,85,247,0.1); border-radius:4px; padding:5px 8px; font-size:11px; color:#e2e8f0;">作业布置 / 提交 API</div>
+        <div style="background:rgba(168,85,247,0.1); border-radius:4px; padding:5px 8px; font-size:11px; color:#e2e8f0;">AI 内容审核 API</div>
+        <div style="background:rgba(168,85,247,0.1); border-radius:4px; padding:5px 8px; font-size:11px; color:#e2e8f0;">学生进度报告 API</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 数据库列 -->
+  <div style="flex:1; display:flex; flex-direction:column; gap:8px;">
+    <div style="text-align:center; font-size:11px; color:#94a3b8; text-transform:uppercase; letter-spacing:2px; margin-bottom:4px;">数据库 (MySQL)</div>
+
+    <div style="background:rgba(34,197,94,0.15); border:1px solid #22c55e; border-radius:8px; padding:10px;">
+      <div style="font-size:11px; color:#4ade80; font-weight:600; margin-bottom:6px;">🟢 保留表</div>
+      <div style="display:flex; flex-direction:column; gap:3px;">
+        <div style="background:rgba(34,197,94,0.1); border-radius:4px; padding:4px 8px; font-size:10px; color:#e2e8f0; font-family:monospace;">sp_user</div>
+        <div style="background:rgba(34,197,94,0.1); border-radius:4px; padding:4px 8px; font-size:10px; color:#e2e8f0; font-family:monospace;">sp_user_xp / sp_user_streak</div>
+        <div style="background:rgba(34,197,94,0.1); border-radius:4px; padding:4px 8px; font-size:10px; color:#e2e8f0; font-family:monospace;">sp_user_badge / sp_badge_def</div>
+        <div style="background:rgba(34,197,94,0.1); border-radius:4px; padding:4px 8px; font-size:10px; color:#e2e8f0; font-family:monospace;">sp_question_bank</div>
+        <div style="background:rgba(34,197,94,0.1); border-radius:4px; padding:4px 8px; font-size:10px; color:#e2e8f0; font-family:monospace;">sp_wrong_question</div>
+        <div style="background:rgba(34,197,94,0.1); border-radius:4px; padding:4px 8px; font-size:10px; color:#e2e8f0; font-family:monospace;">sp_qa_history</div>
+        <div style="background:rgba(34,197,94,0.1); border-radius:4px; padding:4px 8px; font-size:10px; color:#e2e8f0; font-family:monospace;">sp_knowledge_doc（RAG）</div>
+      </div>
+    </div>
+
+    <div style="background:rgba(234,179,8,0.15); border:1px solid #eab308; border-radius:8px; padding:10px;">
+      <div style="font-size:11px; color:#facc15; font-weight:600; margin-bottom:6px;">🟡 重构表</div>
+      <div style="display:flex; flex-direction:column; gap:3px;">
+        <div style="background:rgba(234,179,8,0.1); border-radius:4px; padding:4px 8px; font-size:10px; color:#e2e8f0; font-family:monospace;">sp_subject（新：学科）</div>
+        <div style="background:rgba(234,179,8,0.1); border-radius:4px; padding:4px 8px; font-size:10px; color:#e2e8f0; font-family:monospace;">sp_course → 重命名+扩展</div>
+        <div style="background:rgba(234,179,8,0.1); border-radius:4px; padding:4px 8px; font-size:10px; color:#e2e8f0; font-family:monospace;">sp_unit（重构）</div>
+        <div style="background:rgba(234,179,8,0.1); border-radius:4px; padding:4px 8px; font-size:10px; color:#e2e8f0; font-family:monospace;">sp_lesson（重构）</div>
+        <div style="background:rgba(234,179,8,0.1); border-radius:4px; padding:4px 8px; font-size:10px; color:#e2e8f0; font-family:monospace;">sp_exercise（重构）</div>
+        <div style="background:rgba(234,179,8,0.1); border-radius:4px; padding:4px 8px; font-size:10px; color:#e2e8f0; font-family:monospace;">sp_user_kp_mastery（扩展）</div>
+      </div>
+    </div>
+
+    <div style="background:rgba(168,85,247,0.15); border:1px solid #a855f7; border-radius:8px; padding:10px;">
+      <div style="font-size:11px; color:#c084fc; font-weight:600; margin-bottom:6px;">🟣 新增表</div>
+      <div style="display:flex; flex-direction:column; gap:3px;">
+        <div style="background:rgba(168,85,247,0.1); border-radius:4px; padding:4px 8px; font-size:10px; color:#e2e8f0; font-family:monospace;">sp_class（班级）</div>
+        <div style="background:rgba(168,85,247,0.1); border-radius:4px; padding:4px 8px; font-size:10px; color:#e2e8f0; font-family:monospace;">sp_class_member</div>
+        <div style="background:rgba(168,85,247,0.1); border-radius:4px; padding:4px 8px; font-size:10px; color:#e2e8f0; font-family:monospace;">sp_assignment（作业）</div>
+        <div style="background:rgba(168,85,247,0.1); border-radius:4px; padding:4px 8px; font-size:10px; color:#e2e8f0; font-family:monospace;">sp_assignment_submission</div>
+        <div style="background:rgba(168,85,247,0.1); border-radius:4px; padding:4px 8px; font-size:10px; color:#e2e8f0; font-family:monospace;">sp_lesson_progress（课时进度）</div>
+        <div style="background:rgba(168,85,247,0.1); border-radius:4px; padding:4px 8px; font-size:10px; color:#e2e8f0; font-family:monospace;">sp_content_review（AI审核）</div>
+      </div>
+    </div>
+  </div>
+
+</div>

@@ -1,0 +1,147 @@
+<h2>渐进增强方案 — 架构设计</h2>
+<p class="subtitle">保留现有 AICompanionView，新增 AICompanionImmersive 页面，共用同一套 Java 后端端点</p>
+
+<div class="section">
+  <h3>整体架构</h3>
+</div>
+
+<div class="mockup">
+  <div class="mockup-header">前端组件关系 & 数据流</div>
+  <div class="mockup-body">
+    <div style="display: flex; flex-direction: column; gap: 16px;">
+
+      <!-- Layer 1: Navigation -->
+      <div style="display: flex; gap: 12px; align-items: center;">
+        <div style="flex: 1; text-align: center;">
+          <div class="placeholder" style="background: rgba(59,130,246,0.1); border: 1px solid rgba(59,130,246,0.25);">
+            <strong>StudentLayout.vue</strong><br>
+            <small>侧边栏新增 "沉浸伴学" 入口</small>
+          </div>
+        </div>
+        <div style="font-size: 20px; color: rgba(255,255,255,0.3);">→</div>
+        <div style="flex: 1; text-align: center;">
+          <div class="placeholder" style="background: rgba(59,130,246,0.1); border: 1px solid rgba(59,130,246,0.25);">
+            <strong>AIFloatingBall.vue</strong><br>
+            <small>悬浮球对话中新增 "打开沉浸伴学" 按钮</small>
+          </div>
+        </div>
+      </div>
+
+      <div style="text-align: center; font-size: 20px; color: rgba(255,255,255,0.2);">↓</div>
+
+      <!-- Layer 2: Main Component -->
+      <div style="border: 2px solid rgba(16,185,129,0.4); border-radius: 12px; padding: 16px; background: rgba(16,185,129,0.05);">
+        <div style="font-size: 11px; color: #10b981; margin-bottom: 8px; font-weight: 600;">新增组件</div>
+        <div style="display: flex; gap: 0;">
+          <!-- Left: Unity -->
+          <div style="flex: 1; padding: 12px; border-right: 1px solid rgba(255,255,255,0.08);">
+            <div style="text-align: center; font-weight: 600; color: #60a5fa; margin-bottom: 8px;">Unity WebGL 容器</div>
+            <div class="placeholder" style="height: 180px; display: flex; align-items: center; justify-content: center; flex-direction: column;">
+              <div style="font-size: 40px;">👩‍🏫</div>
+              <small>3D 虚拟人小慧</small>
+              <small style="color: rgba(255,255,255,0.3);">canvas + loader + .wasm</small>
+            </div>
+            <div class="placeholder" style="margin-top: 8px; font-size: 11px; text-align: center; background: rgba(245,158,11,0.1);">
+              window.handleUnityTransmission(str)
+            </div>
+          </div>
+          <!-- Right: Chat -->
+          <div style="flex: 1; padding: 12px;">
+            <div style="text-align: center; font-weight: 600; color: #60a5fa; margin-bottom: 8px;">对话面板</div>
+            <div class="placeholder" style="height: 120px; display: flex; flex-direction: column; gap: 6px; padding: 8px;">
+              <div style="align-self: flex-start; background: rgba(59,130,246,0.15); padding: 4px 8px; border-radius: 8px; font-size: 11px;">你好！我是小慧 👋</div>
+              <div style="align-self: flex-end; background: rgba(16,185,129,0.15); padding: 4px 8px; border-radius: 8px; font-size: 11px;">帮我导航到课程</div>
+              <div style="align-self: flex-start; background: rgba(59,130,246,0.15); padding: 4px 8px; border-radius: 8px; font-size: 11px;">好的，正在跳转...</div>
+            </div>
+            <div style="display: flex; gap: 6px; margin-top: 8px;">
+              <button class="mock-button" style="flex: 0; padding: 4px 8px; font-size: 11px;">🎤</button>
+              <input class="mock-input" style="flex: 1; margin: 0; font-size: 11px;" placeholder="输入问题或指令...">
+              <button class="mock-button" style="flex: 0; padding: 4px 8px; font-size: 11px;">发送</button>
+            </div>
+          </div>
+        </div>
+        <div style="text-align: center; margin-top: 8px; font-size: 11px; color: rgba(255,255,255,0.4);">
+          AICompanionImmersive.vue
+        </div>
+      </div>
+
+      <div style="text-align: center; font-size: 20px; color: rgba(255,255,255,0.2);">↓</div>
+
+      <!-- Layer 3: API -->
+      <div style="display: flex; gap: 12px;">
+        <div style="flex: 1; text-align: center;">
+          <div class="placeholder" style="background: rgba(139,92,246,0.1); border: 1px solid rgba(139,92,246,0.25);">
+            <strong>api/index.js</strong><br>
+            <small>apiSTT() / apiTTS() / apiAgentChat()</small>
+          </div>
+        </div>
+        <div style="flex: 1; text-align: center;">
+          <div class="placeholder" style="background: rgba(139,92,246,0.1); border: 1px solid rgba(139,92,246,0.25);">
+            <strong>api/sse.js</strong><br>
+            <small>SSE 流式对话（已存在）</small>
+          </div>
+        </div>
+      </div>
+
+      <div style="text-align: center; font-size: 20px; color: rgba(255,255,255,0.2);">↓</div>
+
+      <!-- Layer 4: Backend -->
+      <div style="border: 2px solid rgba(245,158,11,0.3); border-radius: 12px; padding: 16px; background: rgba(245,158,11,0.05);">
+        <div style="font-size: 11px; color: #f59e0b; margin-bottom: 8px; font-weight: 600;">Java Backend · AgentController 新增端点</div>
+        <div style="display: flex; gap: 12px;">
+          <div style="flex: 1;">
+            <div class="placeholder" style="font-size: 12px; text-align: center;">
+              <strong>POST /api/agent/chat-stream</strong><br>
+              <small>SSE 流式 LLM 对话<br>讯飞星火大模型</small>
+            </div>
+          </div>
+          <div style="flex: 1;">
+            <div class="placeholder" style="font-size: 12px; text-align: center;">
+              <strong>POST /api/agent/stt</strong><br>
+              <small>语音识别<br>讯飞语音转文本</small>
+            </div>
+          </div>
+          <div style="flex: 1;">
+            <div class="placeholder" style="font-size: 12px; text-align: center;">
+              <strong>POST /api/agent/tts</strong><br>
+              <small>语音合成<br>讯飞文本转语音</small>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<div class="section">
+  <h3>Unity ↔ Vue 通信桥接</h3>
+</div>
+
+<div class="mockup">
+  <div class="mockup-body">
+    <div style="display: flex; gap: 12px; align-items: center; justify-content: center;">
+      <div style="text-align: center;">
+        <div class="placeholder" style="background: rgba(59,130,246,0.15); padding: 12px 20px;">
+          <strong>Unity (C#)</strong><br>
+          <small>ChatManager 组件</small>
+        </div>
+      </div>
+      <div style="display: flex; flex-direction: column; gap: 8px; align-items: center;">
+        <div style="font-size: 11px; color: #60a5fa;">UnityIns.SendMessage()</div>
+        <div style="font-size: 20px; color: rgba(255,255,255,0.2);">⇄</div>
+        <div style="font-size: 11px; color: #f59e0b;">handleUnityTransmission()</div>
+      </div>
+      <div style="text-align: center;">
+        <div class="placeholder" style="background: rgba(245,158,11,0.15); padding: 12px 20px;">
+          <strong>Vue (JS)</strong><br>
+          <small>AICompanionImmersive.vue</small>
+        </div>
+      </div>
+    </div>
+    <div style="margin-top: 12px; text-align: center; font-size: 12px; color: rgba(255,255,255,0.5);">
+      Unity 通过 Application.ExternalCall() 调用 JS → window.handleUnityTransmission 解析指令并导航<br>
+      Vue 通过 UnityIns.SendMessage() 调用 Unity → ChatManager.StartChat / StartRecorderFunc
+    </div>
+  </div>
+</div>

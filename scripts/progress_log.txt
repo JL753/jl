@@ -1,0 +1,5 @@
+--- 18:35:13 ---
+subject_id	courses	videos
+1001	2	80
+1002	5	140
+mysql: [Warning] Using a password on the command line interface can be insecure.

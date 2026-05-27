@@ -1,0 +1,114 @@
+Login OK
+
+=== PARSE ===
+[DS1] Parsing...
+[DS1] 173 total, resuming from #120, 53 remaining
+[DS2] Parsing...
+[DS2] OK: 194 videos
+[WEB] Parsing...
+[WEB] OK: 200 videos
+[AI] Parsing...
+[AI] OK: 35 videos
+[MATH] Parsing...
+[MATH] OK: 54 videos
+[DB] Parsing...
+[DB] OK: 60 videos
+[OS] Parsing...
+[OS] OK: 158 videos
+[NET] Parsing...
+[NET] OK: 17 videos
+
+=== IMPORT ===
+
+[1/8] [DS1] 第01周a--前言
+  Total: 53 videos in 3 chunk(s) Start: 18:38:51
+  Part 5/7: 25 videos
+  OK:24 FAIL:1 Time:444s (7.4m)
+  Part 6/7: 25 videos
+  OK:25 FAIL:0 Time:426s (7.1m)
+  Part 7/7: 3 videos
+  OK:3 FAIL:0 Time:43s (0.7m)
+  TOTAL: 52 OK, 1 FAIL | 914s (15.2m)
+
+[2/8] [DS2] 001_尚硅谷_几个经典的算法面试题(1)
+  Total: 194 videos in 8 chunk(s) Start: 18:54:05
+  Part 1/8: 25 videos
+  OK:25 FAIL:0 Time:391s (6.5m)
+  Part 2/8: 25 videos
+  OK:24 FAIL:1 Time:434s (7.2m)
+  Part 3/8: 25 videos
+  ERROR after 2s: ConnectionError: ('Connection aborted.', ConnectionResetError(10054, '远程主机强迫关闭了一个现有的连接。', None, 10054, None))
+  !!! Chunk failed, continuing to next...
+Traceback (most recent call last):
+  File "C:\Users\ZWC\AppData\Local\Programs\Python\Python312\Lib\site-packages\urllib3\connection.py", line 204, in _new_conn
+    sock = connection.create_connection(
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\ZWC\AppData\Local\Programs\Python\Python312\Lib\site-packages\urllib3\util\connection.py", line 85, in create_connection
+    raise err
+  File "C:\Users\ZWC\AppData\Local\Programs\Python\Python312\Lib\site-packages\urllib3\util\connection.py", line 73, in create_connection
+    sock.connect(sa)
+ConnectionRefusedError: [WinError 10061] 由于目标计算机积极拒绝，无法连接。
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "C:\Users\ZWC\AppData\Local\Programs\Python\Python312\Lib\site-packages\urllib3\connectionpool.py", line 788, in urlopen
+    response = self._make_request(
+               ^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\ZWC\AppData\Local\Programs\Python\Python312\Lib\site-packages\urllib3\connectionpool.py", line 493, in _make_request
+    conn.request(
+  File "C:\Users\ZWC\AppData\Local\Programs\Python\Python312\Lib\site-packages\urllib3\connection.py", line 500, in request
+    self.endheaders()
+  File "C:\Users\ZWC\AppData\Local\Programs\Python\Python312\Lib\http\client.py", line 1333, in endheaders
+    self._send_output(message_body, encode_chunked=encode_chunked)
+  File "C:\Users\ZWC\AppData\Local\Programs\Python\Python312\Lib\http\client.py", line 1093, in _send_output
+    self.send(msg)
+  File "C:\Users\ZWC\AppData\Local\Programs\Python\Python312\Lib\http\client.py", line 1037, in send
+    self.connect()
+  File "C:\Users\ZWC\AppData\Local\Programs\Python\Python312\Lib\site-packages\urllib3\connection.py", line 331, in connect
+    self.sock = self._new_conn()
+                ^^^^^^^^^^^^^^^^
+  File "C:\Users\ZWC\AppData\Local\Programs\Python\Python312\Lib\site-packages\urllib3\connection.py", line 219, in _new_conn
+    raise NewConnectionError(
+urllib3.exceptions.NewConnectionError: HTTPConnection(host='localhost', port=8080): Failed to establish a new connection: [WinError 10061] 由于目标计算机积极拒绝，无法连接。
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "C:\Users\ZWC\AppData\Local\Programs\Python\Python312\Lib\site-packages\requests\adapters.py", line 696, in send
+    resp = conn.urlopen(
+           ^^^^^^^^^^^^^
+  File "C:\Users\ZWC\AppData\Local\Programs\Python\Python312\Lib\site-packages\urllib3\connectionpool.py", line 842, in urlopen
+    retries = retries.increment(
+              ^^^^^^^^^^^^^^^^^^
+  File "C:\Users\ZWC\AppData\Local\Programs\Python\Python312\Lib\site-packages\urllib3\util\retry.py", line 543, in increment
+    raise MaxRetryError(_pool, url, reason) from reason  # type: ignore[arg-type]
+    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+urllib3.exceptions.MaxRetryError: HTTPConnectionPool(host='localhost', port=8080): Max retries exceeded with url: /api/auth/login (Caused by NewConnectionError("HTTPConnection(host='localhost', port=8080): Failed to establish a new connection: [WinError 10061] 由于目标计算机积极拒绝，无法连接。"))
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "C:\Users\ZWC\Desktop\软件杯大赛\softwacecup\scripts\batch_import_v3.py", line 135, in <module>
+    main()
+  File "C:\Users\ZWC\Desktop\软件杯大赛\softwacecup\scripts\batch_import_v3.py", line 119, in main
+    token = login()
+            ^^^^^^^
+  File "C:\Users\ZWC\Desktop\软件杯大赛\softwacecup\scripts\batch_import_v3.py", line 25, in login
+    resp = requests.post(f"{BASE}/auth/login",
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\ZWC\AppData\Local\Programs\Python\Python312\Lib\site-packages\requests\api.py", line 134, in post
+    return request("post", url, data=data, json=json, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\ZWC\AppData\Local\Programs\Python\Python312\Lib\site-packages\requests\api.py", line 71, in request
+    return session.request(method=method, url=url, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\ZWC\AppData\Local\Programs\Python\Python312\Lib\site-packages\requests\sessions.py", line 651, in request
+    resp = self.send(prep, **send_kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\ZWC\AppData\Local\Programs\Python\Python312\Lib\site-packages\requests\sessions.py", line 784, in send
+    r = adapter.send(request, **kwargs)
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\ZWC\AppData\Local\Programs\Python\Python312\Lib\site-packages\requests\adapters.py", line 729, in send
+    raise ConnectionError(e, request=request)
+requests.exceptions.ConnectionError: HTTPConnectionPool(host='localhost', port=8080): Max retries exceeded with url: /api/auth/login (Caused by NewConnectionError("HTTPConnection(host='localhost', port=8080): Failed to establish a new connection: [WinError 10061] 由于目标计算机积极拒绝，无法连接。"))

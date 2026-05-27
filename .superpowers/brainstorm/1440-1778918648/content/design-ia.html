@@ -1,0 +1,103 @@
+<h2>设计方案 — 第 1 节：整体信息架构 & 路由表</h2>
+<p class="subtitle">学生端 16 → 11 个路由，左侧 5 Tab 主导航，课程学习三级混合下钻</p>
+
+<div class="section">
+  <h3>左侧 5 Tab 导航</h3>
+</div>
+
+<div class="mockup">
+  <div class="mockup-body" style="display:flex;gap:0;padding:0;font-family:system-ui;min-height:400px;">
+    <!-- Left sidebar -->
+    <div style="width:72px;background:rgba(8,13,31,0.95);border-right:1px solid rgba(255,255,255,0.06);display:flex;flex-direction:column;align-items:center;padding:16px 0;gap:8px;">
+      <div style="width:40px;height:40px;border-radius:10px;background:linear-gradient(135deg,#3b82f6,#a855f7);display:flex;align-items:center;justify-content:center;font-weight:800;font-size:18px;margin-bottom:16px;">知</div>
+      <div style="width:44px;height:44px;border-radius:10px;background:rgba(59,130,246,0.15);display:flex;flex-direction:column;align-items:center;justify-content:center;font-size:10px;color:#3b82f6;font-weight:600;">🏠<span style="margin-top:2px;">首页</span></div>
+      <div style="width:44px;height:44px;border-radius:10px;display:flex;flex-direction:column;align-items:center;justify-content:center;font-size:10px;color:rgba(255,255,255,0.4);">📚<span style="margin-top:2px;">学科</span></div>
+      <div style="width:44px;height:44px;border-radius:10px;display:flex;flex-direction:column;align-items:center;justify-content:center;font-size:10px;color:rgba(255,255,255,0.4);">🗺️<span style="margin-top:2px;">星图</span></div>
+      <div style="width:44px;height:44px;border-radius:10px;display:flex;flex-direction:column;align-items:center;justify-content:center;font-size:10px;color:rgba(255,255,255,0.4);">🤖<span style="margin-top:2px;">AI</span></div>
+      <div style="flex:1;"></div>
+      <div style="width:44px;height:44px;border-radius:10px;display:flex;flex-direction:column;align-items:center;justify-content:center;font-size:10px;color:rgba(255,255,255,0.4);">👤<span style="margin-top:2px;">我的</span></div>
+    </div>
+    <!-- Main content area -->
+    <div style="flex:1;padding:24px;">
+      <div style="margin-bottom:16px;font-weight:700;font-size:15px;">路由表 — /student/* 下 11 个路由</div>
+      <div style="display:flex;flex-direction:column;gap:6px;font-size:12px;">
+        <div style="display:flex;align-items:center;gap:8px;padding:6px 10px;background:rgba(59,130,246,0.08);border-radius:6px;">
+          <span style="font-weight:600;width:24px;text-align:center;color:#3b82f6;">🏠</span>
+          <span style="width:180px;font-family:monospace;font-size:11px;">/student/dashboard</span>
+          <span style="color:rgba(255,255,255,0.5);">StudentDashboard（重做：对标可汗首页）</span>
+        </div>
+        <div style="display:flex;align-items:center;gap:8px;padding:6px 10px;background:rgba(255,255,255,0.02);border-radius:6px;">
+          <span style="font-weight:600;width:24px;text-align:center;">📚</span>
+          <span style="width:180px;font-family:monospace;font-size:11px;">/student/subjects</span>
+          <span style="color:rgba(255,255,255,0.5);">学科卡片网格（已有，微调）</span>
+        </div>
+        <div style="display:flex;align-items:center;gap:8px;padding:6px 10px;background:rgba(255,255,255,0.02);border-radius:6px;">
+          <span style="font-weight:600;width:24px;text-align:center;">📘</span>
+          <span style="width:180px;font-family:monospace;font-size:11px;">/student/subjects/:id</span>
+          <span style="color:rgba(255,255,255,0.5);">课程列表页（已有，微调）</span>
+        </div>
+        <div style="display:flex;align-items:center;gap:8px;padding:6px 10px;background:rgba(255,255,255,0.02);border-radius:6px;">
+          <span style="font-weight:600;width:24px;text-align:center;">📖</span>
+          <span style="width:180px;font-family:monospace;font-size:11px;">/student/courses/:id</span>
+          <span style="color:rgba(255,255,255,0.5);">课程页（NEW 三栏：左侧树+内容+AI面板）</span>
+        </div>
+        <div style="display:flex;align-items:center;gap:8px;padding:6px 10px;background:rgba(255,255,255,0.02);border-radius:6px;">
+          <span style="font-weight:600;width:24px;text-align:center;">📖</span>
+          <span style="width:180px;font-family:monospace;font-size:11px;">/student/lessons/:id</span>
+          <span style="color:rgba(255,255,255,0.5);">课时页（同三栏，内容为具体课时）</span>
+        </div>
+        <div style="display:flex;align-items:center;gap:8px;padding:6px 10px;background:rgba(168,85,247,0.08);border-radius:6px;">
+          <span style="font-weight:600;width:24px;text-align:center;color:#a855f7;">🗺️</span>
+          <span style="width:180px;font-family:monospace;font-size:11px;">/student/knowledge-map</span>
+          <span style="color:rgba(255,255,255,0.5);">知识星图（已有，微调+嵌入学习路径）</span>
+        </div>
+        <div style="display:flex;align-items:center;gap:8px;padding:6px 10px;background:rgba(59,130,246,0.08);border-radius:6px;">
+          <span style="font-weight:600;width:24px;text-align:center;color:#60d9fa;">🤖</span>
+          <span style="width:180px;font-family:monospace;font-size:11px;">/student/companion</span>
+          <span style="color:rgba(255,255,255,0.5);">AI 辅导对话页（已有，微调）</span>
+        </div>
+        <div style="display:flex;align-items:center;gap:8px;padding:6px 10px;background:rgba(255,255,255,0.02);border-radius:6px;">
+          <span style="font-weight:600;width:24px;text-align:center;">👤</span>
+          <span style="width:180px;font-family:monospace;font-size:11px;">/student/profile</span>
+          <span style="color:rgba(255,255,255,0.5);">个人中心（重做：学习概览+成就+分析+设置）</span>
+        </div>
+        <div style="display:flex;align-items:center;gap:8px;padding:6px 10px;background:rgba(255,255,255,0.02);border-radius:6px;color:rgba(255,255,255,0.35);">
+          <span style="font-weight:600;width:24px;text-align:center;">🎯</span>
+          <span style="width:180px;font-family:monospace;font-size:11px;">/student/achievements</span>
+          <span>"我的"子页：成就&游戏化（合并 GamificationView）</span>
+        </div>
+        <div style="display:flex;align-items:center;gap:8px;padding:6px 10px;background:rgba(255,255,255,0.02);border-radius:6px;color:rgba(255,255,255,0.35);">
+          <span style="font-weight:600;width:24px;text-align:center;">📊</span>
+          <span style="width:180px;font-family:monospace;font-size:11px;">/student/analytics</span>
+          <span>"我的"子页：学习分析（LearningAnalyticsView）</span>
+        </div>
+        <div style="display:flex;align-items:center;gap:8px;padding:6px 10px;background:rgba(255,255,255,0.02);border-radius:6px;color:rgba(255,255,255,0.35);">
+          <span style="font-weight:600;width:24px;text-align:center;">💬</span>
+          <span style="width:180px;font-family:monospace;font-size:11px;">/student/community</span>
+          <span>问答社区（CommunityView）</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="section">
+  <h3>嵌入关系（不占用独立路由）</h3>
+  <table style="width:100%;font-size:12px;border-collapse:collapse;">
+    <tr><td style="padding:4px 8px;color:rgba(255,255,255,0.5);">SmartNotesView</td><td style="padding:4px 8px;">→ 课时页右侧 AI 面板的"笔记"Tab</td></tr>
+    <tr><td style="padding:4px 8px;color:rgba(255,255,255,0.5);">CollaborationSpaceView</td><td style="padding:4px 8px;">→ 课时页右侧面板的"讨论"Tab</td></tr>
+    <tr><td style="padding:4px 8px;color:rgba(255,255,255,0.5);">ImmersiveLearningView</td><td style="padding:4px 8px;">→ 课时页"深入探索"按钮触发弹出</td></tr>
+    <tr><td style="padding:4px 8px;color:rgba(255,255,255,0.5);">KnowledgePathView</td><td style="padding:4px 8px;">→ 星图页子视图 / 首页"推荐路径"卡片</td></tr>
+    <tr><td style="padding:4px 8px;color:rgba(255,255,255,0.5);">KnowledgePuzzleView</td><td style="padding:4px 8px;">→ 星图页子视图 / 成就中心</td></tr>
+  </table>
+</div>
+
+<div class="section">
+  <h3>删除的路由</h3>
+  <p style="font-size:12px;color:rgba(255,255,255,0.4);">
+    <code>/student/workspace</code>（AIWorkspace，功能合并到 companion）<br>
+    <code>/student/courses</code>（CoursePlatform 大杂烩，分解为 subjects/:id → courses/:id → lessons/:id）<br>
+    <code>/student/quiz</code>（自适应测验，嵌入课程页和"我的"）<br>
+    <code>/student/exam</code>（考试，作为"我的"子页）
+  </p>
+</div>

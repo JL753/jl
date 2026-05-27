@@ -1,0 +1,69 @@
+<h2>设计方案 — 第 5 节：知识星图页</h2>
+<p class="subtitle">现有力导向图保留，新增学习路径子视图 + 知识拼图子视图</p>
+
+<div class="mockup">
+  <div class="mockup-header">知识星图 /student/knowledge-map — Tab 切换 + 主视图</div>
+  <div class="mockup-body" style="padding:0;font-family:system-ui;">
+    <!-- Tabs -->
+    <div style="display:flex;border-bottom:1px solid rgba(255,255,255,0.06);padding:0 20px;">
+      <div style="padding:10px 16px;font-size:12px;font-weight:600;color:#60d9fa;border-bottom:2px solid #60d9fa;">星图总览</div>
+      <div style="padding:10px 16px;font-size:12px;color:rgba(255,255,255,0.4);">学习路径</div>
+      <div style="padding:10px 16px;font-size:12px;color:rgba(255,255,255,0.4);">知识拼图</div>
+    </div>
+
+    <!-- Tab 1: Star Map Overview (current KnowledgeStarMap) -->
+    <div style="padding:20px;">
+      <div style="font-size:16px;font-weight:700;margin-bottom:4px;">知识星图总览</div>
+      <div style="font-size:11px;color:rgba(255,255,255,0.4);margin-bottom:16px;">拖拽探索知识点之间的关联，点击节点查看详情</div>
+
+      <!-- Force graph placeholder -->
+      <div style="width:100%;height:280px;background:rgba(0,0,0,0.2);border-radius:12px;border:1px solid rgba(255,255,255,0.06);display:flex;align-items:center;justify-content:center;margin-bottom:16px;">
+        <div style="text-align:center;color:rgba(255,255,255,0.3);font-size:12px;">
+          <div style="width:80px;height:80px;border-radius:50%;border:2px solid rgba(59,130,246,0.3);margin:0 auto 8px;display:flex;align-items:center;justify-content:center;">
+            <div style="width:30px;height:30px;border-radius:50%;background:rgba(59,130,246,0.4);"></div>
+          </div>
+          ECharts 力导向图<br>（现有 KnowledgeStarMap 保留）
+        </div>
+      </div>
+
+      <!-- Node detail popup (simulated) -->
+      <div style="background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);border-radius:10px;padding:16px;">
+        <div style="font-weight:600;margin-bottom:4px;">链表</div>
+        <div style="font-size:11px;color:rgba(255,255,255,0.5);margin-bottom:8px;">数据结构 · 掌握度 60%</div>
+        <div style="height:4px;background:rgba(255,255,255,0.06);border-radius:2px;margin-bottom:12px;">
+          <div style="width:60%;height:100%;background:#eab308;border-radius:2px;"></div>
+        </div>
+        <div style="display:flex;gap:8px;">
+          <button class="mock-button" style="font-size:11px;">进入学习</button>
+          <button class="mock-button" style="font-size:11px;background:rgba(255,255,255,0.06);">查看前置知识</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Tab 2: Learning Path (from KnowledgePathView) — shown as description -->
+    <div style="padding:20px;border-top:1px solid rgba(255,255,255,0.03);">
+      <div style="font-size:13px;font-weight:600;color:rgba(255,255,255,0.5);margin-bottom:8px;">Tab 2: 学习路径 — AI 推荐学习时间线</div>
+      <div style="font-size:11px;color:rgba(255,255,255,0.35);line-height:1.6;">
+        继承 KnowledgePathView 的 Tree 图 + 推荐路径时间线。展示当前学科的知识点前置依赖链，AI 推荐下一步学习什么。与星图总览共享同一份知识图谱数据。
+      </div>
+    </div>
+
+    <!-- Tab 3: Knowledge Puzzle (from KnowledgePuzzleView) — shown as description -->
+    <div style="padding:20px;border-top:1px solid rgba(255,255,255,0.03);">
+      <div style="font-size:13px;font-weight:600;color:rgba(255,255,255,0.5);margin-bottom:8px;">Tab 3: 知识拼图 — 掌握度可视化游戏</div>
+      <div style="font-size:11px;color:rgba(255,255,255,0.35);line-height:1.6;">
+        继承 KnowledgePuzzleView 的 4 列拼图网格。已掌握知识点为亮色，未掌握为暗色。点击可查看详情或进入学习。不保留解锁机制。
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="section">
+  <h3>改动要点</h3>
+  <table style="width:100%;font-size:12px;border-collapse:collapse;">
+    <tr><td style="padding:4px 8px;color:rgba(255,255,255,0.5);width:120px;">现有星图</td><td style="padding:4px 8px;">保留力导向图 + 节点点击详情 + 掌握度进度条</td></tr>
+    <tr><td style="padding:4px 8px;color:rgba(255,255,255,0.5);">新增 Tab</td><td style="padding:4px 8px;">"学习路径"（KnowledgePathView 嵌入）、"知识拼图"（KnowledgePuzzleView 嵌入）</td></tr>
+    <tr><td style="padding:4px 8px;color:rgba(255,255,255,0.5);">数据</td><td style="padding:4px 8px;">三个 Tab 共享同一套知识图谱 API 数据</td></tr>
+    <tr><td style="padding:4px 8px;color:rgba(255,255,255,0.5);">删除文件</td><td style="padding:4px 8px;">KnowledgePathView.vue、KnowledgePuzzleView.vue（功能并入此页）</td></tr>
+  </table>
+</div>

@@ -1,0 +1,104 @@
+<h2>核心组件设计</h2>
+<p class="subtitle">定义页面中反复出现的关键组件视觉规范</p>
+
+<div class="section">
+  <h3>1. 课程卡片 (CourseCard)</h3>
+  <div style="display:flex;gap:16px;flex-wrap:wrap;">
+    <div style="flex:1;min-width:200px;border-radius:12px;border:1px solid rgba(255,255,255,0.06);background:rgba(255,255,255,0.03);overflow:hidden;">
+      <div style="height:80px;background:linear-gradient(135deg,rgba(59,130,246,0.3),rgba(6,182,212,0.2));display:flex;align-items:center;justify-content:center;font-size:24px;">📘</div>
+      <div style="padding:12px;">
+        <div style="font-size:13px;font-weight:600;">课程名称</div>
+        <div style="font-size:11px;color:rgba(255,255,255,0.4);margin:4px 0;">课程简介...</div>
+        <div style="display:flex;gap:6px;margin-top:8px;">
+          <span style="padding:2px 8px;border-radius:4px;background:rgba(59,130,246,0.12);font-size:10px;color:#60a5fa;">12课时</span>
+          <span style="padding:2px 8px;border-radius:4px;background:rgba(16,185,129,0.12);font-size:10px;color:#34d399;">新手</span>
+        </div>
+      </div>
+    </div>
+    <div style="flex:1;min-width:200px;border-radius:12px;border:1px solid rgba(255,255,255,0.1);background:rgba(255,255,255,0.05);overflow:hidden;">
+      <div style="height:100px;background:linear-gradient(135deg,rgba(168,85,247,0.3),rgba(59,130,246,0.2));display:flex;align-items:center;justify-content:center;font-size:28px;">📘</div>
+      <div style="padding:14px;">
+        <div style="font-size:14px;font-weight:600;">课程名称</div>
+        <div style="font-size:12px;color:rgba(255,255,255,0.4);margin:4px 0;">课程简介...</div>
+        <div style="height:4px;border-radius:2px;background:rgba(255,255,255,0.08);margin:10px 0;">
+          <div style="width:60%;height:100%;border-radius:2px;background:linear-gradient(90deg,#3b82f6,#60d9fa);"></div>
+        </div>
+        <span style="font-size:10px;color:rgba(255,255,255,0.3);">60% 完成</span>
+      </div>
+    </div>
+  </div>
+  <div style="margin-top:12px;">
+    <p>你倾向于哪种卡片密度？</p>
+    <div class="options" style="grid-template-columns:1fr 1fr;">
+      <div class="option" data-choice="compact" onclick="toggleSelect(this)">
+        <div class="letter">A</div>
+        <div class="content">
+          <h3>紧凑型</h3>
+          <p>小图(80px) + 简洁信息，一屏可见更多卡片</p>
+        </div>
+      </div>
+      <div class="option" data-choice="expressive" onclick="toggleSelect(this)">
+        <div class="letter">B</div>
+        <div class="content">
+          <h3>表现型</h3>
+          <p>大图(100px+) + 进度条 + 丰富信息，突出沉浸感</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="section">
+  <h3>2. AI 悬浮助手</h3>
+  <p>课时学习页中的 AI 助手样式：</p>
+</div>
+
+<div class="options">
+  <div class="option" data-choice="ai-ball" onclick="toggleSelect(this)">
+    <div class="letter">A</div>
+    <div class="content">
+      <h3>悬浮球</h3>
+      <p>右下角浮动圆形按钮，点击展开对话面板。不遮挡内容。</p>
+    </div>
+  </div>
+  <div class="option" data-choice="ai-sidebar" onclick="toggleSelect(this)">
+    <div class="letter">B</div>
+    <div class="content">
+      <h3>侧边面板</h3>
+      <p>右侧可折叠面板，始终可见侧边栏，随时提问。</p>
+    </div>
+  </div>
+  <div class="option" data-choice="ai-bottom" onclick="toggleSelect(this)">
+    <div class="letter">C</div>
+    <div class="content">
+      <h3>底部对话栏</h3>
+      <p>页面底部固定输入框，类似聊天界面。</p>
+    </div>
+  </div>
+</div>
+
+<div class="section">
+  <h3>3. 课时进度与掌握度标识</h3>
+  <p>课程详情页中的课时列表，掌握度展示方式：</p>
+</div>
+
+<div class="cards">
+  <div class="card" data-choice="progress-dot" onclick="toggleSelect(this)">
+    <div class="card-body">
+      <h3>圆点标识</h3>
+      <p>课时左侧三色圆点：灰=未学 / 蓝=学习中 / 绿=已完成，右端显示掌握度百分比</p>
+    </div>
+  </div>
+  <div class="card" data-choice="progress-bar" onclick="toggleSelect(this)">
+    <div class="card-body">
+      <h3>迷你进度条</h3>
+      <p>每条课时下方显示微型进度条 + 掌握度百分比，信息更丰富</p>
+    </div>
+  </div>
+  <div class="card" data-choice="progress-badge" onclick="toggleSelect(this)">
+    <div class="card-body">
+      <h3>标签徽章</h3>
+      <p>课时右侧显示掌握度标签：未掌握/待加强/已掌握/精通</p>
+    </div>
+  </div>
+</div>

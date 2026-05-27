@@ -1,0 +1,60 @@
+<h2>设计方案 — 第 3 节：学科浏览 & 课程选择</h2>
+<p class="subtitle">两级卡片下钻：学科网格 → 课程列表 → 进入课程后切换为三栏布局</p>
+
+<div class="mockup">
+  <div class="mockup-header">学科列表页 /student/subjects</div>
+  <div class="mockup-body" style="padding:20px;">
+    <div style="font-size:20px;font-weight:700;margin-bottom:4px;">探索学科</div>
+    <div style="font-size:12px;color:rgba(255,255,255,0.4);margin-bottom:20px;">选择一个学科开始学习</div>
+    <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:12px;">
+      <div style="background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);border-radius:12px;padding:20px;cursor:pointer;">
+        <div style="width:48px;height:48px;border-radius:10px;background:linear-gradient(135deg,#3b82f6,#60d9fa);display:flex;align-items:center;justify-content:center;font-size:20px;font-weight:800;margin-bottom:12px;color:#080d1f;">CS</div>
+        <div style="font-weight:700;margin-bottom:2px;">计算机科学</div>
+        <div style="font-size:11px;color:rgba(255,255,255,0.4);">5 门课程 · 42 课时</div>
+      </div>
+      <div style="background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);border-radius:12px;padding:20px;">
+        <div style="width:48px;height:48px;border-radius:10px;background:linear-gradient(135deg,#a855f7,#7c3aed);display:flex;align-items:center;justify-content:center;font-size:20px;font-weight:800;margin-bottom:12px;color:#080d1f;">MA</div>
+        <div style="font-weight:700;margin-bottom:2px;">数学</div>
+        <div style="font-size:11px;color:rgba(255,255,255,0.4);">4 门课程 · 36 课时</div>
+      </div>
+      <div style="background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);border-radius:12px;padding:20px;">
+        <div style="width:48px;height:48px;border-radius:10px;background:linear-gradient(135deg,#06b6d4,#0bc5ea);display:flex;align-items:center;justify-content:center;font-size:20px;font-weight:800;margin-bottom:12px;color:#080d1f;">PH</div>
+        <div style="font-weight:700;margin-bottom:2px;">物理学</div>
+        <div style="font-size:11px;color:rgba(255,255,255,0.4);">3 门课程 · 28 课时</div>
+      </div>
+      <div style="background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);border-radius:12px;padding:20px;">
+        <div style="width:48px;height:48px;border-radius:10px;background:linear-gradient(135deg,#f59e0b,#d97706);display:flex;align-items:center;justify-content:center;font-size:20px;font-weight:800;margin-bottom:12px;color:#080d1f;">EN</div>
+        <div style="font-weight:700;margin-bottom:2px;">英语</div>
+        <div style="font-size:11px;color:rgba(255,255,255,0.4);">3 门课程 · 24 课时</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="mockup" style="margin-top:20px;">
+  <div class="mockup-header">课程列表页 /student/subjects/:id — 点击学科后</div>
+  <div class="mockup-body" style="padding:20px;">
+    <div style="display:flex;align-items:center;gap:8px;margin-bottom:16px;font-size:12px;color:rgba(255,255,255,0.4);">
+      <span>学科</span><span>›</span><span style="color:#fff;">计算机科学</span>
+    </div>
+    <div style="font-size:20px;font-weight:700;margin-bottom:4px;">计算机科学</div>
+    <div style="font-size:12px;color:rgba(255,255,255,0.4);margin-bottom:20px;">5 门课程可供学习</div>
+    <div style="display:flex;flex-direction:column;gap:10px;">
+      <div style="display:flex;align-items:center;gap:14px;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);border-radius:10px;padding:14px;">
+        <div style="width:64px;height:36px;border-radius:6px;background:linear-gradient(135deg,#3b82f6,#60d9fa);display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;color:#080d1f;">入门</div>
+        <div style="flex:1;"><div style="font-weight:600;">编程入门</div><div style="font-size:11px;color:rgba(255,255,255,0.4);">3 单元 · 12 课时 · 已学 40%</div></div>
+        <div style="font-size:11px;color:rgba(255,255,255,0.4);">继续 →</div>
+      </div>
+      <div style="display:flex;align-items:center;gap:14px;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);border-radius:10px;padding:14px;">
+        <div style="width:64px;height:36px;border-radius:6px;background:linear-gradient(135deg,#a855f7,#7c3aed);display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;color:#080d1f;">中级</div>
+        <div style="flex:1;"><div style="font-weight:600;">数据结构与算法</div><div style="font-size:11px;color:rgba(255,255,255,0.4);">4 单元 · 18 课时 · 学习中</div></div>
+        <div style="font-size:11px;color:rgba(255,255,255,0.4);">继续 →</div>
+      </div>
+      <div style="display:flex;align-items:center;gap:14px;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);border-radius:10px;padding:14px;opacity:0.5;">
+        <div style="width:64px;height:36px;border-radius:6px;background:linear-gradient(135deg,#f59e0b,#d97706);display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;color:#080d1f;">高级</div>
+        <div style="flex:1;"><div style="font-weight:600;">操作系统</div><div style="font-size:11px;color:rgba(255,255,255,0.4);">🔒 需先完成数据结构</div></div>
+        <div style="font-size:11px;color:rgba(255,255,255,0.4);">🔒</div>
+      </div>
+    </div>
+  </div>
+</div>

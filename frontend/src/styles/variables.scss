@@ -1,0 +1,82 @@
+// SCSS 变量 — 映射到 CSS 设计令牌
+$primary-color: var(--primary);
+$primary-light: var(--primary-light);
+$primary-lighter: rgba(59, 130, 246, 0.15);
+$primary-dark: var(--primary-deep);
+$success-color: var(--success);
+$warning-color: var(--warning);
+$danger-color: var(--danger);
+
+$bg-page: var(--bg-main);
+$bg-white: var(--bg-soft);
+$bg-light: var(--bg-alt);
+$bg-lighter: rgba(255, 255, 255, 0.04);
+
+$text-primary: var(--text-main);
+$text-regular: var(--text-sub);
+$text-secondary: var(--text-sub);
+$text-placeholder: var(--text-faint);
+
+$border-base: var(--border-base);
+$border-light: var(--border-light);
+$border-extra-light: rgba(255, 255, 255, 0.08);
+$border-lighter: rgba(255, 255, 255, 0.05);
+
+$radius-small: var(--radius-xs);
+$radius-base: var(--radius-sm);
+$radius-medium: var(--radius-md);
+$radius-large: var(--radius-lg);
+$radius-xlarge: var(--radius-xl);
+$radius-round: var(--radius-round);
+
+$shadow-card: var(--shadow-soft);
+$shadow-card-hover: var(--shadow-card);
+$shadow-light: 0 2px 8px rgba(0, 0, 0, 0.3);
+$shadow-medium: 0 4px 16px rgba(0, 0, 0, 0.4);
+$shadow-heavy: 0 8px 32px rgba(0, 0, 0, 0.5);
+
+$spacing-xs: var(--space-xs);
+$spacing-sm: var(--space-sm);
+$spacing-md: var(--space-md);
+$spacing-lg: var(--space-lg);
+$spacing-xl: var(--space-xl);
+$spacing-xxl: var(--space-2xl);
+$spacing-xxxl: var(--space-3xl);
+
+$font-family-base: var(--font-family);
+$font-family-code: 'JetBrains Mono', 'Fira Code', 'Cascadia Code', monospace;
+$font-size-xs: var(--font-xs);
+$font-size-sm: var(--font-sm);
+$font-size-base: var(--font-base);
+$font-size-md: var(--font-md);
+$font-size-lg: var(--font-lg);
+$font-size-xl: var(--font-xl);
+$font-size-xxl: var(--font-2xl);
+$font-size-xxxl: var(--font-3xl);
+
+$font-weight-light: 300;
+$font-weight-normal: 400;
+$font-weight-medium: 500;
+$font-weight-semibold: 600;
+$font-weight-bold: 700;
+
+$transition-fast: var(--transition-fast);
+$transition-base: var(--transition-base);
+$transition-slow: var(--transition-slow);
+
+$header-height: var(--topbar-height);
+$sidebar-width: var(--sidebar-width);
+$sidebar-collapsed-width: var(--sidebar-collapsed);
+
+$gradient-primary: var(--gradient-primary);
+$gradient-success: var(--gradient-success);
+$gradient-blue: linear-gradient(135deg, #3b82f6, #06b6d4);
+$gradient-warning: linear-gradient(135deg, #f59e0b, #fbbf24);
+$gradient-danger: linear-gradient(135deg, #ef4444, #f87171);
+$glow-primary: 0 0 20px rgba(59, 130, 246, 0.4);
+
+$z-index-dropdown: var(--z-dropdown);
+$z-index-sticky: var(--z-sticky);
+$z-index-fixed: var(--z-fixed);
+$z-index-modal-backdrop: var(--z-modal-backdrop);
+$z-index-modal: var(--z-modal);

@@ -1,0 +1,30 @@
+<h2>课时学习页布局 — 最核心的页面</h2>
+<p class="subtitle">可汗三段式（视频+讲义+练习）+ 知域创新功能（AI辅导/笔记/协作）如何共存？</p>
+
+<div class="section">
+  <h3>三个布局方案</h3>
+</div>
+
+<div class="options">
+  <div class="option" data-choice="a" onclick="toggleSelect(this)">
+    <div class="letter">A</div>
+    <div class="content">
+      <h3>方案 A：可汗三段式 + 右侧 AI 面板（可折叠）</h3>
+      <p><strong>布局：</strong>左侧 70% 主内容区（视频 → 讲义 → 练习，纵向滚动），右侧 30% 固定面板（AI 辅导 + 课程进度 + 笔记入口，Tab 切换）。AI 辅导上下文自动绑定当前课时。FAB 浮动按钮（笔记/协作/分享）。<br><strong>优势：</strong>对标可汗主流程，AI 始终可见不打断学习<br><strong>代价：</strong>右侧面板在移动端需要抽屉式隐藏</p>
+    </div>
+  </div>
+  <div class="option" data-choice="b" onclick="toggleSelect(this)">
+    <div class="letter">B</div>
+    <div class="content">
+      <h3>方案 B：内容全宽 + 底部工具栏 + AI 弹窗式</h3>
+      <p><strong>布局：</strong>主内容 100% 宽度（视频 → 讲义 → 练习）。底部固定工具栏：上一个/下一个课时、AI 提问按钮、笔记按钮、标记掌握。AI 以抽屉/弹窗形式从右侧滑出。<br><strong>优势：</strong>内容沉浸感最强，无视觉干扰<br><strong>代价：</strong>AI 和辅助功能不在一屏，需额外点击</p>
+    </div>
+  </div>
+  <div class="option" data-choice="c" onclick="toggleSelect(this)">
+    <div class="letter">C</div>
+    <div class="content">
+      <h3>方案 C：三栏布局 — 课程树 + 主内容 + AI 面板</h3>
+      <p><strong>布局：</strong>左侧 240px 课程树（单元/课时导航），中间主内容区（视频+讲义+练习），右侧 320px AI 面板。类似 VS Code 编辑器布局。<br><strong>优势：</strong>导航、学习、AI 三者同时可见，操作效率最高<br><strong>代价：</strong>三栏在笔记本屏幕上太窄（1280px以下需要折叠左侧树）</p>
+    </div>
+  </div>
+</div>

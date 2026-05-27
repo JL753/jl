@@ -1,0 +1,81 @@
+<h2>设计方案 — 第 7 节："我的"页面</h2>
+<p class="subtitle">整合学习概览 + 成就&游戏化 + 学习分析 + 测验 + 考试 + 社区入口，Tab 切换</p>
+
+<div class="mockup">
+  <div class="mockup-header">个人中心 /student/profile — 顶部信息卡 + 5 个 Tab</div>
+  <div class="mockup-body" style="padding:0;font-family:system-ui;">
+    <!-- User info card (always visible) -->
+    <div style="display:flex;align-items:center;gap:14px;padding:20px;border-bottom:1px solid rgba(255,255,255,0.06);">
+      <div style="width:56px;height:56px;border-radius:50%;background:linear-gradient(135deg,#3b82f6,#a855f7);display:flex;align-items:center;justify-content:center;font-weight:800;font-size:20px;">左</div>
+      <div style="flex:1;">
+        <div style="font-weight:700;">左雯臣</div>
+        <div style="font-size:11px;color:rgba(255,255,255,0.4);">计算机科学 · 大三 · Lv.12</div>
+      </div>
+      <div style="text-align:right;">
+        <div style="font-weight:700;color:#60d9fa;">1,280 XP</div>
+        <div style="font-size:10px;color:rgba(255,255,255,0.3);">连续 7 天</div>
+      </div>
+    </div>
+
+    <!-- Tabs -->
+    <div style="display:flex;border-bottom:1px solid rgba(255,255,255,0.06);padding:0 20px;">
+      <div style="padding:10px 14px;font-size:11px;font-weight:600;color:#60d9fa;border-bottom:2px solid #60d9fa;">学习概览</div>
+      <div style="padding:10px 14px;font-size:11px;color:rgba(255,255,255,0.4);">成就 & 游戏化</div>
+      <div style="padding:10px 14px;font-size:11px;color:rgba(255,255,255,0.4);">学习分析</div>
+      <div style="padding:10px 14px;font-size:11px;color:rgba(255,255,255,0.4);">自适应测验</div>
+      <div style="padding:10px 14px;font-size:11px;color:rgba(255,255,255,0.4);">我的考试</div>
+    </div>
+
+    <!-- Tab 1: Learning Overview -->
+    <div style="padding:20px;">
+      <div style="display:flex;gap:14px;margin-bottom:16px;">
+        <div style="flex:1;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.06);border-radius:10px;padding:14px;">
+          <div style="font-size:10px;text-transform:uppercase;letter-spacing:1px;color:rgba(255,255,255,0.3);">学习统计</div>
+          <div style="display:flex;justify-content:space-between;margin-top:10px;">
+            <div><span style="font-weight:700;">23</span><span style="font-size:10px;color:rgba(255,255,255,0.4);"> 掌握知识点</span></div>
+            <div><span style="font-weight:700;">12</span><span style="font-size:10px;color:rgba(255,255,255,0.4);"> 完成课时</span></div>
+            <div><span style="font-weight:700;">4.5h</span><span style="font-size:10px;color:rgba(255,255,255,0.4);"> 学习时长</span></div>
+          </div>
+        </div>
+        <div style="flex:1;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.06);border-radius:10px;padding:14px;">
+          <div style="font-size:10px;text-transform:uppercase;letter-spacing:1px;color:rgba(255,255,255,0.3);">最近学习</div>
+          <div style="font-size:12px;margin-top:8px;">数据结构 — 链表</div>
+          <div style="font-size:10px;color:rgba(255,255,255,0.4);">2 小时前 · 继续学习 →</div>
+        </div>
+      </div>
+      <div style="background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.06);border-radius:10px;padding:14px;">
+        <div style="font-size:10px;text-transform:uppercase;letter-spacing:1px;color:rgba(255,255,255,0.3);margin-bottom:10px;">学习画像</div>
+        <div style="display:flex;flex-wrap:wrap;gap:8px;font-size:11px;">
+          <div style="background:rgba(59,130,246,0.1);padding:4px 10px;border-radius:6px;color:rgba(255,255,255,0.6);">认知风格：视觉型</div>
+          <div style="background:rgba(168,85,247,0.1);padding:4px 10px;border-radius:6px;color:rgba(255,255,255,0.6);">学习节奏：中等</div>
+          <div style="background:rgba(96,217,250,0.1);padding:4px 10px;border-radius:6px;color:rgba(255,255,255,0.6);">兴趣：编程/算法</div>
+          <div style="background:rgba(245,158,11,0.1);padding:4px 10px;border-radius:6px;color:rgba(255,255,255,0.6);">短板：图论</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Tabs 2-5 described -->
+    <div style="padding:20px;border-top:1px solid rgba(255,255,255,0.03);">
+      <div style="font-size:12px;color:rgba(255,255,255,0.4);line-height:1.8;">
+        <strong>Tab 2: 成就 & 游戏化</strong> — 合并 AchievementCenter + GamificationView<br>
+        &nbsp;&nbsp;XP/等级进度条 / 徽章墙 / 每日挑战 / 排行榜 / 签到按钮<br>
+        <strong>Tab 3: 学习分析</strong> — LearningAnalyticsView 原样保留<br>
+        &nbsp;&nbsp;能力雷达图 / 行为时间线 / 知识热力图 / 学习习惯图表<br>
+        <strong>Tab 4: 自适应测验</strong> — AdaptiveQuizView 原样保留<br>
+        &nbsp;&nbsp;知识点选择 → 出题 → 答题 → 结果分析（3 阶段流程）<br>
+        <strong>Tab 5: 我的考试</strong> — StudentExam 原样保留<br>
+        &nbsp;&nbsp;考试列表 / 考前知识覆盖检查 / 答题 / 提交 / 成绩记录<br>
+        <strong>底部入口</strong> — 问答社区 → /student/community
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="section">
+  <h3>文件整合</h3>
+  <table style="width:100%;font-size:12px;border-collapse:collapse;">
+    <tr><td style="padding:4px 8px;color:rgba(255,255,255,0.5);width:80px;">保留为 Tab</td><td style="padding:4px 8px;">AchievementCenter, GamificationView（合并）, LearningAnalyticsView, AdaptiveQuizView, StudentExam</td></tr>
+    <tr><td style="padding:4px 8px;color:rgba(255,255,255,0.5);">新增</td><td style="padding:4px 8px;">"学习概览" Tab（用户信息 + 学习画像 + 统计）</td></tr>
+    <tr><td style="padding:4px 8px;color:rgba(255,255,255,0.5);">底部入口</td><td style="padding:4px 8px;">问答社区链接（CommunityView 独立路由）</td></tr>
+  </table>
+</div>
