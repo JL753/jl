@@ -16,3 +16,6 @@ application-local.yml
 .vscode/
 *.swp
 *.swo
+
+# Claude worktrees
+.claude/worktrees/
