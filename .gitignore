@@ -5,3 +5,14 @@ backend/target/
 *.log
 .DS_Store
 nul
+
+# Local config overrides
+*.local.*
+.env
+.env.local
+application-local.yml
+
+# IDE
+.vscode/
+*.swp
+*.swo

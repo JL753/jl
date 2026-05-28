@@ -7,7 +7,7 @@ spring:
   datasource:
     url: ${DB_URL:jdbc:mysql://127.0.0.1:3306/smartprep?useUnicode=true&characterEncoding=utf-8&serverTimezone=Asia/Shanghai}
     username: ${DB_USERNAME:root}
-    password: ${DB_PASSWORD:root}
+    password: ${DB_PASSWORD:your_db_password}
     driver-class-name: com.mysql.cj.jdbc.Driver
   data:
     redis:
@@ -27,12 +27,12 @@ mybatis-plus:
 
 smartprep:
   jwt:
-    secret: ${JWT_SECRET:please-set-JWT_SECRET-env-var-before-production}
+    secret: ${JWT_SECRET:your_jwt_secret_change_me}
     expire-hours: ${JWT_EXPIRE_HOURS:24}
   safety:
     blocked-words: ${BLOCKED_WORDS:作弊,违法,恐怖,色情,暴力}
   llm:
-    api-key: ${LLM_API_KEY:YOUR_DEEPSEEK_API_KEY}
+    api-key: ${LLM_API_KEY:your_llm_api_key}
     base-url: ${LLM_BASE_URL:https://api.deepseek.com/v1}
     model: ${LLM_MODEL:deepseek-chat}
     temperature: ${LLM_TEMPERATURE:0.7}
@@ -40,6 +40,6 @@ smartprep:
   neo4j:
     uri: ${NEO4J_URI:bolt://localhost:7687}
     username: ${NEO4J_USERNAME:neo4j}
-    password: ${NEO4J_PASSWORD:password123}
+    password: ${NEO4J_PASSWORD:your_neo4j_password}
   baidu:
-    search-token: ${BAIDU_SEARCH_TOKEN:YOUR_BAIDU_SEARCH_TOKEN}
+    search-token: ${BAIDU_SEARCH_TOKEN:your_baidu_search_token}

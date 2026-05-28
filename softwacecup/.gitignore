@@ -24,3 +24,9 @@ frontend-error.log
 # 临时文件
 temp_patch*.py
 test.txt
+
+# 测试产物（含真实 token）
+login_response.json
+
+# 应用配置（含密钥默认值，仅允许 .example 模板）
+backend/src/main/resources/application.yml
