@@ -1,0 +1,73 @@
+<h2>排版系统 &amp; 布局网格</h2>
+<p class="subtitle">延续混合风格，定义文字层级和页面布局结构</p>
+
+<div class="section">
+  <h3>1. 字体方案</h3>
+  <p>选择主要字体：</p>
+</div>
+
+<div class="options">
+  <div class="option" data-choice="system" onclick="toggleSelect(this)">
+    <div class="letter">A</div>
+    <div class="content">
+      <h3>系统字体栈</h3>
+      <p style="font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;">font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif</p>
+      <p style="font-size:12px;color:rgba(255,255,255,0.5);">无额外加载，性能最佳，原生感强</p>
+    </div>
+  </div>
+  <div class="option" data-choice="inter" onclick="toggleSelect(this)">
+    <div class="letter">B</div>
+    <div class="content">
+      <h3>Inter 字体</h3>
+      <p style="font-family:'Inter',sans-serif;">数字友好，无衬线，现代感强</p>
+      <p style="font-size:12px;color:rgba(255,255,255,0.5);">需加载字体文件，适合科技感产品</p>
+    </div>
+  </div>
+  <div class="option" data-choice="both" onclick="toggleSelect(this)">
+    <div class="letter">C</div>
+    <div class="content">
+      <h3>标题 Inter + 正文系统</h3>
+      <p>标题/数字用 Inter，正文用系统字体</p>
+      <p style="font-size:12px;color:rgba(255,255,255,0.5);">平衡视觉效果与性能</p>
+    </div>
+  </div>
+</div>
+
+<div class="section">
+  <h3>2. 页面布局结构</h3>
+  <p>学生端页面采用哪种布局框架？</p>
+</div>
+
+<div class="cards">
+  <div class="card" data-choice="sidebar" onclick="toggleSelect(this)">
+    <div class="card-body">
+      <h3>固定侧边栏</h3>
+      <div style="display:flex;gap:8px;height:120px;margin-top:8px;">
+        <div style="width:50px;border-radius:8px;background:rgba(255,255,255,0.06);"></div>
+        <div style="flex:1;border-radius:8px;background:rgba(255,255,255,0.03);"></div>
+      </div>
+      <p style="font-size:12px;color:rgba(255,255,255,0.5);margin-top:8px;">左侧固定 50px 图标导航栏，内容区占满剩余宽度</p>
+    </div>
+  </div>
+  <div class="card" data-choice="topbar" onclick="toggleSelect(this)">
+    <div class="card-body">
+      <h3>顶部导航栏</h3>
+      <div style="display:flex;gap:8px;height:120px;margin-top:8px;flex-direction:column;">
+        <div style="height:36px;border-radius:8px;background:rgba(255,255,255,0.06);"></div>
+        <div style="flex:1;border-radius:8px;background:rgba(255,255,255,0.03);"></div>
+      </div>
+      <p style="font-size:12px;color:rgba(255,255,255,0.5);margin-top:8px;">顶部固定导航栏，内容区填满下方</p>
+    </div>
+  </div>
+  <div class="card" data-choice="hybrid" onclick="toggleSelect(this)">
+    <div class="card-body">
+      <h3>顶部 + 标签栏</h3>
+      <div style="display:flex;gap:8px;height:120px;margin-top:8px;flex-direction:column;">
+        <div style="height:36px;border-radius:8px;background:rgba(255,255,255,0.06);"></div>
+        <div style="flex:1;border-radius:8px;background:rgba(255,255,255,0.03);"></div>
+        <div style="height:32px;border-radius:8px;background:rgba(255,255,255,0.04);"></div>
+      </div>
+      <p style="font-size:12px;color:rgba(255,255,255,0.5);margin-top:8px;">顶部导航 + 底部标签栏，适合移动端适配</p>
+    </div>
+  </div>
+</div>

@@ -1,0 +1,43 @@
+<h2>学生端重设计 — 对标可汗学院</h2>
+<p class="subtitle">2026-05-16 · 智域学生端 8 页完整设计规格</p>
+
+<div class="section">
+  <h3>当前状态</h3>
+  <p>学生端现有 <strong>16 个视图文件</strong>，其中 8 个有路由、8 个孤立无路由。核心页面 CoursePlatform 是一个 894 行的"大杂烩"页面，内嵌 6 个 tab（课程/知识/测验/协作/游戏化/笔记），部分功能与独立页面重复。底部导航栏只露出 5 个入口，大量功能无法触达。</p>
+</div>
+
+<div class="section">
+  <h3>目标</h3>
+  <p>让学生端的<strong>完整使用流程</strong>与可汗学院学生端保持一致，同时<strong>保留知域的创新功能</strong>（AI 辅导、知识星图、自适应测验、游戏化等）。</p>
+</div>
+
+<div class="section">
+  <h3>可汗学院学生端核心流程</h3>
+  <div class="mockup">
+    <div class="mockup-body" style="padding:20px;font-family:system-ui;">
+      <div style="display:flex;gap:24px;flex-wrap:wrap;">
+        <div style="flex:1;min-width:180px;background:rgba(255,255,255,0.04);border-radius:12px;padding:16px;border:1px solid rgba(255,255,255,0.08);">
+          <div style="font-weight:700;color:#3b82f6;margin-bottom:8px;">① 首页 Dashboard</div>
+          <div style="font-size:13px;color:rgba(255,255,255,0.6);line-height:1.6;">Continue Learning 卡片<br>最近活动<br>推荐下一步<br>学习周报</div>
+        </div>
+        <div style="flex:1;min-width:180px;background:rgba(255,255,255,0.04);border-radius:12px;padding:16px;border:1px solid rgba(255,255,255,0.08);">
+          <div style="font-weight:700;color:#a855f7;margin-bottom:8px;">② 学科浏览</div>
+          <div style="font-size:13px;color:rgba(255,255,255,0.6);line-height:1.6;">学科 → 课程 → 单元 → 课时<br>四级层级<br>搜索/筛选</div>
+        </div>
+        <div style="flex:1;min-width:180px;background:rgba(255,255,255,0.04);border-radius:12px;padding:16px;border:1px solid rgba(255,255,255,0.08);">
+          <div style="font-weight:700;color:#60d9fa;margin-bottom:8px;">③ 课时学习</div>
+          <div style="font-size:13px;color:rgba(255,255,255,0.6);line-height:1.6;">视频 + 图文讲义<br>课后练习<br>掌握度检测</div>
+        </div>
+        <div style="flex:1;min-width:180px;background:rgba(255,255,255,0.04);border-radius:12px;padding:16px;border:1px solid rgba(255,255,255,0.08);">
+          <div style="font-weight:700;color:#06b6d4;margin-bottom:8px;">④ 进度/掌握度</div>
+          <div style="font-size:13px;color:rgba(255,255,255,0.6);line-height:1.6;">知识地图<br>技能掌握度<br>学习进度追踪</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="section">
+  <h3>确认范围</h3>
+  <p>在开始详细设计之前，请确认：<strong>你要重新设计的是学生端的完整信息架构（不只是页面视觉，而是整体页面结构+导航+路由），对标可汗学院的产品骨架，对吗？</strong></p>
+</div>

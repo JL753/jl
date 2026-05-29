@@ -1,0 +1,80 @@
+<h2>知域 — 设计方向选择</h2>
+<p class="subtitle">哪种视觉风格最能体现"知域"的理念？</p>
+
+<div class="cards">
+  <div class="card" data-choice="cosmos" onclick="toggleSelect(this)">
+    <div class="card-image" style="background: linear-gradient(135deg, #0a0e27 0%, #1a1f4e 50%, #0d2137 100%); height: 160px; display:flex; align-items:center; justify-content:center; position:relative; overflow:hidden;">
+      <div style="position:absolute; width:6px; height:6px; background:#7c9fff; border-radius:50%; top:20%; left:15%; box-shadow: 0 0 8px #7c9fff;"></div>
+      <div style="position:absolute; width:4px; height:4px; background:#a78bfa; border-radius:50%; top:40%; left:70%; box-shadow: 0 0 6px #a78bfa;"></div>
+      <div style="position:absolute; width:8px; height:8px; background:#60d9fa; border-radius:50%; top:65%; left:30%; box-shadow: 0 0 10px #60d9fa;"></div>
+      <div style="position:absolute; width:5px; height:5px; background:#f9a8d4; border-radius:50%; top:25%; left:55%; box-shadow: 0 0 7px #f9a8d4;"></div>
+      <div style="position:absolute; width:3px; height:3px; background:#86efac; border-radius:50%; top:75%; left:80%; box-shadow: 0 0 5px #86efac;"></div>
+      <div style="position:absolute; width:1px; height:40px; background:rgba(124,159,255,0.3); top:18%; left:15%; transform:rotate(30deg);"></div>
+      <div style="position:absolute; width:1px; height:30px; background:rgba(167,139,250,0.3); top:38%; left:70%; transform:rotate(-20deg);"></div>
+      <span style="color:#e2e8f0; font-size:22px; font-weight:700; letter-spacing:4px; text-shadow: 0 0 20px rgba(124,159,255,0.8);">知 域</span>
+    </div>
+    <div class="card-body">
+      <h3>A. 星图宇宙风</h3>
+      <p>深色背景，知识点如星星散布，学习路径如星座连线。强调"探索未知领域"的感觉。适合沉浸式学习体验。</p>
+    </div>
+  </div>
+
+  <div class="card" data-choice="clean" onclick="toggleSelect(this)">
+    <div class="card-image" style="background: #f8fafc; height: 160px; display:flex; align-items:center; justify-content:center; border-bottom: 1px solid #e2e8f0; position:relative; overflow:hidden;">
+      <div style="position:absolute; top:16px; left:16px; right:16px; height:28px; background:#fff; border-radius:6px; border:1px solid #e2e8f0; display:flex; align-items:center; padding:0 12px; gap:8px;">
+        <div style="width:8px;height:8px;background:#3b82f6;border-radius:50%;"></div>
+        <div style="width:60px;height:6px;background:#e2e8f0;border-radius:3px;"></div>
+        <div style="width:40px;height:6px;background:#e2e8f0;border-radius:3px; margin-left:auto;"></div>
+      </div>
+      <div style="display:flex; gap:10px; margin-top:20px;">
+        <div style="width:70px; height:80px; background:#eff6ff; border-radius:8px; border:1px solid #bfdbfe; display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;">
+          <div style="width:24px;height:24px;background:#3b82f6;border-radius:6px;"></div>
+          <div style="width:40px;height:4px;background:#93c5fd;border-radius:2px;"></div>
+          <div style="width:30px;height:4px;background:#bfdbfe;border-radius:2px;"></div>
+        </div>
+        <div style="width:70px; height:80px; background:#f0fdf4; border-radius:8px; border:1px solid #bbf7d0; display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;">
+          <div style="width:24px;height:24px;background:#22c55e;border-radius:6px;"></div>
+          <div style="width:40px;height:4px;background:#86efac;border-radius:2px;"></div>
+          <div style="width:30px;height:4px;background:#bbf7d0;border-radius:2px;"></div>
+        </div>
+        <div style="width:70px; height:80px; background:#faf5ff; border-radius:8px; border:1px solid #e9d5ff; display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;">
+          <div style="width:24px;height:24px;background:#a855f7;border-radius:6px;"></div>
+          <div style="width:40px;height:4px;background:#d8b4fe;border-radius:2px;"></div>
+          <div style="width:30px;height:4px;background:#e9d5ff;border-radius:2px;"></div>
+        </div>
+      </div>
+    </div>
+    <div class="card-body">
+      <h3>B. 简洁现代风</h3>
+      <p>白色主调，彩色学科卡片，清晰的信息层级。类似可汗学院现有风格，专注内容本身。适合所有年龄段。</p>
+    </div>
+  </div>
+
+  <div class="card" data-choice="ink" onclick="toggleSelect(this)">
+    <div class="card-image" style="background: linear-gradient(135deg, #fefce8 0%, #f0fdf4 50%, #eff6ff 100%); height: 160px; display:flex; align-items:center; justify-content:center; position:relative; overflow:hidden;">
+      <div style="position:absolute; top:10px; left:10px; width:50px; height:50px; border:2px solid rgba(0,0,0,0.08); border-radius:50%; display:flex;align-items:center;justify-content:center;">
+        <span style="font-size:20px;">数</span>
+      </div>
+      <div style="position:absolute; top:10px; right:10px; width:50px; height:50px; border:2px solid rgba(0,0,0,0.08); border-radius:50%; display:flex;align-items:center;justify-content:center;">
+        <span style="font-size:20px;">理</span>
+      </div>
+      <div style="position:absolute; bottom:10px; left:30px; width:50px; height:50px; border:2px solid rgba(0,0,0,0.08); border-radius:50%; display:flex;align-items:center;justify-content:center;">
+        <span style="font-size:20px;">文</span>
+      </div>
+      <div style="position:absolute; bottom:10px; right:30px; width:50px; height:50px; border:2px solid rgba(0,0,0,0.08); border-radius:50%; display:flex;align-items:center;justify-content:center;">
+        <span style="font-size:20px;">史</span>
+      </div>
+      <div style="width:60px;height:60px;background:white;border-radius:50%;display:flex;align-items:center;justify-content:center;box-shadow:0 4px 20px rgba(0,0,0,0.1);z-index:1;">
+        <span style="font-size:26px;font-weight:700;color:#1e293b;">知</span>
+      </div>
+      <div style="position:absolute;width:1px;height:35px;background:rgba(0,0,0,0.1);top:35px;left:60px;transform:rotate(45deg);"></div>
+      <div style="position:absolute;width:1px;height:35px;background:rgba(0,0,0,0.1);top:35px;right:60px;transform:rotate(-45deg);"></div>
+      <div style="position:absolute;width:1px;height:35px;background:rgba(0,0,0,0.1);bottom:35px;left:60px;transform:rotate(-45deg);"></div>
+      <div style="position:absolute;width:1px;height:35px;background:rgba(0,0,0,0.1);bottom:35px;right:60px;transform:rotate(45deg);"></div>
+    </div>
+    <div class="card-body">
+      <h3>C. 东方知识图谱风</h3>
+      <p>以汉字为视觉核心，知识点以图谱/网络形式呈现，融合中国传统书院美学与现代设计。体现"知域"的文化底蕴。</p>
+    </div>
+  </div>
+</div>

@@ -1,0 +1,19 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(find . -type f -name \"*.java\" -exec wc -l {} +)",
+      "Bash(grep -l 'public.*ResponseEntity\\\\|public.*ApiResponse' *.java)",
+      "Bash(grep -c public.*ResponseEntity *.java)",
+      "Bash(grep -c public.*ApiResponse *.java)",
+      "Bash(grep -r SplitPaneStudy C:/Users/ZWC/Desktop/软件杯大赛/softwacecup/frontend/src --include=*.vue --include=*.ts --include=*.js)",
+      "Bash(grep -r CourseView C:/Users/ZWC/Desktop/软件杯大赛/softwacecup/frontend/src --include=*.ts --include=*.js)",
+      "Bash(find C:UsersZWCDesktop软件杯大赛softwacecupfrontendsrc -name *token* -o -name *variable* -o -name *design*)",
+      "Bash(node -e \"const p = require\\(''./package.json''\\); console.log\\(p.dependencies.marked\\)\")",
+      "Bash(node -e \"const m = require\\(''marked''\\); console.log\\(typeof m.Renderer, typeof m.parse, typeof m.marked\\)\")",
+      "Bash(grep -n \"import.*from ''''vue''''\\\\|import.*from ''''vue-router\\\\|import.*from ''''marked\\\\|import.*from ''''dompurify\\\\|import.*from ''''.*api\\\\|import.*from ''''.*components\\\\|import.*from ''''element-plus\" CourseView.vue)",
+      "Bash(node -e \":*)",
+      "Bash(npx vite:*)",
+      "Bash(npm install:*)"
+    ]
+  }
+}

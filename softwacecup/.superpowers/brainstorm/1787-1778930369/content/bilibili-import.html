@@ -1,0 +1,105 @@
+<h2>设计方案 — 第 3 节：BilibiliImportModal</h2>
+<p class="subtitle">教师端/管理员通用 — 三 Tab 导入弹窗 + AI 预览确认</p>
+
+<div class="mockup">
+  <div class="mockup-header">BilibiliImportModal — Tab 1: 粘贴链接</div>
+  <div class="mockup-body" style="padding:20px;font-family:system-ui;">
+    <!-- Tabs -->
+    <div style="display:flex;border-bottom:1px solid rgba(255,255,255,0.06);margin-bottom:16px;">
+      <div style="padding:10px 16px;font-size:12px;color:#60d9fa;border-bottom:2px solid #60d9fa;font-weight:600;">粘贴链接</div>
+      <div style="padding:10px 16px;font-size:12px;color:rgba(255,255,255,0.4);">搜索视频</div>
+      <div style="padding:10px 16px;font-size:12px;color:rgba(255,255,255,0.4);">合集导入</div>
+    </div>
+
+    <!-- Textarea -->
+    <div style="font-size:12px;color:rgba(255,255,255,0.5);margin-bottom:8px;">粘贴一个或多个 B站视频链接，每行一个</div>
+    <textarea class="mock-input" rows="4" style="width:100%;margin-bottom:12px;resize:vertical;">https://www.bilibili.com/video/BV1xx411c7mD
+https://www.bilibili.com/video/BV1Es4y1r7wJ</textarea>
+
+    <!-- Parse result preview -->
+    <div style="font-size:10px;text-transform:uppercase;letter-spacing:1px;color:rgba(255,255,255,0.3);margin-bottom:8px;">解析结果</div>
+    <div style="display:flex;gap:8px;margin-bottom:8px;align-items:center;background:rgba(255,255,255,0.03);border-radius:8px;padding:10px;border:1px solid rgba(255,255,255,0.06);">
+      <div style="width:100px;min-width:100px;height:58px;background:rgba(0,0,0,0.3);border-radius:4px;display:flex;align-items:center;justify-content:center;font-size:10px;color:rgba(255,255,255,0.3);">封面图</div>
+      <div style="flex:1;min-width:0;">
+        <div style="font-weight:600;font-size:13px;margin-bottom:2px;">数据结构与算法 — 链表详解</div>
+        <div style="font-size:10px;color:rgba(255,255,255,0.4);">BV1xx411c7mD · 45:32 · 计算机科学讲师</div>
+        <div style="font-size:10px;color:#22c55e;margin-top:4px;">AI 分类预测：计算机科学 › 数据结构 › 链表</div>
+      </div>
+      <div style="font-size:10px;color:rgba(255,255,255,0.3);">✓</div>
+    </div>
+    <div style="display:flex;gap:8px;align-items:center;background:rgba(255,255,255,0.03);border-radius:8px;padding:10px;border:1px solid rgba(255,255,255,0.06);">
+      <div style="width:100px;min-width:100px;height:58px;background:rgba(0,0,0,0.3);border-radius:4px;display:flex;align-items:center;justify-content:center;font-size:10px;color:rgba(255,255,255,0.3);">封面图</div>
+      <div style="flex:1;min-width:0;">
+        <div style="font-weight:600;font-size:13px;margin-bottom:2px;">前端必学！Vue3 Composition API 实战教程</div>
+        <div style="font-size:10px;color:rgba(255,255,255,0.4);">BV1Es4y1r7wJ · 28:15 · 前端之巅</div>
+        <div style="font-size:10px;color:#eab308;margin-top:4px;">AI 分类预测：计算机科学 › 编程入门 › Vue3（置信度 62%）</div>
+      </div>
+      <div style="font-size:10px;color:rgba(255,255,255,0.3);">!</div>
+    </div>
+
+    <div style="display:flex;justify-content:flex-end;margin-top:12px;">
+      <button class="mock-button" style="background:linear-gradient(135deg,#3b82f6,#2563eb);font-size:12px;">一键导入 2 个视频</button>
+    </div>
+  </div>
+</div>
+
+<div class="mockup" style="margin-top:20px;">
+  <div class="mockup-header">Tab 2: 搜索视频</div>
+  <div class="mockup-body" style="padding:20px;font-family:system-ui;">
+    <div style="display:flex;gap:8px;margin-bottom:16px;">
+      <input class="mock-input" placeholder="输入关键词，如：数据结构 链表..." style="flex:1;font-size:12px;" />
+      <button class="mock-button" style="font-size:12px;">搜索</button>
+    </div>
+    <div style="font-size:10px;color:rgba(255,255,255,0.3);margin-bottom:8px;">搜索结果 · 共 42 个</div>
+    <div style="display:flex;flex-direction:column;gap:6px;max-height:300px;overflow-y:auto;">
+      <div style="display:flex;align-items:center;gap:10px;padding:8px;background:rgba(255,255,255,0.03);border-radius:6px;border:1px solid rgba(255,255,255,0.06);">
+        <input type="checkbox" checked style="accent-color:#3b82f6;" />
+        <div style="width:80px;min-width:80px;height:46px;background:rgba(0,0,0,0.3);border-radius:4px;"></div>
+        <div style="flex:1;min-width:0;"><div style="font-size:12px;font-weight:600;">数据结构与算法 — 链表</div><div style="font-size:10px;color:rgba(255,255,255,0.4);">45:32 · 12.5万播放 · 计算机系</div></div>
+      </div>
+      <div style="display:flex;align-items:center;gap:10px;padding:8px;background:rgba(255,255,255,0.03);border-radius:6px;border:1px solid rgba(255,255,255,0.06);">
+        <input type="checkbox" checked style="accent-color:#3b82f6;" />
+        <div style="width:80px;min-width:80px;height:46px;background:rgba(0,0,0,0.3);border-radius:4px;"></div>
+        <div style="flex:1;min-width:0;"><div style="font-size:12px;font-weight:600;">图解链表 — 动画演示</div><div style="font-size:10px;color:rgba(255,255,255,0.4);">18:20 · 8.2万播放 · 算法图解</div></div>
+      </div>
+    </div>
+    <div style="display:flex;justify-content:flex-end;margin-top:12px;">
+      <button class="mock-button" style="background:linear-gradient(135deg,#3b82f6,#2563eb);font-size:12px;">导入选中视频（2）</button>
+    </div>
+  </div>
+</div>
+
+<div class="mockup" style="margin-top:20px;">
+  <div class="mockup-header">Tab 3: 合集/播放列表导入</div>
+  <div class="mockup-body" style="padding:20px;font-family:system-ui;">
+    <div style="display:flex;gap:8px;margin-bottom:16px;">
+      <input class="mock-input" placeholder="粘贴合集链接，如 https://space.bilibili.com/xxx/seriesdetail?sid=xxx" style="flex:1;font-size:12px;" />
+      <button class="mock-button" style="font-size:12px;">解析</button>
+    </div>
+    <div style="background:rgba(255,255,255,0.03);border-radius:8px;padding:12px;border:1px solid rgba(255,255,255,0.06);">
+      <div style="font-weight:600;font-size:14px;margin-bottom:4px;">数据结构精讲合集</div>
+      <div style="font-size:10px;color:rgba(255,255,255,0.4);margin-bottom:8px;">共 12 个视频 · 选中 12 个 · AI预测：计算机科学 › 数据结构 系列</div>
+      <div style="display:flex;gap:4px;flex-wrap:wrap;">
+        <div style="font-size:9px;background:rgba(59,130,246,0.1);padding:2px 6px;border-radius:4px;color:rgba(255,255,255,0.5);">1. 数组基础</div>
+        <div style="font-size:9px;background:rgba(59,130,246,0.1);padding:2px 6px;border-radius:4px;color:rgba(255,255,255,0.5);">2. 时间复杂度</div>
+        <div style="font-size:9px;background:rgba(59,130,246,0.1);padding:2px 6px;border-radius:4px;color:rgba(255,255,255,0.5);">3. 链表介绍</div>
+        <div style="font-size:9px;background:rgba(59,130,246,0.1);padding:2px 6px;border-radius:4px;color:rgba(255,255,255,0.5);">4. 单链表操作</div>
+        <div style="font-size:9px;background:rgba(59,130,246,0.1);padding:2px 6px;border-radius:4px;color:rgba(255,255,255,0.5);">5. 双向链表</div>
+        <div style="font-size:9px;background:rgba(67,107,175,0.15);padding:2px 6px;border-radius:4px;color:rgba(255,255,255,0.3);">... 等 7 个视频</div>
+      </div>
+    </div>
+    <div style="display:flex;justify-content:flex-end;margin-top:12px;">
+      <button class="mock-button" style="background:linear-gradient(135deg,#3b82f6,#2563eb);font-size:12px;">一键导入全部 12 个视频</button>
+    </div>
+  </div>
+</div>
+
+<div class="section" style="margin-top:20px;">
+  <h3>关键交互细节</h3>
+  <table style="width:100%;font-size:12px;border-collapse:collapse;">
+    <tr><td style="padding:4px 8px;color:rgba(255,255,255,0.5);width:120px;">AI分类置信度高</td><td style="padding:4px 8px;">绿色文字显示分类路径，直接导入</td></tr>
+    <tr><td style="padding:4px 8px;color:rgba(255,255,255,0.5);">AI分类置信度低</td><td style="padding:4px 8px;">黄色文字 + 感叹号，仍然导入但教师可事后调整</td></tr>
+    <tr><td style="padding:4px 8px;color:rgba(255,255,255,0.5);">解析失败</td><td style="padding:4px 8px;">红色标识，不阻塞其他成功的视频导入</td></tr>
+    <tr><td style="padding:4px 8px;color:rgba(255,255,255,0.5);">导入后状态</td><td style="padding:4px 8px;">课时 = draft，教师可在 ContentManagement 中审阅发布</td></tr>
+  </table>
+</div>

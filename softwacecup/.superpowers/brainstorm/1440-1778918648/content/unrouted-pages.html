@@ -1,0 +1,75 @@
+<h2>8 个孤立页面的去留 — 哪些保留路由，哪些嵌入，哪些砍掉</h2>
+<p class="subtitle">目前 8 个视图文件没有路由，无法从导航触达。每个页面需要决定：独立路由 / 嵌入其他页 / 删除</p>
+
+<div class="section">
+  <h3>请为每个页面选择处理方式</h3>
+  <p style="font-size:13px;color:rgba(255,255,255,0.5);">当前状态标注了 API 接入情况（真 API vs 纯 mock），帮助你判断</p>
+</div>
+
+<div class="options" data-multiselect>
+
+  <div class="option" data-choice="keep-analytics" onclick="toggleSelect(this)">
+    <div class="letter">1</div>
+    <div class="content">
+      <h3>LearningAnalyticsView — 学习分析仪表盘 <span style="font-size:11px;background:#06b6d4;padding:1px 6px;border-radius:4px;color:#000;">✅ 真 API</span></h3>
+      <p>能力雷达图、行为时间线、知识热力图、学习习惯图表。建议：独立路由，放进"我的"页面下做子页</p>
+    </div>
+  </div>
+
+  <div class="option" data-choice="keep-gamification" onclick="toggleSelect(this)">
+    <div class="letter">2</div>
+    <div class="content">
+      <h3>GamificationView — 游戏化中心 <span style="font-size:11px;background:#06b6d4;padding:1px 6px;border-radius:4px;color:#000;">✅ 真 API</span></h3>
+      <p>等级卡、徽章墙、每日挑战、排行榜、经验值增长图。比 AchievementCenter 更完整。建议：与 AchievementCenter 合并为"成就&游戏化"，放进"我的"</p>
+    </div>
+  </div>
+
+  <div class="option" data-choice="keep-path" onclick="toggleSelect(this)">
+    <div class="letter">3</div>
+    <div class="content">
+      <h3>KnowledgePathView — AI 学习路径 <span style="font-size:11px;background:#06b6d4;padding:1px 6px;border-radius:4px;color:#000;">✅ 真 API</span></h3>
+      <p>知识图谱树、AI 推荐学习路径时间线、前置依赖链。建议：嵌入星图页或首页 Dashboard，不独立开路由</p>
+    </div>
+  </div>
+
+  <div class="option" data-choice="keep-puzzle" onclick="toggleSelect(this)">
+    <div class="letter">4</div>
+    <div class="content">
+      <h3>KnowledgePuzzleView — 知识拼图 <span style="font-size:11px;background:#eab308;padding:1px 6px;border-radius:4px;color:#000;">⚠ 部分实现</span></h3>
+      <p>拼图网格、掌握度色块、解锁验证（未完成）。建议：嵌入星图页做子视图，或嵌入游戏化中心</p>
+    </div>
+  </div>
+
+  <div class="option" data-choice="keep-immersive" onclick="toggleSelect(this)">
+    <div class="letter">5</div>
+    <div class="content">
+      <h3>ImmersiveLearningView — 沉浸式学习 <span style="font-size:11px;background:#dc2626;padding:1px 6px;border-radius:4px;color:#fff;">❌ 纯 mock</span></h3>
+      <p>CSS 模拟 3D 模型、虚拟实验、AR 扫描。无真实 3D 库。建议：保留路由但放进课时页的"深入探索"入口</p>
+    </div>
+  </div>
+
+  <div class="option" data-choice="keep-notes" onclick="toggleSelect(this)">
+    <div class="letter">6</div>
+    <div class="content">
+      <h3>SmartNotesView — 智能笔记 <span style="font-size:11px;background:#dc2626;padding:1px 6px;border-radius:4px;color:#fff;">❌ 纯 mock</span></h3>
+      <p>富文本笔记、AI 摘要、标签搜索。无后端持久化。建议：嵌入课时页的笔记面板，不作为独立路由</p>
+    </div>
+  </div>
+
+  <div class="option" data-choice="keep-collab" onclick="toggleSelect(this)">
+    <div class="letter">7</div>
+    <div class="content">
+      <h3>CollaborationSpaceView — 协作空间 <span style="font-size:11px;background:#dc2626;padding:1px 6px;border-radius:4px;color:#fff;">❌ 纯 mock</span></h3>
+      <p>白板画布、协作文档、思维导图、小组聊天。建议：嵌入课时页的"讨论"面板，或独立路由但低优先级</p>
+    </div>
+  </div>
+
+  <div class="option" data-choice="keep-community" onclick="toggleSelect(this)">
+    <div class="letter">8</div>
+    <div class="content">
+      <h3>CommunityView — 问答社区 <span style="font-size:11px;background:#dc2626;padding:1px 6px;border-radius:4px;color:#fff;">❌ 纯 mock</span></h3>
+      <p>Q&A 列表、投票、标签筛选、采纳回答。建议：保留独立路由，在"我的"或导航中设入口</p>
+    </div>
+  </div>
+
+</div>

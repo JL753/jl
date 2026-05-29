@@ -1,0 +1,59 @@
+<h2>设计方案 — 第 6 节：AI 辅导页</h2>
+<p class="subtitle">独立的 AI 对话页面，保留现有 AICompanionView 核心，微调布局适配左侧导航</p>
+
+<div class="mockup">
+  <div class="mockup-header">AI 辅导 /student/companion</div>
+  <div class="mockup-body" style="padding:20px;font-family:system-ui;">
+    <div style="font-size:16px;font-weight:700;margin-bottom:4px;">AI 学习助手</div>
+    <div style="font-size:11px;color:rgba(255,255,255,0.4);margin-bottom:16px;">随时提问，AI 辅导你的学习问题</div>
+
+    <!-- Chat area (takes most of the screen) -->
+    <div style="background:rgba(0,0,0,0.15);border-radius:12px;border:1px solid rgba(255,255,255,0.06);padding:20px;min-height:300px;margin-bottom:12px;">
+      <div style="margin-bottom:12px;">
+        <div style="font-size:10px;color:rgba(255,255,255,0.25);margin-bottom:4px;">AI 助手</div>
+        <div style="background:rgba(59,130,246,0.1);border-radius:8px;padding:10px;max-width:80%;font-size:12px;color:rgba(255,255,255,0.7);line-height:1.6;">
+          你好！我是知域的 AI 学习助手。你可以问我任何学习相关的问题：<br><br>
+          • 解释某个概念<br>
+          • 出练习题<br>
+          • 帮你理解错题<br>
+          • 推荐学习路径<br><br>
+          有什么可以帮你的？
+        </div>
+      </div>
+      <div style="margin-bottom:12px;display:flex;justify-content:flex-end;">
+        <div style="background:rgba(168,85,247,0.1);border-radius:8px;padding:10px;max-width:70%;font-size:12px;color:rgba(255,255,255,0.7);">帮我解释一下二叉树的遍历方式</div>
+      </div>
+      <div style="margin-bottom:12px;">
+        <div style="font-size:10px;color:rgba(255,255,255,0.25);margin-bottom:4px;">AI 助手</div>
+        <div style="background:rgba(59,130,246,0.1);border-radius:8px;padding:10px;max-width:80%;font-size:12px;color:rgba(255,255,255,0.7);line-height:1.6;">
+          二叉树有三种主要遍历方式：<br><br>
+          • <strong>前序遍历</strong>：根 → 左 → 右<br>
+          • <strong>中序遍历</strong>：左 → 根 → 右<br>
+          • <strong>后序遍历</strong>：左 → 右 → 根<br><br>
+          需要我出几道相关的练习吗？
+        </div>
+      </div>
+    </div>
+
+    <!-- Input area -->
+    <div style="display:flex;gap:8px;">
+      <input class="mock-input" placeholder="输入你的问题..." style="flex:1;font-size:12px;">
+      <button class="mock-button">发送</button>
+    </div>
+    <div style="display:flex;gap:6px;margin-top:8px;">
+      <div style="font-size:10px;padding:4px 10px;border-radius:6px;background:rgba(255,255,255,0.04);color:rgba(255,255,255,0.4);">课程相关</div>
+      <div style="font-size:10px;padding:4px 10px;border-radius:6px;background:rgba(255,255,255,0.04);color:rgba(255,255,255,0.4);">错题分析</div>
+      <div style="font-size:10px;padding:4px 10px;border-radius:6px;background:rgba(255,255,255,0.04);color:rgba(255,255,255,0.4);">学习建议</div>
+      <div style="font-size:10px;padding:4px 10px;border-radius:6px;background:rgba(255,255,255,0.04);color:rgba(255,255,255,0.4);">随便聊聊</div>
+    </div>
+  </div>
+</div>
+
+<div class="section">
+  <h3>与现有实现的差异</h3>
+  <table style="width:100%;font-size:12px;border-collapse:collapse;">
+    <tr><td style="padding:4px 8px;color:rgba(255,255,255,0.5);width:100px;">保留</td><td style="padding:4px 8px;">Markdown 渲染、对话历史、打字指示器、欢迎语</td></tr>
+    <tr><td style="padding:4px 8px;color:rgba(255,255,255,0.5);">微调</td><td style="padding:4px 8px;">适配左侧 5 Tab 导航宽度、快捷话题标签替换为预设指令</td></tr>
+    <tr><td style="padding:4px 8px;color:rgba(255,255,255,0.5);">删除</td><td style="padding:4px 8px;">AIWorkspace.vue（1187 行）— 其聊天功能已被此页 + 课时 AI 面板覆盖</td></tr>
+  </table>
+</div>
