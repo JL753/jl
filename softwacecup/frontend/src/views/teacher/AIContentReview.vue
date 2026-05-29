@@ -3,6 +3,7 @@
     <h1>AI 内容审核</h1>
     <p class="subtitle">AI 生成的课堂内容需要你的审核才能发布</p>
 
+    <div v-if="loading" class="empty-state">加载中...</div>
     <div v-for="r in pendingReviews" :key="r.id" class="glass-card review-card">
       <div class="review-header">
         <h3>课时 #{{ r.lessonId }}</h3>
@@ -16,29 +17,49 @@
         <button class="glass-btn primary" @click="approve(r.id)">审核通过</button>
       </div>
     </div>
-    <div v-if="pendingReviews.length === 0" class="empty-state">暂无待审核内容</div>
+    <div v-if="!loading && pendingReviews.length === 0" class="empty-state">暂无待审核内容</div>
   </div>
 </template>
 
 <script setup>
 import { ref, onMounted } from 'vue'
+import { ElMessage, ElMessageBox } from 'element-plus'
 import { apiContentReviewPending, apiContentReviewApprove, apiContentReviewReject } from '../../api/index.js'
 
 const pendingReviews = ref([])
+const loading = ref(false)
 
 onMounted(async () => {
-  try { pendingReviews.value = (await apiContentReviewPending()).data || [] }
-  catch(e) { /* ignore */ }
+  try {
+    loading.value = true
+    pendingReviews.value = (await apiContentReviewPending()).data || []
+  } catch (e) {
+    ElMessage.error('加载审核列表失败')
+  } finally {
+    loading.value = false
+  }
 })
 
 async function approve(id) {
-  try { await apiContentReviewApprove(id); pendingReviews.value = pendingReviews.value.filter(r => r.id !== id) }
-  catch(e) { /* ignore */ }
+  try {
+    await ElMessageBox.confirm('确定要通过此内容的审核吗？', '审核确认', { type: 'info' })
+    await apiContentReviewApprove(id)
+    pendingReviews.value = pendingReviews.value.filter(r => r.id !== id)
+    ElMessage.success('审核已通过')
+  } catch (e) {
+    if (e !== 'cancel' && e !== 'close') ElMessage.error('操作失败，请重试')
+  }
 }
 
 async function reject(id) {
-  try { await apiContentReviewReject(id); pendingReviews.value = pendingReviews.value.filter(r => r.id !== id) }
-  catch(e) { /* ignore */ }
+  try {
+    await ElMessageBox.confirm('确定要拒绝此内容吗？', '拒绝确认', { type: 'warning' })
+    await apiContentReviewReject(id)
+    pendingReviews.value = pendingReviews.value.filter(r => r.id !== id)
+    ElMessage.success('已拒绝')
+  } catch (e) {
+    if (e !== 'cancel' && e !== 'close') ElMessage.error('操作失败，请重试')
+  }
 }
 </script>
 

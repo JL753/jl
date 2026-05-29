@@ -157,7 +157,7 @@ onMounted(async () => {
     userGrade.value = me.grade || ''
     userLevel.value = me.level || 1
     userXp.value = me.xp || 0
-    userStreak.value = streakRes.data?.streak || 0
+    userStreak.value = streakRes.data?.currentStreak || streakRes.data?.current_streak || streakRes.data?.streak || 0
 
     const p = profileRes.data || {}
     stats.value = { mastered: p.masteredCount || 0, lessons: p.completedLessons || 0, hours: p.totalHours || 0 }

@@ -102,13 +102,11 @@
 import * as echarts from 'echarts'
 import { computed, nextTick, onMounted, onUnmounted, ref } from 'vue'
 import { useRouter } from 'vue-router'
-import { useAuthStore } from '../../stores/auth'
 import { apiTeacherDashboard, apiTeacherWorkspace } from '../../api'
 
 const router = useRouter()
-const auth = useAuthStore()
 const barRef = ref(), lineRef = ref(), pieRef = ref(), radarRef = ref(), trendRef = ref()
-const data = ref({ summary: {}, bar: [], notices: [] })
+const data = ref({ summary: {}, bar: [] })
 const workspace = ref({ pendingTasks: [] })
 const currentMonthIdx = ref(new Date().getMonth())
 const currentYear = ref(new Date().getFullYear())

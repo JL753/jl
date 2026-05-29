@@ -33,9 +33,13 @@
 - `dashboard` — 学习概览看板
 - `subjects` — 学科目录
 - `courses/:id` — 课程学习页（含 AI 对话、练习、讲义）
+- `courses` — 重定向到学科目录
 - `knowledge-map` — 知识星图
 - `companion` — AI 学习伙伴（沉浸式）
 - `profile` — 个人中心（含成就、学习分析、自适应测评、考试面板）
+- `exam` — 在线考试
+- `workspace` — 学习分析工作区
+- `analytics` — 学习数据分析
 - `community` — 学习社区
 
 **教师端（/teacher）**
@@ -181,6 +185,30 @@ softwacecup/
 - 全局异常处理
 - 前端 Axios 拦截器自动注入 Token + 401 自动登出
 
-## 9. 更新日志
+## 9. API Key 配置
 
-详见 [CHANGELOG.md](softwacecup/CHANGELOG.md)（2026-05-28 前端全面修复与优化）
+本项目需要配置以下环境变量（详见 [.env.example](softwacecup/.env.example)）：
+
+```bash
+# 方式一：系统环境变量（推荐）
+setx LLM_API_KEY "your_deepseek_api_key"
+setx BAIDU_SEARCH_TOKEN "your_baidu_search_token"
+
+# 方式二：直接修改 application.yml
+# backend/src/main/resources/application.yml 中的 smartprep.llm.api-key 和 smartprep.baidu.search-token
+```
+
+| 变量 | 用途 | 获取地址 |
+|------|------|----------|
+| `LLM_API_KEY` | 大模型（DeepSeek）API | https://platform.deepseek.com/api_keys |
+| `BAIDU_SEARCH_TOKEN` | 百度千帆 AI 搜索 | https://console.bce.baidu.com/iam/#/iam/apikey/list |
+| `JWT_SECRET` | JWT 签名密钥（生产必备） | 任意 64 字符随机字符串 |
+| `NEO4J_PASSWORD` | Neo4j 图数据库（可选） | Neo4j 安装时设置 |
+
+若不配置 LLM_API_KEY，AI 功能（Agent 资源生成、AI 辅导对话）将不可用。
+
+## 10. 更新日志
+
+详见 [CHANGELOG.md](softwacecup/CHANGELOG.md)
+- 2026-05-29：全功能扫描、12 项 BUG 修复、路由完善、API Key 环境变量配置
+- 2026-05-28：前端全面修复与优化（34 项 BUG）、数据库种子数据生成

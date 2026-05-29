@@ -28,7 +28,10 @@ export const apiClassMembers = (classId) => http.get(`/classes/${classId}/member
 export const apiMyClassList = () => http.get('/classes/my-classes')
 export const apiRemoveClassMember = (classId, studentId) => http.delete(`/classes/${classId}/members/${studentId}`)
 export const apiMyAssignments = () => http.get('/assignments/my')
+export const apiClassAssignments = (classId) => http.get(`/assignments/class/${classId}`)
+export const apiCreateAssignment = (data) => http.post('/assignments', data)
 export const apiSubmitAssignment = (id) => http.post(`/assignments/${id}/submit`)
+export const apiAssignmentSubmissions = (id) => http.get(`/assignments/${id}/submissions`)
 
 // ==================== 游戏化 ====================
 export const apiGamificationProgress = () => http.get('/gamification/progress')

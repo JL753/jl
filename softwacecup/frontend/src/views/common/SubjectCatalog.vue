@@ -41,6 +41,7 @@
 <script setup>
 import { ref, computed, onMounted } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
+import { ElMessage } from 'element-plus'
 import { apiSubjects, apiMyImports } from '../../api/index.js'
 import BilibiliImportModal from '../../components/BilibiliImportModal.vue'
 
@@ -64,13 +65,19 @@ async function loadMyImports() {
   try {
     const res = await apiMyImports()
     myImports.value = res.data || []
-  } catch (e) { /* ignore */ }
+  } catch (e) {
+    console.warn('Failed to load imports:', e)
+  }
 }
 
 onMounted(async () => {
   try {
-    subjects.value = (await apiSubjects()).data || []
-  } catch (e) { /* ignore */ }
+    const res = await apiSubjects()
+    const data = res.data
+    subjects.value = Array.isArray(data) ? data : (data?.subjects || data?.list || [])
+  } catch (e) {
+    ElMessage.warning('学科列表加载失败')
+  }
   loadMyImports()
 })
 </script>

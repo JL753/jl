@@ -125,7 +125,7 @@ import { ref, computed, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 import { useAuthStore } from '../stores/auth'
 import TopNavBar from '../components/TopNavBar.vue'
-import { apiSubjects, apiAbilityLatest, apiGamificationStreak } from '../api/index.js'
+import { apiSubjects, apiAbilityLatest, apiGamificationStreak, apiResourceRecommendation } from '../api/index.js'
 
 const auth = useAuthStore()
 const router = useRouter()
@@ -166,8 +166,8 @@ async function loadAuthData() {
   }
   if (!auth.isLoggedIn) return
   try {
-    const [abilityRes, streakRes] = await Promise.allSettled([
-      apiAbilityLatest(), apiGamificationStreak(),
+    const [abilityRes, streakRes, recRes] = await Promise.allSettled([
+      apiAbilityLatest(), apiGamificationStreak(), apiResourceRecommendation('推荐学习资源'),
     ])
     if (abilityRes.status === 'fulfilled') {
       const d = abilityRes.value.data || {}
@@ -185,6 +185,14 @@ async function loadAuthData() {
     if (streakRes.status === 'fulfilled') {
       const d = streakRes.value.data || {}
       streakDays.value = d.currentStreak || d.current_streak || d.streak || 0
+    }
+    if (recRes.status === 'fulfilled') {
+      const list = recRes.value.data?.data || recRes.value.data || []
+      recommendations.value = (Array.isArray(list) ? list : []).slice(0, 5).map(r => ({
+        title: r.title || r.name || '',
+        source: r.source || r.url || '',
+        duration: r.duration || r.estimatedMinutes ? `${r.duration || r.estimatedMinutes}分钟` : '',
+      }))
     }
   } catch {}
 }

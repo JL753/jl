@@ -27,6 +27,10 @@ const routes = [
       { path: 'companion-immersive', redirect: '/student/companion' },
       { path: 'profile', name: 'student-profile', component: () => import('../views/common/ProfileView.vue') },
       { path: 'community', name: 'student-community', component: () => import('../views/student/CommunityView.vue') },
+      { path: 'workspace', name: 'student-workspace', component: () => import('../views/student/LearningAnalyticsView.vue') },
+      { path: 'analytics', name: 'student-analytics', component: () => import('../views/student/LearningAnalyticsView.vue') },
+      { path: 'exam', name: 'student-exam', component: () => import('../views/student/StudentExam.vue') },
+      { path: 'courses', redirect: '/student/subjects' },
     ]
   },
 

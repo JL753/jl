@@ -16,7 +16,7 @@ public class Neo4jConfig {
     @Value("${smartprep.neo4j.username:neo4j}")
     private String username;
 
-    @Value("${smartprep.neo4j.password:password123}")
+    @Value("${smartprep.neo4j.password:your_neo4j_password}")
     private String password;
 
     @Bean

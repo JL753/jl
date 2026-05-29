@@ -177,7 +177,7 @@
 <script setup>
 import { ref, computed, reactive, onBeforeUnmount, onMounted, watch } from 'vue'
 import { ElMessage, ElMessageBox } from 'element-plus'
-import { apiExamList, apiSubmitExam, apiExamRecords } from '../../api'
+import { apiExamList, apiExamDetail, apiSubmitExam, apiExamRecords } from '../../api'
 import { useKnowledgeMapStore, KNOWLEDGE_DOMAINS } from '../../stores/knowledgeMap'
 
 const kmStore = useKnowledgeMapStore()
@@ -243,9 +243,23 @@ function viewExamDetail(row) {
   startExam(row)
 }
 
-function startExam(exam) {
+async function startExam(exam) {
   currentExam.value = exam
   showExamModal.value = true
+  try {
+    const res = await apiExamDetail(exam.id || exam.examId, 'student')
+    if (res.data?.success && res.data?.data?.questions) {
+      examQuestions.value = res.data.data.questions.map(q => ({
+        id: q.questionNo || q.id,
+        content: q.title || q.content,
+        type: q.questionType || q.type || 'single',
+        options: q.options || [],
+        correctAnswer: Array.isArray(q.answerKey) ? q.answerKey : (q.answerKey ? [q.answerKey] : [])
+      }))
+    }
+  } catch (e) {
+    console.warn('Failed to load exam questions, using defaults')
+  }
 }
 
 function startExamProcess() {

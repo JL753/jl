@@ -394,8 +394,11 @@ onMounted(() => {
   }, 30000)
 })
 
+const sseConnection = ref(null)
+
 onUnmounted(() => {
   if (heartbeatTimer) clearInterval(heartbeatTimer)
+  if (sseConnection.value) { sseConnection.value.close(); sseConnection.value = null }
 })
 
 async function loadCourse() {
@@ -640,8 +643,9 @@ function sendMessage() {
   chatHistory.value.push(aiMsg)
   nextTick(() => scrollChat())
 
+  if (sseConnection.value) { sseConnection.value.close() }
   let accumulated = ''
-  openTutorSSE(
+  sseConnection.value = openTutorSSE(
     {
       question: text,
       context: JSON.stringify({ subChapterId: currentSubChapterId.value, lessonName: currentSubChapter.value?.title }),

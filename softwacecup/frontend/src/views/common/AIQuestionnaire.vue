@@ -103,7 +103,7 @@
 </template>
 
 <script setup>
-import { ref, computed, onBeforeUnmount } from 'vue'
+import { ref, onBeforeUnmount } from 'vue'
 import { useRouter } from 'vue-router'
 import { apiBuildProfile } from '../../api/index.js'
 import { ElMessage } from 'element-plus'
@@ -166,83 +166,41 @@ const progressPercent = computed(() => {
   return ((currentStep.value + 1) / steps.length) * 100
 })
 
-// Generate estimated ability levels based on answers
-const abilities = computed(() => {
-  // Default moderate levels
-  const base = {
-    breadth: { label: '知识广度', value: 50, color: 'blue' },
-    depth: { label: '知识深度', value: 40, color: 'purple' },
-    problemSolving: { label: '解题能力', value: 45, color: 'cyan' },
-    activity: { label: '学习活跃度', value: 55, color: 'emerald' },
-    transfer: { label: '知识迁移', value: 40, color: 'amber' },
-    resilience: { label: '学习韧性', value: 50, color: 'rose' },
+const abilities = ref([
+  { label: '知识广度', value: 0, color: 'blue' },
+  { label: '知识深度', value: 0, color: 'purple' },
+  { label: '解题能力', value: 0, color: 'cyan' },
+  { label: '学习活跃度', value: 0, color: 'emerald' },
+  { label: '知识迁移', value: 0, color: 'amber' },
+  { label: '学习韧性', value: 0, color: 'rose' },
+])
+
+function parseAbilitiesFromProfile(profile) {
+  const result = [
+    { label: '知识广度', value: 0, color: 'blue' },
+    { label: '知识深度', value: 0, color: 'purple' },
+    { label: '解题能力', value: 0, color: 'cyan' },
+    { label: '学习活跃度', value: 0, color: 'emerald' },
+    { label: '知识迁移', value: 0, color: 'amber' },
+    { label: '学习韧性', value: 0, color: 'rose' },
+  ]
+  if (!profile) return result
+  const values = {
+    knowledgeBase: 50, cognitiveStyle: 50, pacePreference: 50,
+    interestPreference: 50, examGoal: 50, weakPoints: 50,
   }
-
-  const a = answers.value
-
-  // Adjust based on stage
-  if (a.stage === '大学') {
-    base.depth.value += 15
-    base.problemSolving.value += 10
-    base.transfer.value += 10
-  } else if (a.stage === '在职') {
-    base.breadth.value += 10
-    base.transfer.value += 15
-    base.resilience.value += 10
-  }
-
-  // Adjust based on knowledge
-  if (a.knowledge === '编程基础') {
-    base.breadth.value += 15
-    base.problemSolving.value += 10
-  } else if (a.knowledge === '数学') {
-    base.depth.value += 10
-    base.problemSolving.value += 15
-  }
-
-  // Adjust based on goal
-  if (a.goal === '考试') {
-    base.depth.value += 10
-    base.problemSolving.value += 10
-    base.resilience.value += 10
-  } else if (a.goal === '技能提升') {
-    base.transfer.value += 15
-    base.activity.value += 10
-  } else if (a.goal === '兴趣') {
-    base.breadth.value += 10
-    base.activity.value += 10
-  }
-
-  // Adjust based on time
-  if (a.time === '2小时以上') {
-    base.activity.value += 15
-    base.resilience.value += 10
-  } else if (a.time === '1小时') {
-    base.activity.value += 5
-  } else if (a.time === '<30分钟') {
-    base.resilience.value += 5
-  }
-
-  // Adjust based on style
-  if (a.style === '动手练习') {
-    base.problemSolving.value += 10
-    base.transfer.value += 10
-  } else if (a.style === '混合模式') {
-    base.breadth.value += 10
-    base.transfer.value += 5
-  } else if (a.style === '图文阅读') {
-    base.depth.value += 5
-  } else if (a.style === '视频学习') {
-    base.breadth.value += 5
-  }
-
-  // Clamp to 5-95 range
-  for (const k of Object.keys(base)) {
-    base[k].value = Math.max(5, Math.min(95, base[k].value))
-  }
-
-  return Object.values(base)
-})
+  if (profile.knowledgeBase === '扎实' || profile.knowledgeBase === '良好') { values.knowledgeBase = 70 }
+  if (profile.knowledgeBase === '中等') { values.knowledgeBase = 50 }
+  if (profile.cognitiveStyle === '动手练习' || profile.cognitiveStyle === '混合模式') { values.cognitiveStyle = 65 }
+  if (profile.pacePreference?.includes('3') || profile.pacePreference?.includes('每日')) { values.pacePreference = 75 }
+  result[0].value = Math.max(5, Math.min(95, values.knowledgeBase))
+  result[1].value = Math.max(5, Math.min(95, values.knowledgeBase - 10 + (profile.examGoal ? 10 : 0)))
+  result[2].value = Math.max(5, Math.min(95, values.cognitiveStyle - 5))
+  result[3].value = Math.max(5, Math.min(95, values.pacePreference))
+  result[4].value = Math.max(5, Math.min(95, values.cognitiveStyle))
+  result[5].value = Math.max(5, Math.min(95, values.pacePreference - 10))
+  return result
+}
 
 function selectOption(option) {
   selectedOption.value = option
@@ -263,13 +221,16 @@ function selectOption(option) {
 
 async function submitProfile() {
   try {
-    await apiBuildProfile({
+    const res = await apiBuildProfile({
       major: answers.value.stage,
       course: answers.value.goal,
       knowledgeBase: answers.value.knowledge,
       cognitiveStyle: answers.value.style,
       dailyTime: answers.value.time,
     })
+    if (res.data?.data) {
+      abilities.value = parseAbilitiesFromProfile(res.data.data)
+    }
     submitted.value = true
   } catch (e) {
     ElMessage.warning('画像提交异常，已使用本地结果')
