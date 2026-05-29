@@ -84,15 +84,7 @@ public class SchemaInitializer {
         jdbcTemplate.execute("CREATE TABLE IF NOT EXISTS sp_course_question (id BIGINT PRIMARY KEY, course_id BIGINT NOT NULL, user_id BIGINT NOT NULL, title VARCHAR(256) NOT NULL, content TEXT, created_at DATETIME, updated_at DATETIME)");
         jdbcTemplate.execute("CREATE TABLE IF NOT EXISTS sp_course_answer (id BIGINT PRIMARY KEY, question_id BIGINT NOT NULL, user_id BIGINT, content TEXT NOT NULL, is_ai TINYINT(1) DEFAULT 0, created_at DATETIME, updated_at DATETIME)");
 
-        // 确保基础表存在（init.sql 可能未执行）
-        jdbcTemplate.execute("CREATE TABLE IF NOT EXISTS sp_subject (id BIGINT PRIMARY KEY, name VARCHAR(128) NOT NULL, icon VARCHAR(32), color VARCHAR(16), description VARCHAR(512), sort_order INT DEFAULT 0)");
-        jdbcTemplate.execute("CREATE TABLE IF NOT EXISTS sp_course (id BIGINT PRIMARY KEY, title VARCHAR(255), category VARCHAR(128), description TEXT, cover_image VARCHAR(512), price VARCHAR(64), tag VARCHAR(64), status VARCHAR(32), total_hours INT, target_audience VARCHAR(255), chapters_json LONGTEXT, created_by BIGINT, created_at DATETIME, updated_at DATETIME)");
-
-        // 确保 sp_user 有 display_name 和 avatar_url 列（init.sql 创建的表没有这些列）
-        ensureColumnExists("sp_user", "display_name", "ALTER TABLE sp_user ADD COLUMN display_name VARCHAR(255)");
-        ensureColumnExists("sp_user", "avatar_url", "ALTER TABLE sp_user ADD COLUMN avatar_url VARCHAR(512)");
-
-        // 确保"我的导入"学科存在
+        // 确保“我的导入”学科存在
         jdbcTemplate.execute("INSERT IGNORE INTO sp_subject (id, name, icon, color, description, sort_order) " +
                 "VALUES (9999, '我的导入', '📥', '#f59e0b', '未能自动归类的视频合集', 999)");
 
@@ -105,9 +97,6 @@ public class SchemaInitializer {
         // Ensure sub_chapter has course_id for playlist imports, and chapter_id can be null
         ensureColumnExists("sp_sub_chapter", "course_id", "ALTER TABLE sp_sub_chapter ADD COLUMN course_id BIGINT AFTER chapter_id");
         try { jdbcTemplate.execute("ALTER TABLE sp_sub_chapter MODIFY COLUMN chapter_id BIGINT NULL"); } catch (Exception e) { /* already nullable */ }
-
-        // Ensure sp_knowledge_point has sort_order column
-        ensureColumnExists("sp_knowledge_point", "sort_order", "ALTER TABLE sp_knowledge_point ADD COLUMN sort_order INT DEFAULT 0");
 
         // Ensure dependent tables have sub_chapter_id
         ensureColumnExists("sp_lesson_progress", "sub_chapter_id", "ALTER TABLE sp_lesson_progress ADD COLUMN sub_chapter_id BIGINT");
@@ -139,26 +128,14 @@ public class SchemaInitializer {
     }
 
     private void ensureColumnExists(String tableName, String columnName, String alterSql) {
-        try {
-            // 先确认表存在，避免在空数据库上 ALTER 时报错
-            Integer tableCount = jdbcTemplate.queryForObject(
-                    "SELECT COUNT(*) FROM information_schema.TABLES WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = ?",
-                    Integer.class, tableName);
-            if (tableCount == null || tableCount == 0) {
-                log.debug("表 {} 不存在，跳过添加列 {}", tableName, columnName);
-                return;
-            }
-            Integer count = jdbcTemplate.queryForObject(
-                    "SELECT COUNT(*) FROM information_schema.COLUMNS WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = ? AND COLUMN_NAME = ?",
-                    Integer.class,
-                    tableName,
-                    columnName
-            );
-            if (count == null || count == 0) {
-                jdbcTemplate.execute(alterSql);
-            }
-        } catch (Exception e) {
-            log.warn("确保列 {}.{} 失败: {}", tableName, columnName, e.getMessage());
+        Integer count = jdbcTemplate.queryForObject(
+                "SELECT COUNT(*) FROM information_schema.COLUMNS WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = ? AND COLUMN_NAME = ?",
+                Integer.class,
+                tableName,
+                columnName
+        );
+        if (count == null || count == 0) {
+            jdbcTemplate.execute(alterSql);
         }
     }
 
@@ -374,8 +351,8 @@ public class SchemaInitializer {
         ));
         payload.put("annotations", List.of(
                 Map.of("questionId", 6101L, "score", 10, "comment", "概念完整，监督/无监督区别表述清楚。"),
-                Map.of("questionId", 6102L, "score", 9, "comment", "答到了泛化能力评估，若补充「减少偶然性」会更完整。"),
-                Map.of("questionId", 6103L, "score", 6, "comment", "正则化回答正确，但「增加训练轮次」可能加重过拟合，建议改为早停或数据增强。")
+                Map.of("questionId", 6102L, "score", 9, "comment", "答到了泛化能力评估，若补充“减少偶然性”会更完整。"),
+                Map.of("questionId", 6103L, "score", 6, "comment", "正则化回答正确，但“增加训练轮次”可能加重过拟合，建议改为早停或数据增强。")
         ));
 
         ExamRecord record = new ExamRecord();
@@ -396,7 +373,7 @@ public class SchemaInitializer {
         wrong.setQuestionTitle("请列举两种缓解过拟合的方法。");
         wrong.setMyAnswer("可以通过正则化和增加训练轮次来解决过拟合。");
         wrong.setCorrectAnswer("可采用正则化、早停、数据增强、降低模型复杂度等方法。");
-        wrong.setAnalysis("你已经答对了正则化，但「增加训练轮次」并不是常规缓解过拟合的方法，建议结合早停与数据增强重新理解。 ");
+        wrong.setAnalysis("你已经答对了正则化，但“增加训练轮次”并不是常规缓解过拟合的方法，建议结合早停与数据增强重新理解。 ");
         wrong.setCreatedAt(LocalDateTime.now().minusDays(2));
         wrongQuestionMapper.insert(wrong);
     }

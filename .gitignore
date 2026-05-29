@@ -1,0 +1,21 @@
+node_modules/
+frontend/node_modules/
+backend/target/
+.idea/
+*.log
+.DS_Store
+nul
+
+# Local config overrides
+*.local.*
+.env
+.env.local
+application-local.yml
+
+# IDE
+.vscode/
+*.swp
+*.swo
+
+# Claude worktrees
+.claude/worktrees/
