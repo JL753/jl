@@ -102,8 +102,12 @@
 
 <script setup>
 import { ref, computed, nextTick } from 'vue'
+import DOMPurify from 'dompurify'
+import { useChatStore } from '../stores/chat'
+import { apiSaveQaHistory } from '../api/qa'
 
 const emit = defineEmits(['update:courses'])
+const chatStore = useChatStore()
 
 const inputText = ref('')
 const loading = ref(false)
@@ -138,12 +142,13 @@ const toggleRouteInfo = () => {
 const renderedResponse = computed(() => {
   if (!aiResponse.value) return ''
   // Basic markdown: bold, lists, code, newlines
-  return aiResponse.value
+  const html = aiResponse.value
     .replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>')
     .replace(/^## (.+)$/gm, '<h3 style="color:#60a5fa;margin:12px 0 6px;">$1</h3>')
     .replace(/\n- /g, '\n<span class="md-li">• </span>')
     .replace(/\n(\d+)\. /g, '\n<span class="md-li">$1. </span>')
     .replace(/\n/g, '<br>')
+  return DOMPurify.sanitize(html)
     .replace(/`(.+?)`/g, '<code>$1</code>')
 })
 
@@ -199,6 +204,17 @@ const sendMessage = async () => {
     const result = await response.json()
     aiResponse.value = result.content || result.message || '暂无回复'
 
+    // 自动保存问答历史
+    const answerText = result.content || result.message || ''
+    if (answerText) {
+      apiSaveQaHistory({
+        question: text,
+        answer: answerText,
+        summary: text.length > 50 ? text.substring(0, 50) + '...' : text,
+        sessionId: chatStore.sessionId
+      }).catch(() => {})
+    }
+
     // Sync recommended courses to parent if available
     if (result.courses && result.courses.length > 0) {
       emit('update:courses', result.courses)
@@ -213,6 +229,13 @@ const sendMessage = async () => {
       path: '## 学习路径规划\n\n为你规划以下学习路线：\n1. **第一阶段**（1-2周）：基础知识铺垫\n2. **第二阶段**（2-4周）：核心技能训练\n3. **第三阶段**（4-6周）：项目实战演练\n4. **第四阶段**（持续）：进阶与专项提升\n\n每个阶段都配有对应的推荐课程，请查看下方卡片。',
     }
     aiResponse.value = fallback[intent] || fallback.tutor
+    // 保存兜底回复
+    apiSaveQaHistory({
+      question: text,
+      answer: aiResponse.value,
+      summary: text.length > 50 ? text.substring(0, 50) + '...' : text,
+      sessionId: chatStore.sessionId
+    }).catch(() => {})
   }
 
   loading.value = false

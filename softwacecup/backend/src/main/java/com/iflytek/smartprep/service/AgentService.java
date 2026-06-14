@@ -4,9 +4,12 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.iflytek.smartprep.domain.Subject;
 import com.iflytek.smartprep.mapper.SubjectMapper;
+import com.iflytek.smartprep.rag.model.RetrievalResult;
+import com.iflytek.smartprep.rag.service.RAGService;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
@@ -25,7 +28,10 @@ public class AgentService {
     private final LLMClient llmClient;
     private final SubjectMapper subjectMapper;
     private final KnowledgeGraphService knowledgeGraphService;
+    private final RAGService ragService;
     private final ObjectMapper objectMapper = new ObjectMapper();
+
+    @Value("${smartprep.safety.blocked-words}") private String blockedWords;
 
     // ==================== 课程推荐 ====================
 
@@ -64,6 +70,7 @@ public class AgentService {
                 query, subjectsInfo);
 
         String content = llmClient.chat(COURSE_ADVISOR_PROMPT, prompt);
+        if (content != null) content = filterOutput(content, query);
 
         Map<String, Object> result = new HashMap<>();
         result.put("success", true);
@@ -75,8 +82,17 @@ public class AgentService {
     // ==================== 知识讲解 ====================
 
     public Map<String, Object> knowledgeExplain(String query, Long userId) {
+        // RAG 检索相关知识文档，为回答提供事实基础
+        String ragContext = "";
+        try {
+            List<RetrievalResult> results = ragService.retrieveRelevantDocuments(query, null, 3);
+            if (results != null && !results.isEmpty()) {
+                ragContext = ragService.buildRAGContext(results) + "\n\n---\n\n";
+            }
+        } catch (Exception e) { log.warn("知识讲解 RAG 检索失败: {}", e.getMessage()); }
+
         String prompt = String.format("""
-                请详细讲解以下知识概念：%s
+                %s请详细讲解以下知识概念：%s
 
                 要求：
                 1. 核心概念与定义
@@ -87,9 +103,10 @@ public class AgentService {
 
                 输出适合前端渲染的Markdown格式，结构清晰，包含小标题、列表等。
                 面向高校学生，语言通俗但不失严谨。""",
-                query);
+                ragContext, query);
 
         String content = llmClient.chat(KNOWLEDGE_TUTOR_PROMPT, prompt);
+        if (content != null) content = filterOutput(content, query);
 
         Map<String, Object> result = new HashMap<>();
         result.put("success", true);
@@ -103,9 +120,17 @@ public class AgentService {
     public Map<String, Object> diagnosis(String query, Long userId) {
         // 尝试获取用户真实学习数据
         String userContext = buildUserContext(userId);
+        // RAG 检索相关学习诊断资料
+        String ragContext = "";
+        try {
+            List<RetrievalResult> results = ragService.retrieveRelevantDocuments(query, null, 3);
+            if (results != null && !results.isEmpty()) {
+                ragContext = ragService.buildRAGContext(results) + "\n\n---\n\n";
+            }
+        } catch (Exception e) { log.warn("诊断 RAG 检索失败: {}", e.getMessage()); }
 
         String prompt = String.format("""
-                请对以下学习情况进行诊断分析：
+                %s请对以下学习情况进行诊断分析：
 
                 用户关注点：%s
 
@@ -123,10 +148,11 @@ public class AgentService {
 
                 请以JSON格式返回（不要markdown代码块）：
                 {"content": "Markdown报告...", "dimensions": [{"name": "...", "score": N}]}""",
-                query, userContext);
+                ragContext, query, userContext);
 
         try {
             String resp = llmClient.chat(DIAGNOSIS_PROMPT, prompt);
+            if (resp != null) resp = filterOutput(resp, query);
             Map<String, Object> parsed = objectMapper.readValue(
                     LLMClient.extractJson(resp),
                     new TypeReference<Map<String, Object>>() {});
@@ -147,9 +173,17 @@ public class AgentService {
 
     public Map<String, Object> pathPlanning(String query, Long userId) {
         String userContext = buildUserContext(userId);
+        // RAG 检索相关学习资料
+        String ragContext = "";
+        try {
+            List<RetrievalResult> results = ragService.retrieveRelevantDocuments(query, null, 3);
+            if (results != null && !results.isEmpty()) {
+                ragContext = ragService.buildRAGContext(results) + "\n\n---\n\n";
+            }
+        } catch (Exception e) { log.warn("路径规划 RAG 检索失败: {}", e.getMessage()); }
 
         String prompt = String.format("""
-                请为以下学习目标规划学习路径：
+                %s请为以下学习目标规划学习路径：
 
                 学习目标：%s
 
@@ -173,10 +207,11 @@ public class AgentService {
                 - 阶段递进合理，从基础到进阶
                 - 每个阶段3-4个可执行的具体任务
                 - 颜色交替使用 #3b82f6、#8b5cf6、#10b981、#f59e0b""",
-                query, userContext);
+                ragContext, query, userContext);
 
         try {
             String resp = llmClient.chat(PATH_PLANNER_PROMPT, prompt);
+            if (resp != null) resp = filterOutput(resp, query);
             Map<String, Object> parsed = objectMapper.readValue(
                     LLMClient.extractJson(resp),
                     new TypeReference<Map<String, Object>>() {});
@@ -277,27 +312,33 @@ public class AgentService {
 
     // ==================== System Prompts ====================
 
+    private static final String UNCERTAINTY = "如果你不确定答案或缺乏足够信息，请明确说明'我不确定'，不要猜测或编造内容。";
+
     private static final String COURSE_ADVISOR_PROMPT = """
             你是高校智能学习平台的课程顾问AI。你的任务是根据用户的兴趣和需求，
             从平台现有课程中推荐最匹配的学习方向，并给出有说服力的推荐理由和学习建议。
-            输出适合前端渲染的Markdown格式，结构清晰、重点突出。""";
+            输出适合前端渲染的Markdown格式，结构清晰、重点突出。
+            """ + UNCERTAINTY;
 
     private static final String KNOWLEDGE_TUTOR_PROMPT = """
             你是高校智能学习平台的知识讲解AI导师。你的任务是深入浅出地讲解知识点，
             涵盖核心概念、原理机制、应用场景和常见误区。
             使用Markdown格式输出，适当使用标题、列表、强调等排版，便于学生阅读。
-            语言风格：专业但亲和，鼓励学生深入思考。""";
+            语言风格：专业但亲和，鼓励学生深入思考。
+            """ + UNCERTAINTY;
 
     private static final String DIAGNOSIS_PROMPT = """
             你是高校智能学习平台的学情诊断AI。你的任务是基于学生的学习数据，
             分析其学习状态，识别薄弱环节，并给出可操作的改进建议。
-            输出JSON格式，包含markdown报告和能力维度评分。""";
+            输出JSON格式，包含markdown报告和能力维度评分。
+            """ + UNCERTAINTY;
 
     private static final String PATH_PLANNER_PROMPT = """
             你是高校智能学习平台的学习路径规划AI。你的任务是根据学习目标，
             设计循序渐进的学习阶段，每阶段包含具体可执行的任务。
             阶段设计遵循"基础→核心→应用→进阶"的递进逻辑。
-            输出JSON格式。""";
+            输出JSON格式。
+            """ + UNCERTAINTY;
 
     private static final String COMPANION_SYSTEM_PROMPT = """
             你是知域智能学习平台的虚拟教学助手，名叫小慧。你应该用可爱且口语化的语气回复，
@@ -340,6 +381,18 @@ public class AgentService {
 
         messages.add(Map.of("role", "user", "content", question));
 
-        return llmClient.chatStreamMessages(messages, onChunk);
+        String result = llmClient.chatStreamMessages(messages, onChunk);
+        return result != null ? filterOutput(result, question) : null;
+    }
+
+    private String filterOutput(String content, String question) {
+        if (content == null || content.isBlank()) return content;
+        for (String w : Arrays.stream(blockedWords.split(",")).toList()) {
+            if (content.contains(w)) {
+                log.warn("Agent LLM 输出命中敏感词: {}", w);
+                return "表情：难过|动作：右手放胸前|回复文本：抱歉，我检测到回答中包含不适当内容，已被自动拦截。请换个方式提问或联系老师获取帮助。|指令：无";
+            }
+        }
+        return content;
     }
 }

@@ -281,7 +281,7 @@ const initCharts = () => {
     if (!ref.value || ref.value.clientWidth === 0 || ref.value.clientHeight === 0) {
       return null
     }
-    return echarts.init(ref.value)
+    return echarts.init(ref.value, 'dark')
   }
 
   behaviorInstance = initIfReady(behaviorChart, 'behavior')
@@ -435,13 +435,16 @@ onMounted(async () => {
 }
 
 .stat-card {
-  background: #fff;
-  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.06);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 16px;
   padding: 16px;
   display: flex;
   align-items: center;
   gap: 12px;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.35);
 
   .stat-icon {
     width: 44px; height: 44px;
@@ -457,8 +460,8 @@ onMounted(async () => {
     flex: 1;
   }
 
-  .stat-value { font-size: 20px; font-weight: 700; color: #333; }
-  .stat-label { font-size: 12px; color: #999; }
+  .stat-value { font-size: 20px; font-weight: 700; color: #e2e8f0; }
+  .stat-label { font-size: 12px; color: rgba(255, 255, 255, 0.5); }
 
   .stat-trend {
     font-size: 12px;
@@ -475,9 +478,12 @@ onMounted(async () => {
 }
 
 .chart-card {
-  background: #fff;
-  border-radius: 16px;
-  box-shadow: 0 2px 12px rgba(0,0,0,0.06);
+  background: rgba(255, 255, 255, 0.06);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 20px;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.35);
   overflow: hidden;
 
   &.large { grid-column: span 1; }
@@ -489,9 +495,9 @@ onMounted(async () => {
   justify-content: space-between;
   align-items: center;
   padding: 14px 20px;
-  border-bottom: 1px solid #f0f0f0;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
 
-  h3 { margin: 0; font-size: 15px; }
+  h3 { margin: 0; font-size: 15px; color: rgba(255, 255, 255, 0.85); }
 }
 
 .chart-area {
@@ -517,16 +523,16 @@ onMounted(async () => {
   border-radius: 10px;
   border-left: 3px solid;
 
-  &.danger { border-color: #ef4444; background: #fef2f2; }
-  &.warning { border-color: #f59e0b; background: #fffbeb; }
-  &.info { border-color: #3b82f6; background: #eff6ff; }
-  &.success { border-color: #10b981; background: #ecfdf5; }
+  &.danger { border-color: #ef4444; background: rgba(239, 68, 68, 0.1); }
+  &.warning { border-color: #f59e0b; background: rgba(245, 158, 11, 0.1); }
+  &.info { border-color: #3b82f6; background: rgba(59, 130, 246, 0.1); }
+  &.success { border-color: #10b981; background: rgba(16, 185, 129, 0.1); }
 
   .pred-icon { font-size: 18px; flex-shrink: 0; }
   .pred-content { flex: 1; }
-  .pred-title { font-size: 13px; font-weight: 600; margin: 0 0 4px; }
-  .pred-desc { font-size: 12px; color: #666; margin: 0; line-height: 1.5; }
-  .pred-confidence { font-size: 12px; font-weight: 700; color: #333; flex-shrink: 0; }
+  .pred-title { font-size: 13px; font-weight: 600; margin: 0 0 4px; color: rgba(255, 255, 255, 0.85); }
+  .pred-desc { font-size: 12px; color: rgba(255, 255, 255, 0.55); margin: 0; line-height: 1.5; }
+  .pred-confidence { font-size: 12px; font-weight: 700; color: rgba(255, 255, 255, 0.7); flex-shrink: 0; }
 }
 
 /* 热力图 */
@@ -592,6 +598,20 @@ onMounted(async () => {
 
   .insight-icon { font-size: 14px; }
 }
+
+/* Element Plus 深色主题覆盖 */
+:deep(.el-select) { --el-fill-color-blank: rgba(255,255,255,0.06); }
+:deep(.el-input__wrapper) { background: rgba(255,255,255,0.06) !important; box-shadow: none !important; border: 1px solid rgba(255,255,255,0.1) !important; }
+:deep(.el-input__inner) { color: #e2e8f0 !important; }
+:deep(.el-radio-button__inner) { background: rgba(255,255,255,0.05) !important; border-color: rgba(255,255,255,0.1) !important; color: rgba(255,255,255,0.6) !important; }
+:deep(.el-radio-button.is-active .el-radio-button__inner) { background: rgba(59,130,246,0.3) !important; color: #fff !important; }
+:deep(.el-select-dropdown) { background: rgba(15,23,42,0.95) !important; border: 1px solid rgba(255,255,255,0.1) !important; backdrop-filter: blur(16px); }
+:deep(.el-select-dropdown__item) { color: rgba(255,255,255,0.7) !important; }
+:deep(.el-select-dropdown__item.hover) { background: rgba(255,255,255,0.06) !important; }
+
+/* 热力图文字修正 */
+.heatmap-row .heatmap-label { color: rgba(255,255,255,0.45); }
+.insight-item { color: rgba(255,255,255,0.55); }
 
 @media (max-width: 1200px) {
   .stats-row { grid-template-columns: repeat(3, 1fr); }

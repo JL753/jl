@@ -160,11 +160,13 @@ async function handleCheckin() {
 }
 
 .glass-card {
-  background: rgba(255, 255, 255, 0.04);
-  backdrop-filter: blur(12px);
-  border: 1px solid rgba(255, 255, 255, 0.08);
-  border-radius: 14px;
+  background: rgba(255, 255, 255, 0.06);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 20px;
   padding: 20px;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.35);
 }
 
 /* XP Card */
@@ -230,11 +232,13 @@ async function handleCheckin() {
 
 /* Badges */
 .badges-section {
-  background: rgba(255, 255, 255, 0.04);
-  backdrop-filter: blur(12px);
-  border: 1px solid rgba(255, 255, 255, 0.08);
-  border-radius: 14px;
+  background: rgba(255, 255, 255, 0.06);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 20px;
   padding: 20px;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.35);
 }
 
 .section-title {
@@ -256,14 +260,14 @@ async function handleCheckin() {
   align-items: center;
   gap: 8px;
   padding: 16px 10px;
-  background: rgba(255, 255, 255, 0.04);
-  border: 1px solid rgba(255, 255, 255, 0.06);
-  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 14px;
   transition: all 0.2s;
 }
 
 .badge-card:hover {
-  background: rgba(255, 255, 255, 0.07);
+  background: rgba(255, 255, 255, 0.1);
   transform: translateY(-2px);
 }
 

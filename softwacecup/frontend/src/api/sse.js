@@ -1,6 +1,7 @@
-export const openTutorSSE = ({ question, context = '', answerMode = '' }, handlers = {}) => {
+export const openTutorSSE = ({ question, context = '', answerMode = '', sessionId = '' }, handlers = {}) => {
   const token = localStorage.getItem('sp_token') || ''
   const params = new URLSearchParams({ question, context, answerMode })
+  if (sessionId) params.set('sessionId', sessionId)
   const url = `/api/tutor/stream?${params.toString()}`
   const controller = new AbortController()
   const timeoutMs = handlers.timeoutMs ?? 60000

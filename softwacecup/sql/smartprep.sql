@@ -1,23 +1,18 @@
 /*
  Navicat Premium Dump SQL
 
- Source Server         : JL
+ Source Server         : User
  Source Server Type    : MySQL
- Source Server Version : 80043 (8.0.43)
+ Source Server Version : 80033 (8.0.33)
  Source Host           : localhost:3306
  Source Schema         : smartprep
 
  Target Server Type    : MySQL
- Target Server Version : 80043 (8.0.43)
+ Target Server Version : 80033 (8.0.33)
  File Encoding         : 65001
 
- Date: 28/05/2026 18:02:40
+ Date: 14/06/2026 23:52:05
 */
-CREATE DATABASE IF NOT EXISTS `smartprep`
-  CHARACTER SET utf8mb4
-  COLLATE utf8mb4_general_ci;
-
-USE `smartprep`;
 
 SET NAMES utf8mb4;
 SET FOREIGN_KEY_CHECKS = 0;
@@ -35,12 +30,20 @@ CREATE TABLE `sp_assignment`  (
   `due_at` datetime NULL DEFAULT NULL,
   `created_at` datetime NULL DEFAULT NULL,
   PRIMARY KEY (`id`) USING BTREE,
-  INDEX `idx_assign_class`(`class_id` ASC) USING BTREE
-) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_general_ci ROW_FORMAT = Dynamic;
+  INDEX `idx_assign_class`(`class_id` ASC) USING BTREE,
+  CONSTRAINT `fk_assign_class` FOREIGN KEY (`class_id`) REFERENCES `sp_class` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
+) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_general_ci ROW_FORMAT = DYNAMIC;
 
 -- ----------------------------
 -- Records of sp_assignment
 -- ----------------------------
+INSERT INTO `sp_assignment` VALUES (1779900001001, 1778903957642, '第一章课后作业', '[1778945292204,1778945309169]', '完成第一章的编程练习，提交源代码和运行截图', '2026-06-15 23:59:59', '2026-05-20 08:00:00');
+INSERT INTO `sp_assignment` VALUES (1779900001002, 1778903957642, '第二章综合练习', '[1778945335548,1778945352317]', '完成变量与数据类型章节的综合练习', '2026-06-22 23:59:59', '2026-05-22 08:00:00');
+INSERT INTO `sp_assignment` VALUES (1779900001003, 1778903957642, '条件判断与循环作业', '[1778945372976,1778945390332]', '完成条件判断和循环结构的编程题目', '2026-06-30 23:59:59', '2026-05-25 08:00:00');
+INSERT INTO `sp_assignment` VALUES (1779900001004, 1778903957642, '函数模块实践', '[1778945406858]', '编写至少3个自定义函数并完成单元测试', '2026-07-07 23:59:59', '2026-05-28 08:00:00');
+INSERT INTO `sp_assignment` VALUES (1779900001005, 1778903957642, '数据结构基础练习', '[1778941914331]', '完成线性结构相关习题，含代码实现', '2026-07-15 23:59:59', '2026-06-01 08:00:00');
+INSERT INTO `sp_assignment` VALUES (1779900001006, 1778903957642, '算法思维训练', '[1778941945222]', '完成5道算法设计题目并分析时间复杂度', '2026-07-22 23:59:59', '2026-06-05 08:00:00');
+INSERT INTO `sp_assignment` VALUES (1779900001007, 1778903957642, '期中项目：简易计算器', '[1778945324508]', '使用Qt开发一个带GUI的科学计算器', '2026-08-01 23:59:59', '2026-06-10 08:00:00');
 
 -- ----------------------------
 -- Table structure for sp_assignment_submission
@@ -57,12 +60,22 @@ CREATE TABLE `sp_assignment_submission`  (
   PRIMARY KEY (`id`) USING BTREE,
   UNIQUE INDEX `uk_assign_submit`(`assignment_id` ASC, `student_id` ASC) USING BTREE,
   INDEX `idx_as_assign`(`assignment_id` ASC) USING BTREE,
-  INDEX `idx_as_student`(`student_id` ASC) USING BTREE
-) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_general_ci ROW_FORMAT = Dynamic;
+  INDEX `idx_as_student`(`student_id` ASC) USING BTREE,
+  CONSTRAINT `fk_as_assign` FOREIGN KEY (`assignment_id`) REFERENCES `sp_assignment` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
+  CONSTRAINT `fk_as_student` FOREIGN KEY (`student_id`) REFERENCES `sp_user` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
+) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_general_ci ROW_FORMAT = DYNAMIC;
 
 -- ----------------------------
 -- Records of sp_assignment_submission
 -- ----------------------------
+INSERT INTO `sp_assignment_submission` VALUES (1779900002001, 1779900001001, 3, 'submitted', 92, '代码规范，注释清晰，运行结果正确', '2026-06-14 21:30:00');
+INSERT INTO `sp_assignment_submission` VALUES (1779900002002, 1779900001001, 4, 'submitted', 85, '功能实现正常，部分变量命名可优化', '2026-06-14 22:15:00');
+INSERT INTO `sp_assignment_submission` VALUES (1779900002003, 1779900001001, 5, 'submitted', 78, '基本功能完成，缺少异常处理', '2026-06-15 20:45:00');
+INSERT INTO `sp_assignment_submission` VALUES (1779900002004, 1779900001002, 3, 'submitted', 95, '完成质量高，逻辑清晰', '2026-06-21 19:30:00');
+INSERT INTO `sp_assignment_submission` VALUES (1779900002005, 1779900001002, 4, 'pending', NULL, NULL, '2026-06-22 10:00:00');
+INSERT INTO `sp_assignment_submission` VALUES (1779900002006, 1779900001003, 3, 'submitted', 88, '循环逻辑正确，边界条件处理得当', '2026-06-28 21:00:00');
+INSERT INTO `sp_assignment_submission` VALUES (1779900002007, 1779900001003, 5, 'submitted', 72, '部分循环条件有误，需加强练习', '2026-06-29 22:30:00');
+INSERT INTO `sp_assignment_submission` VALUES (1779900002008, 1779900001004, 3, 'submitted', 90, '函数设计合理，测试覆盖全面', '2026-07-05 20:00:00');
 
 -- ----------------------------
 -- Table structure for sp_badge_def
@@ -77,7 +90,7 @@ CREATE TABLE `sp_badge_def`  (
   `unlock_rule` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL DEFAULT NULL COMMENT '解锁规则JSON',
   `sort_order` int NULL DEFAULT 0,
   PRIMARY KEY (`id`) USING BTREE
-) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_general_ci ROW_FORMAT = Dynamic;
+) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_general_ci ROW_FORMAT = DYNAMIC;
 
 -- ----------------------------
 -- Records of sp_badge_def
@@ -108,8 +121,10 @@ CREATE TABLE `sp_chapter`  (
   `prerequisite_chapter_id` bigint NULL DEFAULT NULL,
   `created_at` datetime NULL DEFAULT NULL,
   `updated_at` datetime NULL DEFAULT NULL,
-  PRIMARY KEY (`id`) USING BTREE
-) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_general_ci ROW_FORMAT = Dynamic;
+  PRIMARY KEY (`id`) USING BTREE,
+  INDEX `idx_chapter_course`(`course_id` ASC) USING BTREE,
+  CONSTRAINT `fk_chapter_course` FOREIGN KEY (`course_id`) REFERENCES `sp_course` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
+) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_general_ci ROW_FORMAT = DYNAMIC;
 
 -- ----------------------------
 -- Records of sp_chapter
@@ -159,12 +174,24 @@ CREATE TABLE `sp_chapter_resource`  (
   `size` varchar(32) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL DEFAULT NULL,
   `created_at` datetime NULL DEFAULT NULL,
   `updated_at` datetime NULL DEFAULT NULL,
-  PRIMARY KEY (`id`) USING BTREE
-) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_general_ci ROW_FORMAT = Dynamic;
+  PRIMARY KEY (`id`) USING BTREE,
+  INDEX `idx_cr_course`(`course_id` ASC) USING BTREE,
+  INDEX `idx_cr_chapter`(`chapter_id` ASC) USING BTREE,
+  CONSTRAINT `fk_chres_chapter` FOREIGN KEY (`chapter_id`) REFERENCES `sp_chapter` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
+  CONSTRAINT `fk_chres_course` FOREIGN KEY (`course_id`) REFERENCES `sp_course` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
+) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_general_ci ROW_FORMAT = DYNAMIC;
 
 -- ----------------------------
 -- Records of sp_chapter_resource
 -- ----------------------------
+INSERT INTO `sp_chapter_resource` VALUES (1779900003001, 1779182227741, 2001, 'pdf', '编程入门PPT课件', '第一章的完整课件，包含基本概念讲解', '/resources/slides/ch01-intro.pdf', '2.4MB', '2026-05-16 10:00:00', '2026-05-16 10:00:00');
+INSERT INTO `sp_chapter_resource` VALUES (1779900003002, 1779182227741, 2001, 'doc', '编程语言对比表', '常见编程语言特性对比（Python/Java/C++）', '/resources/docs/lang-comparison.md', '156KB', '2026-05-16 10:30:00', '2026-05-16 10:30:00');
+INSERT INTO `sp_chapter_resource` VALUES (1779900003003, 1779182227741, 2004, 'pdf', '变量与数据类型详解', '数据类型转换规则与内存模型图解', '/resources/slides/ch04-datatypes.pdf', '3.1MB', '2026-05-18 14:00:00', '2026-05-18 14:00:00');
+INSERT INTO `sp_chapter_resource` VALUES (1779900003004, 8004, 1401, 'link', '机器学习入门指南', '吴恩达机器学习课程学习路径', 'https://www.coursera.org/learn/machine-learning', NULL, '2026-05-20 09:00:00', '2026-05-20 09:00:00');
+INSERT INTO `sp_chapter_resource` VALUES (1779900003005, 8004, 1401, 'pdf', '监督学习算法综述', '线性回归、逻辑回归、SVM、决策树对比', '/resources/slides/supervised-learning.pdf', '4.2MB', '2026-05-20 09:30:00', '2026-05-20 09:30:00');
+INSERT INTO `sp_chapter_resource` VALUES (1779900003006, 8004, 1402, 'video', '神经网络可视化演示', '交互式神经网络前向传播演示', 'https://playground.tensorflow.org', NULL, '2026-05-22 11:00:00', '2026-05-22 11:00:00');
+INSERT INTO `sp_chapter_resource` VALUES (1779900003007, 1779184286152, 1201, 'pdf', '数组与链表讲解', '线性结构核心知识点梳理', '/resources/slides/linear-structures.pdf', '2.8MB', '2026-05-25 08:00:00', '2026-05-25 08:00:00');
+INSERT INTO `sp_chapter_resource` VALUES (1779900003008, 1779184286152, 1202, 'code', '二叉树实现代码', 'BST的插入、删除、遍历Java实现', '/resources/code/bst-demo.zip', '45KB', '2026-05-25 09:00:00', '2026-05-25 09:00:00');
 
 -- ----------------------------
 -- Table structure for sp_class
@@ -179,8 +206,9 @@ CREATE TABLE `sp_class`  (
   `created_at` datetime NULL DEFAULT NULL,
   PRIMARY KEY (`id`) USING BTREE,
   UNIQUE INDEX `invite_code`(`invite_code` ASC) USING BTREE,
-  INDEX `idx_class_teacher`(`teacher_id` ASC) USING BTREE
-) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_general_ci ROW_FORMAT = Dynamic;
+  INDEX `idx_class_teacher`(`teacher_id` ASC) USING BTREE,
+  CONSTRAINT `fk_class_teacher` FOREIGN KEY (`teacher_id`) REFERENCES `sp_user` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
+) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_general_ci ROW_FORMAT = DYNAMIC;
 
 -- ----------------------------
 -- Records of sp_class
@@ -199,12 +227,18 @@ CREATE TABLE `sp_class_member`  (
   PRIMARY KEY (`id`) USING BTREE,
   UNIQUE INDEX `uk_class_student`(`class_id` ASC, `student_id` ASC) USING BTREE,
   INDEX `idx_cm_class`(`class_id` ASC) USING BTREE,
-  INDEX `idx_cm_student`(`student_id` ASC) USING BTREE
-) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_general_ci ROW_FORMAT = Dynamic;
+  INDEX `idx_cm_student`(`student_id` ASC) USING BTREE,
+  CONSTRAINT `fk_cm_class` FOREIGN KEY (`class_id`) REFERENCES `sp_class` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
+  CONSTRAINT `fk_cm_student` FOREIGN KEY (`student_id`) REFERENCES `sp_user` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
+) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_general_ci ROW_FORMAT = DYNAMIC;
 
 -- ----------------------------
 -- Records of sp_class_member
 -- ----------------------------
+INSERT INTO `sp_class_member` VALUES (1779900004001, 1778903957642, 3, '2026-05-16 12:00:00');
+INSERT INTO `sp_class_member` VALUES (1779900004002, 1778903957642, 4, '2026-05-17 09:30:00');
+INSERT INTO `sp_class_member` VALUES (1779900004003, 1778903957642, 5, '2026-05-18 14:20:00');
+INSERT INTO `sp_class_member` VALUES (1779900004004, 1778903957642, 2055687643366133761, '2026-05-20 10:15:00');
 
 -- ----------------------------
 -- Table structure for sp_content_review
@@ -219,8 +253,11 @@ CREATE TABLE `sp_content_review`  (
   `reviewed_at` datetime NULL DEFAULT NULL,
   PRIMARY KEY (`id`) USING BTREE,
   INDEX `idx_cr_lesson`(`lesson_id` ASC) USING BTREE,
-  INDEX `idx_cr_status`(`status` ASC) USING BTREE
-) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_general_ci ROW_FORMAT = Dynamic;
+  INDEX `idx_cr_status`(`status` ASC) USING BTREE,
+  INDEX `fk_cr_reviewer`(`reviewer_id` ASC) USING BTREE,
+  CONSTRAINT `fk_cr_lesson` FOREIGN KEY (`lesson_id`) REFERENCES `sp_lesson` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
+  CONSTRAINT `fk_cr_reviewer` FOREIGN KEY (`reviewer_id`) REFERENCES `sp_user` (`id`) ON DELETE SET NULL ON UPDATE CASCADE
+) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_general_ci ROW_FORMAT = DYNAMIC;
 
 -- ----------------------------
 -- Records of sp_content_review
@@ -254,7 +291,11 @@ CREATE TABLE `sp_course`  (
   `background` varchar(512) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL DEFAULT NULL,
   `target` varchar(512) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL DEFAULT NULL,
   `principle` varchar(512) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL DEFAULT NULL,
-  PRIMARY KEY (`id`) USING BTREE
+  PRIMARY KEY (`id`) USING BTREE,
+  INDEX `idx_course_subject`(`subject_id` ASC) USING BTREE,
+  INDEX `idx_course_creator`(`created_by` ASC) USING BTREE,
+  CONSTRAINT `fk_course_creator` FOREIGN KEY (`created_by`) REFERENCES `sp_user` (`id`) ON DELETE SET NULL ON UPDATE CASCADE,
+  CONSTRAINT `fk_course_subject` FOREIGN KEY (`subject_id`) REFERENCES `sp_subject` (`id`) ON DELETE SET NULL ON UPDATE CASCADE
 ) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_general_ci ROW_FORMAT = DYNAMIC;
 
 -- ----------------------------
@@ -293,12 +334,21 @@ CREATE TABLE `sp_course_announcement`  (
   `content` text CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL,
   `created_at` datetime NULL DEFAULT NULL,
   `updated_at` datetime NULL DEFAULT NULL,
-  PRIMARY KEY (`id`) USING BTREE
-) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_general_ci ROW_FORMAT = Dynamic;
+  PRIMARY KEY (`id`) USING BTREE,
+  INDEX `idx_ca_course`(`course_id` ASC) USING BTREE,
+  CONSTRAINT `fk_ca_course` FOREIGN KEY (`course_id`) REFERENCES `sp_course` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
+) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_general_ci ROW_FORMAT = DYNAMIC;
 
 -- ----------------------------
 -- Records of sp_course_announcement
 -- ----------------------------
+INSERT INTO `sp_course_announcement` VALUES (1779900005001, 1779182227741, '课程通知', '第一周学习任务发布', '请各位同学完成\"什么是编程\"和\"开发环境搭建\"两个课时的学习内容，并在讨论区提交学习笔记。', '2026-05-16 08:30:00', '2026-05-16 08:30:00');
+INSERT INTO `sp_course_announcement` VALUES (1779900005002, 1779182227741, '作业提醒', '第一次作业截止提醒', '第一章课后作业将于6月15日截止，请还未提交的同学尽快完成。', '2026-06-13 10:00:00', '2026-06-13 10:00:00');
+INSERT INTO `sp_course_announcement` VALUES (1779900005003, 1779182227741, '重要通知', '期中考试安排', '期中考试定于7月5日，考试范围：第1-5章，考试时长120分钟。', '2026-06-25 14:00:00', '2026-06-25 14:00:00');
+INSERT INTO `sp_course_announcement` VALUES (1779900005004, 8004, '课程通知', '机器学习课程开课须知', '请提前安装Python 3.10+和Jupyter Notebook环境，课程中会使用scikit-learn库。', '2026-05-16 09:00:00', '2026-05-16 09:00:00');
+INSERT INTO `sp_course_announcement` VALUES (1779900005005, 8004, '资源推荐', '推荐阅读材料', '推荐《统计学习方法》（李航著）作为本课程的辅助教材，特别是第2-6章。', '2026-05-20 11:00:00', '2026-05-20 11:00:00');
+INSERT INTO `sp_course_announcement` VALUES (1779900005006, 1779184286152, '课程通知', '实验环境配置', '请安装JDK 17+和IntelliJ IDEA Community版，后续实验将使用Java实现数据结构。', '2026-05-18 08:00:00', '2026-05-18 08:00:00');
+INSERT INTO `sp_course_announcement` VALUES (1779900005007, 1001, '欢迎公告', '欢迎加入编程入门课程', '本课程从零开始教授编程基础知识，配套有丰富的练习题和实践项目，祝学习愉快！', '2026-05-16 04:35:00', '2026-05-16 04:35:00');
 
 -- ----------------------------
 -- Table structure for sp_course_answer
@@ -312,12 +362,23 @@ CREATE TABLE `sp_course_answer`  (
   `is_ai` tinyint(1) NULL DEFAULT 0,
   `created_at` datetime NULL DEFAULT NULL,
   `updated_at` datetime NULL DEFAULT NULL,
-  PRIMARY KEY (`id`) USING BTREE
-) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_general_ci ROW_FORMAT = Dynamic;
+  PRIMARY KEY (`id`) USING BTREE,
+  INDEX `idx_canswer_question`(`question_id` ASC) USING BTREE,
+  INDEX `idx_canswer_user`(`user_id` ASC) USING BTREE,
+  CONSTRAINT `fk_canswer_question` FOREIGN KEY (`question_id`) REFERENCES `sp_course_question` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
+  CONSTRAINT `fk_canswer_user` FOREIGN KEY (`user_id`) REFERENCES `sp_user` (`id`) ON DELETE SET NULL ON UPDATE CASCADE
+) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_general_ci ROW_FORMAT = DYNAMIC;
 
 -- ----------------------------
 -- Records of sp_course_answer
 -- ----------------------------
+INSERT INTO `sp_course_answer` VALUES (1779900007001, 1779900006001, 2, '在C语言中，当全局变量和局部变量同名时，函数内部访问的是局部变量（就近原则）。示例：\n```c\nint x = 10; // 全局变量\nvoid test() {\n    int x = 20; // 局部变量\n    printf(\"%d\", x); // 输出20，访问局部变量\n}\n```\n如果确实需要访问全局变量，可以使用extern声明或在没有同名局部变量的作用域中访问。', 0, '2026-05-20 16:30:00', '2026-05-20 16:30:00');
+INSERT INTO `sp_course_answer` VALUES (1779900007002, 1779900006001, NULL, '补充说明：局部变量会\"遮蔽\"（shadowing）同名的全局变量。编译器会优先在当前作用域查找变量，找到即停止，不会继续向外层查找。这是一种语言设计上的保护机制，避免内部代码意外修改全局状态。', 0, '2026-05-20 17:00:00', '2026-05-20 17:00:00');
+INSERT INTO `sp_course_answer` VALUES (1779900007003, 1779900006002, 2, '是的，break默认只跳出最内层循环。要跳出外层循环有几种方法：\n1. 使用goto语句（最简单直接）\n2. 设置标志变量，在外层循环条件中判断\n3. 将嵌套循环封装成函数，使用return退出\n\n推荐使用方法2或3，因为goto会降低代码可读性。', 0, '2026-05-22 14:00:00', '2026-05-22 14:00:00');
+INSERT INTO `sp_course_answer` VALUES (1779900007004, 1779900006004, NULL, '训练集准确率95%而测试集只有70%，这是典型的过拟合（Overfitting）现象。判断标准：\n- 过拟合：训练集误差低、测试集误差高（泛化能力差）\n- 欠拟合：训练集和测试集误差都高\n\n解决方法：增加正则化（L1/L2）、使用Dropout、数据增强、早停法、减少模型复杂度。', 1, '2026-05-23 14:05:00', '2026-05-23 14:05:00');
+INSERT INTO `sp_course_answer` VALUES (1779900007005, 1779900006005, NULL, '学习率影响：\n- 过大：损失函数震荡甚至发散，无法收敛\n- 过小：收敛速度慢，可能陷入局部最优\n\n自适应方法推荐：Adam（最常用）、RMSprop、Adagrad。Adam结合了动量和自适应学习率，通常是最佳默认选择。', 1, '2026-05-26 11:35:00', '2026-05-26 11:35:00');
+INSERT INTO `sp_course_answer` VALUES (1779900007006, 1779900006006, 2, '递归反转单链表的思路：\n1. 递归终止条件：当前节点为空或只有一个节点\n2. 递归反转后续链表\n3. 将当前节点的下一个节点的next指向当前节点\n4. 将当前节点的next置为NULL\n\n```c\nNode* reverse(Node* head) {\n    if (head == NULL || head->next == NULL) return head;\n    Node* newHead = reverse(head->next);\n    head->next->next = head;\n    head->next = NULL;\n    return newHead;\n}\n```', 0, '2026-05-28 10:00:00', '2026-05-28 10:00:00');
+INSERT INTO `sp_course_answer` VALUES (1779900007007, 1779900006007, 2, '使用后继（successor）或前驱（predecessor）替换都可以，结果都是合法的BST。通常选择后继（右子树的最小节点），因为实现更直观。如果树比较平衡，两者效率相同；如果树偏向一侧，选择较少节点的那一侧更高效。', 0, '2026-05-28 17:30:00', '2026-05-28 17:30:00');
 
 -- ----------------------------
 -- Table structure for sp_course_question
@@ -331,12 +392,23 @@ CREATE TABLE `sp_course_question`  (
   `content` text CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL,
   `created_at` datetime NULL DEFAULT NULL,
   `updated_at` datetime NULL DEFAULT NULL,
-  PRIMARY KEY (`id`) USING BTREE
-) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_general_ci ROW_FORMAT = Dynamic;
+  PRIMARY KEY (`id`) USING BTREE,
+  INDEX `idx_cq_course`(`course_id` ASC) USING BTREE,
+  INDEX `idx_cq_user`(`user_id` ASC) USING BTREE,
+  CONSTRAINT `fk_cq_course` FOREIGN KEY (`course_id`) REFERENCES `sp_course` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
+  CONSTRAINT `fk_cq_user` FOREIGN KEY (`user_id`) REFERENCES `sp_user` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
+) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_general_ci ROW_FORMAT = DYNAMIC;
 
 -- ----------------------------
 -- Records of sp_course_question
 -- ----------------------------
+INSERT INTO `sp_course_question` VALUES (1779900006001, 1779182227741, 3, '关于变量作用域的问题', '在C语言中，全局变量和局部变量同名时，函数内部访问的是哪个变量？能否给出示例代码说明？', '2026-05-20 15:30:00', '2026-05-20 15:30:00');
+INSERT INTO `sp_course_question` VALUES (1779900006002, 1779182227741, 4, 'for循环嵌套的疑问', '双重for循环中，break语句只能跳出内层循环吗？如果想跳出外层循环应该怎么实现？', '2026-05-22 10:45:00', '2026-05-22 10:45:00');
+INSERT INTO `sp_course_question` VALUES (1779900006003, 1779182227741, 5, '指针和数组的关系', 'C语言中数组名和指针有什么区别？为什么说数组名是常量指针？', '2026-05-25 16:20:00', '2026-05-25 16:20:00');
+INSERT INTO `sp_course_question` VALUES (1779900006004, 8004, 3, '过拟合和欠拟合如何判断', '在训练机器学习模型时，通过什么指标可以判断是过拟合还是欠拟合？训练集准确率95%但测试集只有70%，这说明什么问题？', '2026-05-23 14:00:00', '2026-05-23 14:00:00');
+INSERT INTO `sp_course_question` VALUES (1779900006005, 8004, 4, '学习率的选择策略', '学习率设置过大或过小会有什么影响？有没有自适应调整学习率的方法推荐？', '2026-05-26 11:30:00', '2026-05-26 11:30:00');
+INSERT INTO `sp_course_question` VALUES (1779900006006, 1779184286152, 3, '链表反转的递归思路', '用递归实现单链表反转时，递归函数的返回值和参数应该如何设计？', '2026-05-28 09:15:00', '2026-05-28 09:15:00');
+INSERT INTO `sp_course_question` VALUES (1779900006007, 1779184286152, 5, '二叉搜索树的删除操作', 'BST删除一个有两个子节点的节点时，用前驱还是后继替代比较好？', '2026-05-28 16:00:00', '2026-05-28 16:00:00');
 
 -- ----------------------------
 -- Table structure for sp_course_schedule
@@ -355,8 +427,9 @@ CREATE TABLE `sp_course_schedule`  (
   `created_at` datetime NULL DEFAULT NULL,
   `updated_at` datetime NULL DEFAULT NULL,
   PRIMARY KEY (`id`) USING BTREE,
-  INDEX `idx_schedule_user`(`user_id` ASC) USING BTREE
-) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_general_ci ROW_FORMAT = Dynamic;
+  INDEX `idx_schedule_user`(`user_id` ASC) USING BTREE,
+  CONSTRAINT `fk_cs_user` FOREIGN KEY (`user_id`) REFERENCES `sp_user` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
+) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_general_ci ROW_FORMAT = DYNAMIC;
 
 -- ----------------------------
 -- Records of sp_course_schedule
@@ -387,12 +460,20 @@ CREATE TABLE `sp_exam`  (
   `status` varchar(32) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL DEFAULT NULL,
   `question_count` int NULL DEFAULT NULL,
   `created_at` datetime NULL DEFAULT NULL,
-  PRIMARY KEY (`id`) USING BTREE
-) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_general_ci ROW_FORMAT = Dynamic;
+  PRIMARY KEY (`id`) USING BTREE,
+  INDEX `idx_exam_creator`(`creator_user_id` ASC) USING BTREE,
+  CONSTRAINT `fk_exam_creator` FOREIGN KEY (`creator_user_id`) REFERENCES `sp_user` (`id`) ON DELETE SET NULL ON UPDATE CASCADE
+) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_general_ci ROW_FORMAT = DYNAMIC;
 
 -- ----------------------------
 -- Records of sp_exam
 -- ----------------------------
+INSERT INTO `sp_exam` VALUES (1779900008001, 2, '编程入门期中考试', '计算机科学', 120, '变量、数据类型、流程控制、函数', '已发布', 25, '2026-06-01 10:00:00');
+INSERT INTO `sp_exam` VALUES (1779900008002, 2, '编程入门期末考试', '计算机科学', 150, '全部课程内容', '草稿', 40, '2026-06-15 10:00:00');
+INSERT INTO `sp_exam` VALUES (1779900008003, 2, '数据结构单元测验一', '数据结构与算法', 60, '线性结构与树结构', '已发布', 15, '2026-05-25 08:00:00');
+INSERT INTO `sp_exam` VALUES (1779900008004, 2, '数据结构单元测验二', '数据结构与算法', 60, '图结构与排序算法', '已发布', 15, '2026-06-10 08:00:00');
+INSERT INTO `sp_exam` VALUES (1779900008005, 2, '机器学习阶段测试', '人工智能', 90, '监督学习与神经网络基础', '已发布', 20, '2026-06-05 14:00:00');
+INSERT INTO `sp_exam` VALUES (1779900008006, 2, '数据库SQL综合测试', '数据库系统', 90, 'SQL查询、索引、事务', '已发布', 20, '2026-06-20 09:00:00');
 
 -- ----------------------------
 -- Table structure for sp_exam_assignment
@@ -405,12 +486,22 @@ CREATE TABLE `sp_exam_assignment`  (
   `created_at` datetime NULL DEFAULT NULL,
   PRIMARY KEY (`id`) USING BTREE,
   INDEX `idx_assignment_exam`(`exam_id` ASC) USING BTREE,
-  INDEX `idx_assignment_student`(`student_id` ASC) USING BTREE
-) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_general_ci ROW_FORMAT = Dynamic;
+  INDEX `idx_assignment_student`(`student_id` ASC) USING BTREE,
+  CONSTRAINT `fk_exam_assign_exam` FOREIGN KEY (`exam_id`) REFERENCES `sp_exam` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
+  CONSTRAINT `fk_exam_assign_student` FOREIGN KEY (`student_id`) REFERENCES `sp_user` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
+) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_general_ci ROW_FORMAT = DYNAMIC;
 
 -- ----------------------------
 -- Records of sp_exam_assignment
 -- ----------------------------
+INSERT INTO `sp_exam_assignment` VALUES (1779900009001, 1779900008001, 3, '2026-06-01 10:00:00');
+INSERT INTO `sp_exam_assignment` VALUES (1779900009002, 1779900008001, 4, '2026-06-01 10:00:00');
+INSERT INTO `sp_exam_assignment` VALUES (1779900009003, 1779900008001, 5, '2026-06-01 10:00:00');
+INSERT INTO `sp_exam_assignment` VALUES (1779900009004, 1779900008003, 3, '2026-05-25 08:00:00');
+INSERT INTO `sp_exam_assignment` VALUES (1779900009005, 1779900008003, 4, '2026-05-25 08:00:00');
+INSERT INTO `sp_exam_assignment` VALUES (1779900009006, 1779900008003, 5, '2026-05-25 08:00:00');
+INSERT INTO `sp_exam_assignment` VALUES (1779900009007, 1779900008005, 3, '2026-06-05 14:00:00');
+INSERT INTO `sp_exam_assignment` VALUES (1779900009008, 1779900008005, 4, '2026-06-05 14:00:00');
 
 -- ----------------------------
 -- Table structure for sp_exam_question
@@ -425,12 +516,23 @@ CREATE TABLE `sp_exam_question`  (
   `score` int NULL DEFAULT NULL,
   `answer_key` text CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL,
   PRIMARY KEY (`id`) USING BTREE,
-  INDEX `idx_exam_question_exam`(`exam_id` ASC) USING BTREE
-) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_general_ci ROW_FORMAT = Dynamic;
+  INDEX `idx_exam_question_exam`(`exam_id` ASC) USING BTREE,
+  CONSTRAINT `fk_eq_exam` FOREIGN KEY (`exam_id`) REFERENCES `sp_exam` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
+) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_general_ci ROW_FORMAT = DYNAMIC;
 
 -- ----------------------------
 -- Records of sp_exam_question
 -- ----------------------------
+INSERT INTO `sp_exam_question` VALUES (1779900010001, 1779900008001, 1, 'single_choice', '以下哪种数据类型占用的内存最大？', 4, 'D');
+INSERT INTO `sp_exam_question` VALUES (1779900010002, 1779900008001, 2, 'single_choice', '在C语言中，for循环的初始化语句在什么时候执行？', 4, 'A');
+INSERT INTO `sp_exam_question` VALUES (1779900010003, 1779900008001, 3, 'single_choice', '以下哪个是合法的C语言变量名？', 4, 'C');
+INSERT INTO `sp_exam_question` VALUES (1779900010004, 1779900008001, 4, 'multiple_choice', '以下关于函数的描述，哪些是正确的？', 6, 'ABD');
+INSERT INTO `sp_exam_question` VALUES (1779900010005, 1779900008001, 5, 'short_answer', '请用C语言编写一个函数，实现计算1+2+...+n的功能，并分析其时间复杂度。', 10, 'int sum(int n) { int s=0; for(int i=1;i<=n;i++) s+=i; return s; } 时间复杂度O(n)');
+INSERT INTO `sp_exam_question` VALUES (1779900010006, 1779900008003, 1, 'single_choice', '数组和链表的主要区别是什么？', 4, 'B');
+INSERT INTO `sp_exam_question` VALUES (1779900010007, 1779900008003, 2, 'single_choice', '栈的特点是？', 4, 'C');
+INSERT INTO `sp_exam_question` VALUES (1779900010008, 1779900008003, 3, 'single_choice', '二叉搜索树的中序遍历结果是？', 4, 'A');
+INSERT INTO `sp_exam_question` VALUES (1779900010009, 1779900008003, 4, 'short_answer', '请描述快速排序的基本思想，并给出其平均时间复杂度。', 8, '分治法：选基准，分区，递归。平均O(n log n)');
+INSERT INTO `sp_exam_question` VALUES (1779900010010, 1779900008005, 1, 'single_choice', '以下哪个不是监督学习算法？', 4, 'D');
 
 -- ----------------------------
 -- Table structure for sp_exam_record
@@ -446,12 +548,20 @@ CREATE TABLE `sp_exam_record`  (
   `submitted_at` datetime NULL DEFAULT NULL,
   PRIMARY KEY (`id`) USING BTREE,
   INDEX `idx_exam_record_exam`(`exam_id` ASC) USING BTREE,
-  INDEX `idx_exam_record_user`(`user_id` ASC) USING BTREE
-) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_general_ci ROW_FORMAT = Dynamic;
+  INDEX `idx_exam_record_user`(`user_id` ASC) USING BTREE,
+  CONSTRAINT `fk_er_exam` FOREIGN KEY (`exam_id`) REFERENCES `sp_exam` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
+  CONSTRAINT `fk_er_user` FOREIGN KEY (`user_id`) REFERENCES `sp_user` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
+) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_general_ci ROW_FORMAT = DYNAMIC;
 
 -- ----------------------------
 -- Records of sp_exam_record
 -- ----------------------------
+INSERT INTO `sp_exam_record` VALUES (1779900011001, 1779900008001, 3, 88, '基础扎实，函数题回答完整，选择题偶有失误', '[{\"qid\":1779900010001,\"answer\":\"D\"},{\"qid\":1779900010002,\"answer\":\"A\"},{\"qid\":1779900010003,\"answer\":\"B\"},{\"qid\":1779900010004,\"answer\":\"ABD\"},{\"qid\":1779900010005,\"answer\":\"正确\"}]', '2026-06-01 11:50:00');
+INSERT INTO `sp_exam_record` VALUES (1779900011002, 1779900008001, 4, 76, '选择题表现好，函数题部分失分，需加强编程练习', '[{\"qid\":1779900010001,\"answer\":\"D\"},{\"qid\":1779900010002,\"answer\":\"A\"},{\"qid\":1779900010003,\"answer\":\"C\"},{\"qid\":1779900010004,\"answer\":\"AB\"},{\"qid\":1779900010005,\"answer\":\"部分正确\"}]', '2026-06-01 11:55:00');
+INSERT INTO `sp_exam_record` VALUES (1779900011003, 1779900008001, 5, 68, '基础知识掌握不够牢固，建议重新复习前五章', '[{\"qid\":1779900010001,\"answer\":\"C\"},{\"qid\":1779900010002,\"answer\":\"B\"},{\"qid\":1779900010003,\"answer\":\"C\"},{\"qid\":1779900010004,\"answer\":\"AD\"},{\"qid\":1779900010005,\"answer\":\"有错误\"}]', '2026-06-01 12:00:00');
+INSERT INTO `sp_exam_record` VALUES (1779900011004, 1779900008003, 3, 92, '数据结构基础扎实，算法分析能力优秀', '[{\"qid\":1779900010006,\"answer\":\"B\"},{\"qid\":1779900010007,\"answer\":\"C\"},{\"qid\":1779900010008,\"answer\":\"A\"},{\"qid\":1779900010009,\"answer\":\"正确\"}]', '2026-05-25 08:55:00');
+INSERT INTO `sp_exam_record` VALUES (1779900011005, 1779900008003, 4, 80, '链表和树结构掌握较好，建议再复习图相关章节', '[{\"qid\":1779900010006,\"answer\":\"B\"},{\"qid\":1779900010007,\"answer\":\"C\"},{\"qid\":1779900010008,\"answer\":\"B\"},{\"qid\":1779900010009,\"answer\":\"基本正确\"}]', '2026-05-25 08:50:00');
+INSERT INTO `sp_exam_record` VALUES (1779900011006, 1779900008005, 3, 85, '监督学习概念清晰，神经网络部分表现良好', '[{\"qid\":1779900010010,\"answer\":\"D\"}]', '2026-06-05 15:20:00');
 
 -- ----------------------------
 -- Table structure for sp_exercise
@@ -466,8 +576,12 @@ CREATE TABLE `sp_exercise`  (
   `answer` text CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL,
   `explanation` text CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL,
   `lesson_id` bigint NULL DEFAULT NULL COMMENT '鍏宠仈璇炬椂',
-  PRIMARY KEY (`id`) USING BTREE
-) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_general_ci ROW_FORMAT = Dynamic;
+  PRIMARY KEY (`id`) USING BTREE,
+  INDEX `idx_exercise_kp`(`knowledge_point_id` ASC) USING BTREE,
+  INDEX `idx_exercise_lesson`(`lesson_id` ASC) USING BTREE,
+  CONSTRAINT `fk_exercise_kp` FOREIGN KEY (`knowledge_point_id`) REFERENCES `sp_knowledge_point` (`id`) ON DELETE SET NULL ON UPDATE CASCADE,
+  CONSTRAINT `fk_exercise_lesson` FOREIGN KEY (`lesson_id`) REFERENCES `sp_lesson` (`id`) ON DELETE SET NULL ON UPDATE CASCADE
+) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_general_ci ROW_FORMAT = DYNAMIC;
 
 -- ----------------------------
 -- Records of sp_exercise
@@ -2909,8 +3023,14 @@ CREATE TABLE `sp_exercise_attempt`  (
   `difficulty` int NULL DEFAULT 2,
   `correct` int NULL DEFAULT 0,
   `created_at` datetime NULL DEFAULT NULL,
-  PRIMARY KEY (`id`) USING BTREE
-) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_general_ci ROW_FORMAT = Dynamic;
+  PRIMARY KEY (`id`) USING BTREE,
+  INDEX `idx_ea_user`(`user_id` ASC) USING BTREE,
+  INDEX `idx_ea_lesson`(`lesson_id` ASC) USING BTREE,
+  INDEX `idx_ea_exercise`(`exercise_id` ASC) USING BTREE,
+  CONSTRAINT `fk_ea_exercise` FOREIGN KEY (`exercise_id`) REFERENCES `sp_exercise` (`id`) ON DELETE SET NULL ON UPDATE CASCADE,
+  CONSTRAINT `fk_ea_lesson` FOREIGN KEY (`lesson_id`) REFERENCES `sp_lesson` (`id`) ON DELETE SET NULL ON UPDATE CASCADE,
+  CONSTRAINT `fk_ea_user` FOREIGN KEY (`user_id`) REFERENCES `sp_user` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
+) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_general_ci ROW_FORMAT = DYNAMIC;
 
 -- ----------------------------
 -- Records of sp_exercise_attempt
@@ -2950,7 +3070,7 @@ CREATE TABLE `sp_knowledge_doc`  (
   `content` longtext CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL,
   `tag` varchar(64) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL DEFAULT NULL,
   PRIMARY KEY (`id`) USING BTREE
-) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_general_ci ROW_FORMAT = Dynamic;
+) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_general_ci ROW_FORMAT = DYNAMIC;
 
 -- ----------------------------
 -- Records of sp_knowledge_doc
@@ -2972,8 +3092,12 @@ CREATE TABLE `sp_knowledge_point`  (
   `tags` varchar(256) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL DEFAULT NULL,
   `sort_order` int NULL DEFAULT 0,
   `sub_chapter_id` bigint NULL DEFAULT NULL,
-  PRIMARY KEY (`id`) USING BTREE
-) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_general_ci ROW_FORMAT = Dynamic;
+  PRIMARY KEY (`id`) USING BTREE,
+  INDEX `idx_kp_lesson`(`lesson_id` ASC) USING BTREE,
+  INDEX `idx_kp_sub_chapter`(`sub_chapter_id` ASC) USING BTREE,
+  CONSTRAINT `fk_kp_lesson` FOREIGN KEY (`lesson_id`) REFERENCES `sp_lesson` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
+  CONSTRAINT `fk_kp_sub_chapter` FOREIGN KEY (`sub_chapter_id`) REFERENCES `sp_sub_chapter` (`id`) ON DELETE SET NULL ON UPDATE CASCADE
+) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_general_ci ROW_FORMAT = DYNAMIC;
 
 -- ----------------------------
 -- Records of sp_knowledge_point
@@ -6969,8 +7093,12 @@ CREATE TABLE `sp_kp_dependency`  (
   `id` bigint NOT NULL,
   `kp_id` bigint NOT NULL,
   `depends_on_kp_id` bigint NOT NULL,
-  PRIMARY KEY (`id`) USING BTREE
-) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_general_ci ROW_FORMAT = Dynamic;
+  PRIMARY KEY (`id`) USING BTREE,
+  INDEX `idx_kpd_kp`(`kp_id` ASC) USING BTREE,
+  INDEX `idx_kpd_depends`(`depends_on_kp_id` ASC) USING BTREE,
+  CONSTRAINT `fk_kpd_depends` FOREIGN KEY (`depends_on_kp_id`) REFERENCES `sp_knowledge_point` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
+  CONSTRAINT `fk_kpd_kp` FOREIGN KEY (`kp_id`) REFERENCES `sp_knowledge_point` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
+) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_general_ci ROW_FORMAT = DYNAMIC;
 
 -- ----------------------------
 -- Records of sp_kp_dependency
@@ -7011,7 +7139,8 @@ CREATE TABLE `sp_learning_activity`  (
   `resource_view_count` int NULL DEFAULT 0 COMMENT '资源查看次数',
   `created_at` datetime NULL DEFAULT NULL,
   PRIMARY KEY (`id`) USING BTREE,
-  INDEX `idx_activity_user_date`(`user_id` ASC, `activity_date` ASC) USING BTREE
+  INDEX `idx_activity_user_date`(`user_id` ASC, `activity_date` ASC) USING BTREE,
+  CONSTRAINT `fk_lact_user` FOREIGN KEY (`user_id`) REFERENCES `sp_user` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
 ) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_general_ci ROW_FORMAT = DYNAMIC;
 
 -- ----------------------------
@@ -7037,12 +7166,18 @@ CREATE TABLE `sp_learning_assessment`  (
   `optimize_suggestion` text CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL,
   `created_at` datetime NULL DEFAULT NULL,
   PRIMARY KEY (`id`) USING BTREE,
-  INDEX `idx_assess_user`(`user_id` ASC) USING BTREE
-) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_general_ci ROW_FORMAT = Dynamic;
+  INDEX `idx_assess_user`(`user_id` ASC) USING BTREE,
+  CONSTRAINT `fk_la_user` FOREIGN KEY (`user_id`) REFERENCES `sp_user` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
+) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_general_ci ROW_FORMAT = DYNAMIC;
 
 -- ----------------------------
 -- Records of sp_learning_assessment
 -- ----------------------------
+INSERT INTO `sp_learning_assessment` VALUES (1779900012001, 3, '{\"accuracy_score\":85,\"activity_score\":78,\"completion_score\":82,\"resource_score\":75,\"stability_score\":80}', '学习表现整体良好。准确率和课程完成度较高，说明知识掌握扎实。资源使用度稍低，建议多利用系统推荐的学习资料丰富知识面。', '建议增加每日学习时长至1.5小时以上，每周至少完成2次练习题。重点关注数据结构与算法模块的薄弱环节。', '2026-05-28 10:00:00');
+INSERT INTO `sp_learning_assessment` VALUES (1779900012002, 4, '{\"accuracy_score\":72,\"activity_score\":85,\"completion_score\":70,\"resource_score\":82,\"stability_score\":68}', '学习积极性高，活跃度好。但知识掌握的稳定性不足，准确率波动较大。资源使用情况良好，能够主动查阅学习资料。', '建议在完成练习题后认真阅读解析，建立错题本。每周回顾本周所学内容，加强知识巩固。', '2026-05-28 10:05:00');
+INSERT INTO `sp_learning_assessment` VALUES (1779900012003, 5, '{\"accuracy_score\":65,\"activity_score\":60,\"completion_score\":55,\"resource_score\":45,\"stability_score\":58}', '学习进度偏慢，各项指标均处于中下水平。课程完成度和资源使用度较低，需要加强学习投入。', '建议制定每周学习计划，确保每天至少1小时学习时间。从基础章节开始重新梳理，打好基础再推进。', '2026-05-28 10:10:00');
+INSERT INTO `sp_learning_assessment` VALUES (1779900012004, 3, '{\"accuracy_score\":88,\"activity_score\":82,\"completion_score\":85,\"resource_score\":80,\"stability_score\":86}', '近期学习表现优秀，各项指标稳步提升。准确率和稳定性均达到良好水平，学习习惯和方法值得肯定。', '可尝试挑战更高难度的练习题目，参加编程竞赛提升实战能力。建议开始学习更深入的算法知识。', '2026-06-15 10:00:00');
+INSERT INTO `sp_learning_assessment` VALUES (1779900012005, 4, '{\"accuracy_score\":76,\"activity_score\":90,\"completion_score\":75,\"resource_score\":88,\"stability_score\":72}', '学习热情高涨，活跃度显著提升。资源使用能力强，善于查找学习资料。准确性还需进一步提高。', '在保持学习热情的同时，注重学习质量。每道错题都要深入理解原因，避免重复犯错。', '2026-06-15 10:05:00');
 
 -- ----------------------------
 -- Table structure for sp_learning_resource
@@ -7058,12 +7193,20 @@ CREATE TABLE `sp_learning_resource`  (
   `confidence` int NULL DEFAULT NULL,
   `created_at` datetime NULL DEFAULT NULL,
   PRIMARY KEY (`id`) USING BTREE,
-  INDEX `idx_res_user`(`user_id` ASC) USING BTREE
-) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_general_ci ROW_FORMAT = Dynamic;
+  INDEX `idx_res_user`(`user_id` ASC) USING BTREE,
+  CONSTRAINT `fk_lr_user` FOREIGN KEY (`user_id`) REFERENCES `sp_user` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
+) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_general_ci ROW_FORMAT = DYNAMIC;
 
 -- ----------------------------
 -- Records of sp_learning_resource
 -- ----------------------------
+INSERT INTO `sp_learning_resource` VALUES (1779900013001, 3, 'syllabus', '编程入门 - 个性化学习讲义', '## 第一章：认识编程\n\n### 什么是程序\n程序（Program）是计算机能够理解和执行的一组有序指令。它告诉计算机做什么以及怎么做。\n\n程序 = 数据结构 + 算法\n- 数据结构：组织数据的方式（数组、链表、树等）\n- 算法：解决问题的步骤\n\n### 三种基本结构\n1. 顺序结构：按书写顺序依次执行\n2. 选择结构：if-else分支\n3. 循环结构：for/while重复执行\n\n### 重点提示\n理解程序的本质是解决问题的过程，代码只是工具。', '[\"https://www.runoob.com/cprogramming/c-tutorial.html\",\"https://leetcode.cn/problemset/all/\"]', 92, '2026-05-20 14:00:00');
+INSERT INTO `sp_learning_resource` VALUES (1779900013002, 3, 'mind_map', '数据结构知识图谱', '# 数据结构知识体系\n\n## 线性结构\n- 数组 → 连续存储 → O(1)随机访问\n- 链表 → 离散存储 → O(1)插入删除\n- 栈 → LIFO → 函数调用、括号匹配\n- 队列 → FIFO → BFS、任务调度\n\n## 树形结构\n- 二叉树 → 遍历（前中后序）\n- 二叉搜索树 → 查找O(log n)\n- 堆 → 优先队列\n- 哈夫曼树 → 数据压缩\n\n## 图形结构\n- 邻接矩阵 vs 邻接表\n- DFS（深度优先）vs BFS（广度优先）\n- 最短路径：Dijkstra、Floyd\n\n## 排序算法\n| 算法 | 平均时间 | 空间 |\n|------|---------|------|\n| 冒泡 | O(n²) | O(1) |\n| 快排 | O(n log n) | O(log n) |\n| 归并 | O(n log n) | O(n) |', NULL, 88, '2026-05-22 15:00:00');
+INSERT INTO `sp_learning_resource` VALUES (1779900013003, 3, 'practice', '机器学习 - 分层练习题', '## 基础题\n1. 以下哪种方法用于处理缺失值？\n   A. 删除缺失行  B. 均值填充  C. 插值法  D. 以上都是\n\n2. 在逻辑回归中，Sigmoid函数的输出范围是？\n\n## 进阶题\n3. 请简述SVM中核函数的作用，并列举两种常用核函数。\n4. 决策树分裂时，信息增益和基尼系数分别如何计算？\n\n## 挑战题\n5. 某数据集的训练准确率为99%，测试准确率为78%，请分析原因并给出3种优化方案。', NULL, 85, '2026-05-25 16:00:00');
+INSERT INTO `sp_learning_resource` VALUES (1779900013004, 3, 'video_script', '排序算法可视化讲解 - 视频脚本', '# 排序算法可视化讲解\n\n## 开场（30秒）\n画面：展示乱序的柱状图\n解说：\"面对一堆杂乱的数据，如何让它们变得有序？今天我们来了解三种经典排序算法。\"\n\n## 冒泡排序（2分钟）\n画面：动画展示相邻元素比较和交换过程\n解说：\"冒泡排序像水中的气泡，较小的值像气泡一样向上浮...\"\n\n## 快速排序（2.5分钟）\n画面：展示分区过程，枢轴元素归位\n解说：\"快速排序采用分治思想，选择一个基准值...\"\n\n## 对比总结（1分钟）\n画面：三列并排对比动画\n解说：\"冒泡简单但慢，快速高效但不稳定...\"', NULL, 90, '2026-05-26 10:00:00');
+INSERT INTO `sp_learning_resource` VALUES (1779900013005, 3, 'code_lab', 'Python数据分析实战项目', '# 实战项目：学生成绩分析\n\n## 项目目标\n使用Pandas和Matplotlib分析学生成绩数据\n\n```python\nimport pandas as pd\nimport matplotlib.pyplot as plt\n\n# 1. 数据加载\ndf = pd.read_csv(\"student_scores.csv\")\nprint(df.describe())\n\n# 2. 数据清洗\ndf = df.dropna()\ndf[\"avg_score\"] = df[[\"math\",\"english\",\"cs\"]].mean(axis=1)\n\n# 3. 成绩分布可视化\nplt.hist(df[\"avg_score\"], bins=20)\nplt.xlabel(\"Average Score\")\nplt.ylabel(\"Count\")\nplt.title(\"Student Score Distribution\")\nplt.show()\n\n# 4. 找出需要关注的学生\nlow_performers = df[df[\"avg_score\"] < 60]\nprint(f\"需要关注的学生人数：{len(low_performers)}\")\n```', NULL, 87, '2026-05-27 09:00:00');
+INSERT INTO `sp_learning_resource` VALUES (1779900013006, 4, 'syllabus', 'Web开发入门 - 学习讲义', '## HTML/CSS基础\n\n### HTML5语义化\n使用语义化标签提升页面可访问性和SEO。\n\n### CSS布局\n- Flexbox：一维布局利器\n- Grid：二维布局最佳选择\n\n### 实践建议\n多动手，从仿写页面开始。', NULL, 80, '2026-05-23 11:00:00');
+INSERT INTO `sp_learning_resource` VALUES (1779900013007, 5, 'practice', 'C语言基础练习集', '## 练习题\n1. 写出程序输出：int a=5; printf(\"%d\", ++a + a++);\n2. 用指针实现两个变量值的交换函数\n3. 判断一个字符串是否为回文', NULL, 75, '2026-05-24 14:00:00');
 
 -- ----------------------------
 -- Table structure for sp_lesson
@@ -7081,8 +7224,10 @@ CREATE TABLE `sp_lesson`  (
   `status` varchar(32) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL DEFAULT 'published',
   `user_id` bigint NULL DEFAULT NULL COMMENT 'NULL=公共课程库，有值=该用户个人导入',
   `cover_url` varchar(500) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL DEFAULT NULL COMMENT '视频封面图URL',
-  PRIMARY KEY (`id`) USING BTREE
-) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_general_ci ROW_FORMAT = Dynamic;
+  PRIMARY KEY (`id`) USING BTREE,
+  INDEX `idx_lesson_unit`(`unit_id` ASC) USING BTREE,
+  CONSTRAINT `fk_lesson_unit` FOREIGN KEY (`unit_id`) REFERENCES `sp_unit` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
+) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_general_ci ROW_FORMAT = DYNAMIC;
 
 -- ----------------------------
 -- Records of sp_lesson
@@ -7231,8 +7376,12 @@ CREATE TABLE `sp_lesson_progress`  (
   PRIMARY KEY (`id`) USING BTREE,
   UNIQUE INDEX `uk_lesson_progress`(`user_id` ASC, `lesson_id` ASC) USING BTREE,
   INDEX `idx_lp_user`(`user_id` ASC) USING BTREE,
-  INDEX `idx_lp_lesson`(`lesson_id` ASC) USING BTREE
-) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_general_ci ROW_FORMAT = Dynamic;
+  INDEX `idx_lp_lesson`(`lesson_id` ASC) USING BTREE,
+  INDEX `fk_lp_sub_chapter`(`sub_chapter_id` ASC) USING BTREE,
+  CONSTRAINT `fk_lp_lesson` FOREIGN KEY (`lesson_id`) REFERENCES `sp_lesson` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
+  CONSTRAINT `fk_lp_sub_chapter` FOREIGN KEY (`sub_chapter_id`) REFERENCES `sp_sub_chapter` (`id`) ON DELETE SET NULL ON UPDATE CASCADE,
+  CONSTRAINT `fk_lp_user` FOREIGN KEY (`user_id`) REFERENCES `sp_user` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
+) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_general_ci ROW_FORMAT = DYNAMIC;
 
 -- ----------------------------
 -- Records of sp_lesson_progress
@@ -7244,7 +7393,7 @@ INSERT INTO `sp_lesson_progress` VALUES (1778942186340, 3, 10003, 'completed', '
 INSERT INTO `sp_lesson_progress` VALUES (1778943047818, 3, 1778941900950, 'completed', '2026-05-16 22:50:48', NULL);
 INSERT INTO `sp_lesson_progress` VALUES (1779182579680, 3, 1779182244592, 'completed', '2026-05-19 17:58:17', 1779182244592);
 INSERT INTO `sp_lesson_progress` VALUES (1779182599698, 3, 1779182262714, 'completed', '2026-05-19 17:23:20', 1779182262714);
-INSERT INTO `sp_lesson_progress` VALUES (1779766987869, 3, 1779182686029, 'completed', '2026-05-26 11:43:08', 1779182686029);
+INSERT INTO `sp_lesson_progress` VALUES (1779766987869, 3, 1779182686029, 'completed', '2026-06-14 14:39:41', 1779182686029);
 INSERT INTO `sp_lesson_progress` VALUES (1779852176622, 3, 1779850762314, 'completed', '2026-05-27 11:22:57', 1779850762314);
 
 -- ----------------------------
@@ -7260,7 +7409,9 @@ CREATE TABLE `sp_operation_log`  (
   `details` text CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL,
   `ip_address` varchar(64) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL DEFAULT NULL,
   `created_at` datetime NULL DEFAULT NULL,
-  PRIMARY KEY (`id`) USING BTREE
+  PRIMARY KEY (`id`) USING BTREE,
+  INDEX `fk_ol_user`(`user_id` ASC) USING BTREE,
+  CONSTRAINT `fk_ol_user` FOREIGN KEY (`user_id`) REFERENCES `sp_user` (`id`) ON DELETE SET NULL ON UPDATE CASCADE
 ) ENGINE = InnoDB AUTO_INCREMENT = 2054778644676435970 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_general_ci ROW_FORMAT = DYNAMIC;
 
 -- ----------------------------
@@ -7283,11 +7434,18 @@ CREATE TABLE `sp_ppt_template`  (
   `theme_color` varchar(32) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL DEFAULT NULL,
   `created_at` datetime NULL DEFAULT NULL,
   PRIMARY KEY (`id`) USING BTREE
-) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_general_ci ROW_FORMAT = Dynamic;
+) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_general_ci ROW_FORMAT = DYNAMIC;
 
 -- ----------------------------
 -- Records of sp_ppt_template
 -- ----------------------------
+INSERT INTO `sp_ppt_template` VALUES (1779900014001, '科技蓝风格', 'tech-blue', '/templates/tech-blue-cover.png', '课程讲解', '适合计算机类课程的课件模板，蓝色科技风格', '{\"slides\":[\"封面\",\"目录\",\"章节页\",\"内容页\",\"代码展示页\",\"总结页\"]}', '#2563eb', '2026-05-16 00:00:00');
+INSERT INTO `sp_ppt_template` VALUES (1779900014002, '学术简约', 'academic-clean', '/templates/academic-cover.png', '学术报告', '简洁大方的学术报告模板，适合高等数学、物理等理科课程', '{\"slides\":[\"封面\",\"目录\",\"概念页\",\"公式推演\",\"案例页\",\"参考文献\"]}', '#1e293b', '2026-05-16 00:00:00');
+INSERT INTO `sp_ppt_template` VALUES (1779900014003, '暖色教育', 'warm-edu', '/templates/warm-cover.png', '通识课程', '温暖亲和的教育风格，适合人文社科类通识课程', '{\"slides\":[\"封面\",\"导入页\",\"知识点\",\"讨论页\",\"案例页\",\"总结\"]}', '#ea580c', '2026-05-16 00:00:00');
+INSERT INTO `sp_ppt_template` VALUES (1779900014004, '数据可视化', 'data-viz', '/templates/dataviz-cover.png', '数据分析', '包含多种图表的模板，适合数据分析和统计类课程', '{\"slides\":[\"封面\",\"数据展示\",\"柱状图\",\"折线图\",\"饼图\",\"结论\"]}', '#7c3aed', '2026-05-16 00:00:00');
+INSERT INTO `sp_ppt_template` VALUES (1779900014005, 'AI未来风', 'ai-future', '/templates/ai-cover.png', 'AI课程', '深色背景搭配霓虹色调，适合人工智能与前沿科技类课程', '{\"slides\":[\"封面\",\"背景介绍\",\"技术原理\",\"应用场景\",\"未来展望\",\"Q&A\"]}', '#06b6d4', '2026-05-16 00:00:00');
+INSERT INTO `sp_ppt_template` VALUES (1779900014006, '代码学院', 'code-academy', '/templates/code-cover.png', '编程教学', '代码高亮友好的模板，适合编程语言教学', '{\"slides\":[\"封面\",\"理论讲解\",\"代码演示\",\"动手实践\",\"常见错误\",\"练习\"]}', '#0891b2', '2026-05-16 00:00:00');
+INSERT INTO `sp_ppt_template` VALUES (1779900014007, '商务演示', 'business-pro', '/templates/biz-cover.png', '项目管理', '专业的商务演示模板，适合项目汇报和答辩场景', '{\"slides\":[\"封面\",\"议程\",\"进度汇报\",\"数据分析\",\"风险与对策\",\"下一步计划\"]}', '#0f172a', '2026-05-16 00:00:00');
 
 -- ----------------------------
 -- Table structure for sp_qa_history
@@ -7303,12 +7461,68 @@ CREATE TABLE `sp_qa_history`  (
   `created_at` datetime NULL DEFAULT NULL,
   PRIMARY KEY (`id`) USING BTREE,
   INDEX `idx_qa_user`(`user_id` ASC) USING BTREE,
-  INDEX `idx_qa_session`(`session_id` ASC) USING BTREE
-) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_general_ci ROW_FORMAT = Dynamic;
+  INDEX `idx_qa_session`(`session_id` ASC) USING BTREE,
+  CONSTRAINT `fk_qa_user` FOREIGN KEY (`user_id`) REFERENCES `sp_user` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
+) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_general_ci ROW_FORMAT = DYNAMIC;
 
 -- ----------------------------
 -- Records of sp_qa_history
 -- ----------------------------
+INSERT INTO `sp_qa_history` VALUES (1779900015001, 3, '什么是递归？能给我一个简单的例子吗？', '递归（Recursion）是一种编程技巧，指函数直接或间接调用自身。递归包含两个关键部分：\n\n1. **基线条件**：终止递归的条件\n2. **递归条件**：函数调用自身的条件\n\n最简单的例子——计算阶乘：\n```c\nint factorial(int n) {\n    if (n <= 1) return 1;  // 基线条件\n    return n * factorial(n - 1);  // 递归条件\n}\n```\n\n递归的优点是代码简洁优雅，缺点是可能导致栈溢出，效率通常不如迭代。适用于树遍历、分治算法、动态规划等场景。', '递归的定义与阶乘示例', 'sess_20260520_001', '2026-05-20 15:00:00');
+INSERT INTO `sp_qa_history` VALUES (1779900015002, 3, '二叉树的先序遍历和中序遍历有什么区别？', '二叉树的三种遍历方式：\n\n**先序遍历（Pre-order）**：根 → 左 → 右\n- 先访问根节点，再遍历左子树，最后遍历右子树\n- 示例：A, B, D, E, C, F\n\n**中序遍历（In-order）**：左 → 根 → 右\n- 先遍历左子树，再访问根节点，最后遍历右子树\n- 示例：D, B, E, A, C, F\n- **重要特性**：BST的中序遍历结果是有序的\n\n**后序遍历（Post-order）**：左 → 右 → 根\n- 示例：D, E, B, F, C, A\n- 应用：计算目录大小、表达式树求值\n\n记忆技巧：前中后指的是\"访问根节点\"的时机。', '二叉树三种遍历方式的区别', 'sess_20260522_001', '2026-05-22 16:30:00');
+INSERT INTO `sp_qa_history` VALUES (1779900015003, 3, '过拟合和欠拟合有什么区别？怎么解决？', '## 过拟合 vs 欠拟合\n\n| 特征 | 欠拟合 | 刚好 | 过拟合 |\n|------|--------|------|--------|\n| 训练误差 | 高 | 低 | 很低 |\n| 测试误差 | 高 | 低 | 高 |\n| 表现 | 学得太少 | 恰到好处 | 学得太多 |\n\n**欠拟合原因**：模型太简单、特征太少、训练不足\n**过拟合原因**：模型太复杂、数据太少、噪声被学习\n\n**解决方案**：\n- 欠拟合：增加特征、增加模型复杂度、更长时间训练\n- 过拟合：正则化（L1/L2）、Dropout、数据增强、早停法、交叉验证', '机器学习中过拟合与欠拟合的辨析', 'sess_20260525_001', '2026-05-25 10:00:00');
+INSERT INTO `sp_qa_history` VALUES (1779900015004, 4, '数组和链表哪个查找更快？', '**数组**查找更快。\n\n原因：\n- 数组支持随机访问，通过索引O(1)直接定位元素\n- 链表只能顺序访问，需要从头遍历，O(n)时间\n\n但是注意：\n- 如果是有序数组，还可以用二分查找达到O(log n)\n- 链表的优势在于插入和删除（O(1)，前提是已知位置）\n\n结论：查找多用数组，频繁增删多用链表。', '数组vs链表的查找效率对比', 'sess_20260523_001', '2026-05-23 09:30:00');
+INSERT INTO `sp_qa_history` VALUES (1779900015005, 4, 'CSS中flex和grid有什么区别？什么时候用哪个？', '## Flexbox vs Grid\n\n**Flexbox**：一维布局（行或列）\n- 适用：导航栏、按钮组、卡片横向排列\n- 特点：内容驱动，弹性伸缩\n\n**Grid**：二维布局（行和列）\n- 适用：页面整体布局、仪表盘、图片画廊\n- 特点：布局驱动，精确控制\n\n**选择建议**：\n- 单行/单列排列 → Flex\n- 多行多列网格 → Grid\n- 可以混用：外层Grid定布局，内层Flex排组件', 'CSS Flexbox与Grid布局的区别与选择', 'sess_20260524_001', '2026-05-24 11:00:00');
+INSERT INTO `sp_qa_history` VALUES (1779900015006, 5, '栈和队列的区别是什么？各有什么应用场景？', '## 栈 vs 队列\n\n| 特性 | 栈 Stack | 队列 Queue |\n|------|----------|------------|\n| 数据进出 | LIFO（后进先出） | FIFO（先进先出） |\n| 操作端 | 一端（栈顶） | 两端（队头出，队尾入） |\n\n**栈的应用**：\n- 函数调用栈\n- 括号匹配检查\n- 浏览器后退按钮\n- 撤销操作（Ctrl+Z）\n\n**队列的应用**：\n- 任务调度（先来先服务）\n- BFS图遍历\n- 打印队列\n- 消息队列', '栈与队列的区别和应用场景', 'sess_20260526_001', '2026-05-26 14:00:00');
+INSERT INTO `sp_qa_history` VALUES (1779900015007, 3, '请解释动态规划的核心思想', '## 动态规划核心思想\n\n**本质**：将大问题分解为小问题，记住小问题的解，避免重复计算。\n\n**两个关键要素**：\n1. **最优子结构**：问题的最优解包含子问题的最优解\n2. **重叠子问题**：子问题被重复计算多次\n\n**经典示例——斐波那契**：\n```python\n# 原始递归（重复计算多）\ndef fib(n):\n    if n <= 1: return n\n    return fib(n-1) + fib(n-2)  # O(2^n)\n\n# 动态规划（记忆化）\ndef fib_dp(n):\n    dp = [0] * (n+1)\n    dp[1] = 1\n    for i in range(2, n+1):\n        dp[i] = dp[i-1] + dp[i-2]  # O(n)\n    return dp[n]\n```\n\n**经典问题**：背包问题、最长公共子序列、编辑距离。', '动态规划的核心思想与斐波那契示例', 'sess_20260527_001', '2026-05-27 15:30:00');
+INSERT INTO `sp_qa_history` VALUES (2065769452668186625, 3, '请解释动态规划的核心思想', '表情：有趣|动作：右手放胸前|回复文本：哈哈，我刚刚已经解释过啦！动态规划的核心思想就是把大问题拆成小问题，记住小问题的解来避免重复计算～要不我换个方式再讲讲，或者你问点别的？比如背包问题或者最长公共子序列？|指令：无', '请解释动态规划的核心思想', NULL, '2026-06-13 20:13:12');
+INSERT INTO `sp_qa_history` VALUES (2065769509786218498, 3, '什么是递归？能给我一个简单的例子吗？', '表情：有趣|动作：右手放身前|回复文本：好呀！递归就像一个套娃，函数自己调用自己，直到遇到一个简单的情况停下来！最简单的例子就是计算阶乘：5! = 5×4×3×2×1，用递归就是 `factorial(5) = 5 * factorial(4)`，一直拆到 `factorial(1) = 1` 就结束啦！是不是很像俄罗斯套娃？|指令：无', '什么是递归？能给我一个简单的例子吗？', NULL, '2026-06-13 20:13:26');
+INSERT INTO `sp_qa_history` VALUES (2065772201799577602, 3, '过拟合和欠拟合有什么区别？怎么解决？', '表情：开心|动作：右手放胸前|回复文本：好问题呀！过拟合就像学生死记硬背了所有题目，但换个新题就不会了；欠拟合则像学生没认真学，连训练题都做不对～解决过拟合可以加正则化、减少特征或交叉验证；解决欠拟合就增加特征、提高模型复杂度或减少正则化！需要我详细说说哪个方法吗？|指令：无', '过拟合和欠拟合有什么区别？怎么解决？', '5c15249c-d5aa-4821-a446-f1c8806e7a22', '2026-06-13 20:24:08');
+INSERT INTO `sp_qa_history` VALUES (2065772349430689793, 3, '什么是递归？能给我一个简单的例子吗？', '表情：有趣|动作：右手放头上|回复文本：哈哈，这个问题你问了两遍呢！看来递归的概念让你很感兴趣呀～那我再用另一个例子说吧：想象你有一排盒子，每个盒子里都有一把钥匙，钥匙又能打开下一个盒子，直到最后一个盒子里有宝藏。你打开一个盒子→拿到钥匙→打开下一个盒子，这就是递归啦！用代码写就是找宝藏的函数里又调了自己，直到找到宝藏为止！|指令：无', '什么是递归？能给我一个简单的例子吗？', '5c15249c-d5aa-4821-a446-f1c8806e7a22', '2026-06-13 20:24:43');
+INSERT INTO `sp_qa_history` VALUES (2065774917619806209, 3, '喂喂喂喂喂喂。听得到听得到我听得到我说话听得到我说话吗听得到我说话吗？', '表情：困惑|动作：右手放头上|回复文本：哎呀，我听到啦听到啦！你好像有点着急，是不是网络卡顿啦？别担心，我在这里一直在线呢～有什么问题尽管说，小慧随时为你服务！|指令：无', '喂喂喂喂喂喂。听得到听得到我听得到我说话听得到我说话吗听得到我说话吗？', '5c15249c-d5aa-4821-a446-f1c8806e7a22', '2026-06-13 20:34:55');
+INSERT INTO `sp_qa_history` VALUES (2065775551731449858, 3, '的吧v发大水发的武器', '表情：困惑|动作：右手放胸前|回复文本：咦？小慧有点没看懂你的消息呢～你说的“的吧v发大水发的武器”是不是打字时不小心按错键盘啦？可以重新告诉我想做什么吗？比如想打开哪个页面，或者想问什么学习问题，我都会认真帮你哒！|指令：无', '的吧v发大水发的武器', '5c15249c-d5aa-4821-a446-f1c8806e7a22', '2026-06-13 20:37:26');
+INSERT INTO `sp_qa_history` VALUES (2065776385118683138, 3, '什么是递归？能给我一个简单的例子吗？', '表情：有趣|动作：右手放胸前|回复文本：嘿嘿，这个问题问得好！递归就像是一个会“自己调用自己”的小魔法～简单来说，就是一个函数在执行过程中，又调用了它自己。我给你举个生活中的例子：想象你在一个有很多层镜子的房间里，每面镜子都照出另一面镜子里的自己，这就是一种“递归”的感觉～更实际点的例子是计算阶乘：5! = 5 × 4 × 3 × 2 × 1，用递归写就是：factorial(5) = 5 × factorial(4)，而factorial(4) = 4 × factorial(3)……直到factorial(1) = 1。明白了吗？不懂的话我还可以再举个更简单的例子哦！|指令：无', '什么是递归？能给我一个简单的例子吗？', '5c15249c-d5aa-4821-a446-f1c8806e7a22', '2026-06-13 20:40:45');
+INSERT INTO `sp_qa_history` VALUES (2065777428250476545, 3, '小惠小惠听得到我说话吗？', '表情：开心|动作：右手放胸前|回复文本：在呢在呢！听得到哦～我耳朵可灵啦！有什么需要小慧帮忙的吗？无论是学习问题还是导航页面，我随时待命！|指令：无', '小惠小惠听得到我说话吗？', '5c15249c-d5aa-4821-a446-f1c8806e7a22', '2026-06-13 20:44:54');
+INSERT INTO `sp_qa_history` VALUES (2065777562464010242, 3, '过拟合和欠拟合有什么区别？怎么解决？', '表情：开心|动作：右手放胸前|回复文本：嘿嘿，这个问题超经典的！简单来说，过拟合就像是你把课本背得滚瓜烂熟，但一遇到没见过的题目就懵了；欠拟合则是你连课本都没学明白，基础题都做不好～具体来说：过拟合是模型在训练数据上表现太好，但在新数据上表现很差，像“死记硬背”；欠拟合则是模型连训练数据都没学好，像“学了个寂寞”。解决方法嘛：过拟合可以试试增加数据量、降低模型复杂度、加正则化（L1/L2）或者用Dropout；欠拟合就简单啦，换个更复杂的模型、加更多特征或者减少正则化强度就行啦！你最近在调模型吗？要不要我帮你看看具体问题？|指令：无', '过拟合和欠拟合有什么区别？怎么解决？', '5c15249c-d5aa-4821-a446-f1c8806e7a22', '2026-06-13 20:45:26');
+INSERT INTO `sp_qa_history` VALUES (2065778640802791425, 3, '什么是递归？能给我一个简单的例子吗？', '表情：开心|动作：右手放胸前|回复文本：哈哈，又来一个问递归的小伙伴！我超喜欢讲这个的～简单说，递归就是“自己调用自己”，像一个套娃一样一层层往里钻，直到碰到一个最简单的“出口”再一层层返回来。举个超简单的例子：数台阶！你想知道从第10级台阶走到第1级有多少步，可以这样想——从第10级到第1级的步数 = 从第10级到第9级的1步 + 从第9级到第1级的步数。而“从第9级到第1级的步数”又可以用同样的方法算下去，直到“从第1级到第1级”是0步，这就是出口啦！代码写出来就是：function steps(n) { if (n === 1) return 0; return 1 + steps(n-1); } 懂了吗？要不要我写个更详细的例子给你看看？|指令：无', '什么是递归？能给我一个简单的例子吗？', '5c15249c-d5aa-4821-a446-f1c8806e7a22', '2026-06-13 20:49:43');
+INSERT INTO `sp_qa_history` VALUES (2065778983435485185, 3, '给我写一个更详细的例子，看看吧。', '好嘞！那我用经典的“阶乘”例子给你细细讲～阶乘就是“5! = 5×4×3×2×1”这种。递归的思路是：5! = 5 × 4!，4! = 4 × 3!，依此类推，直到1! = 1（这就是出口）。代码长这样：\n\n```python\ndef factorial(n):\n    if n == 1:  # 出口\n        return 1\n    else:\n        return n * factorial(n - 1)  # 自己调用自己\n\nprint(factorial(5))  # 输出120\n```\n\n运行过程像这样：factorial(5) → 5 × factorial(4) → 5 × (4 × factorial(3)) → ... → 5×4×3×2×1 = 120。你看，就像剥洋葱一样一层层剥到最里面，再一层层套回来～是不是很巧妙？递归在树结构、分治算法里超常用哦！', '给我写一个更详细的例子，看看吧。', '5c15249c-d5aa-4821-a446-f1c8806e7a22', '2026-06-13 20:51:05');
+INSERT INTO `sp_qa_history` VALUES (2065780404008501249, 3, '请解释动态规划的核心思想', '表情：有趣|动作：右手放头上|回复文本：哇，又是个经典问题！动态规划的核心思想其实超好记，就四个字：**记住过去，避免重复**！它跟递归有点像，但递归可能会重复算很多次同样的问题（比如斐波那契数列里算fib(3)好多次），而动态规划会把算过的结果存下来，下次直接拿来用，省时省力！核心步骤分三步：第一，把大问题分解成小问题；第二，找到小问题之间的关系（这叫状态转移方程）；第三，从最小的子问题开始，一步步往上推，直到解决原问题。简单说就是：别总做重复劳动，用脑子记下来，效率翻倍！要不要我给你举个经典例子，比如“爬楼梯”问题？|指令：无', '请解释动态规划的核心思想', '5c15249c-d5aa-4821-a446-f1c8806e7a22', '2026-06-13 20:56:43');
+INSERT INTO `sp_qa_history` VALUES (2065782892283543553, 3, '简单解释一下什么是卷积神经网络。', '表情：有趣|动作：右手放胸前|回复文本：好嘞！卷积神经网络，简称CNN，就像一个“自动扫描仪”，专门用来处理像图片这样的网格数据。它的核心是“卷积层”，会拿着一个个小窗口（叫卷积核）在图片上滑来滑去，检测边缘、颜色、纹理这些特征。然后通过“池化层”压缩信息，最后用全连接层做出判断，比如“这是一只猫”还是“这是一只狗”。简单说，它就是一种特别擅长看图、识别图片里有什么的神经网络！想看看它怎么识别数字吗？|指令：无', '简单解释一下什么是卷积神经网络。', '5c15249c-d5aa-4821-a446-f1c8806e7a22', '2026-06-13 21:06:37');
+INSERT INTO `sp_qa_history` VALUES (2065783951097839618, 3, '能给我一个简单的例子吗？', '表情：开心|动作：右手放胸前|回复文本：当然可以！假设我们要识别手写的数字“3”，CNN会这么工作：先拿一个小窗口（比如3x3的像素块）在图片上滑动，检测出像“曲线”或“拐角”这样的基础特征。然后把这些特征组合起来，识别出“三个曲线和两个拐角”这种中间特征，最后判断这是数字“3”。整个过程就像搭积木，从简单的小块拼出完整的图案。是不是很直观？要不要试试用这个思路识别你写的数字？|指令：无', '能给我一个简单的例子吗？', '5c15249c-d5aa-4821-a446-f1c8806e7a22', '2026-06-13 21:10:49');
+INSERT INTO `sp_qa_history` VALUES (2065784332343296001, 3, '过拟合和欠拟合有什么区别？怎么解决？', '表情：有趣|动作：右手放胸前|回复文本：哈哈，这个问题好经典！简单说，过拟合就像“死记硬背”——模型把训练数据背得滚瓜烂熟，连噪音都记住了，但遇到新题目就懵了；而欠拟合就像“学得太浅”——模型连基本规律都没搞懂，训练和考试都考不好。解决的话，过拟合可以试试增加数据量、用正则化（比如L1/L2）、或者用Dropout让神经元随机“罢工”一下；欠拟合呢，就增加模型复杂度（比如加更多层或神经元）、或者减少正则化、多训练几轮。你是在做项目时遇到这个问题了吗？|指令：无', '过拟合和欠拟合有什么区别？怎么解决？', '5c15249c-d5aa-4821-a446-f1c8806e7a22', '2026-06-13 21:12:20');
+INSERT INTO `sp_qa_history` VALUES (2065785277206740994, 3, '数据结构与算法的核心', '表情：开心|动作：右手放胸前|回复文本：核心就是一句话：**用合适的数据结构存储数据，用高效的算法处理数据**！具体来说，数据结构关注的是“怎么存”，比如数组、链表、栈、队列、树、图这些；算法关注的是“怎么算”，比如排序、搜索、动态规划、图遍历这些。它们俩就像一对好搭档——选对数据结构能大大简化算法，比如用哈希表查找直接O(1)，而用数组就得O(n)。所以学的时候，重点是理解每种结构的优缺点，以及常见算法的思想（比如分治、贪心、回溯），而不是死记硬背代码哦！需要我帮你梳理某个具体结构或算法的例子吗？|指令：无', '数据结构与算法的核心', '5c15249c-d5aa-4821-a446-f1c8806e7a22', '2026-06-13 21:16:05');
+INSERT INTO `sp_qa_history` VALUES (2065786136971952130, 3, '过拟合和欠拟合有什么区别？怎么解决？', '表情：有趣|动作：右手放胸前|回复文本：哈哈，这个问题你已经问过啦！不过没关系，小慧再给你详细说一遍～过拟合就像考试前疯狂刷题，把答案都背下来了，结果题目一变就懵；欠拟合就像上课打瞌睡，连基本公式都没记住。解决过拟合可以试试加更多数据、用正则化或Dropout；欠拟合就加复杂模型、减少正则化、多训练几轮。你是在做机器学习项目吗？需要小慧帮你看看具体代码或数据不？|指令：无', '过拟合和欠拟合有什么区别？怎么解决？', '5c15249c-d5aa-4821-a446-f1c8806e7a22', '2026-06-13 21:19:30');
+INSERT INTO `sp_qa_history` VALUES (2065787899183611905, 3, '数据结构与算法的核心', '表情：开心|动作：右手放胸前|回复文本：看来你真的很想弄懂这个核心呢！小慧再给你总结一下：**数据结构是组织数据的“容器”，算法是处理数据的“步骤”**。核心思想就是——根据问题选择最合适的数据结构，然后设计出高效的算法来解决问题。比如你要快速查找数据，就用哈希表；要按顺序处理，就用队列或栈。学好它们的两个关键是：理解每种结构的优缺点（时间/空间复杂度），以及掌握常见算法思想（分治、动态规划、贪心等）。需要小慧帮你举个例子对比一下吗？比如数组和链表的区别？|指令：无', '数据结构与算法的核心', '5c15249c-d5aa-4821-a446-f1c8806e7a22', '2026-06-13 21:26:30');
+INSERT INTO `sp_qa_history` VALUES (2065789001186656258, 3, '请解释动态规划的核心思想', '表情：开心|动作：右手放胸前|回复文本：动态规划的核心思想其实超级好理解！简单来说就是：**把一个大问题拆成很多小问题，记住每个小问题的答案，避免重复计算**。就像你爬楼梯，要算到第10层有多少种方法，其实只要知道到第8层和到第9层的方法数，加起来就好啦！不用每次都从第一层开始数。关键就是两个步骤：**定义状态**（比如dp[i]表示到第i层的方法数）和**找状态转移方程**（dp[i]=dp[i-1]+dp[i-2]）。小慧觉得它最酷的地方就是“用空间换时间”，把指数级复杂度降成多项式级！你想看个具体例子吗？比如背包问题怎么用动态规划？|指令：无', '请解释动态规划的核心思想', '5c15249c-d5aa-4821-a446-f1c8806e7a22', '2026-06-13 21:30:53');
+INSERT INTO `sp_qa_history` VALUES (2065790575397027841, 3, '数据结构与算法的核心', '表情：开心|动作：右手放胸前|回复文本：哈哈，你又回来问这个啦！看来真的很想彻底搞懂呢！小慧再给你梳理一遍：**数据结构与算法的核心就是“高效地组织和处理数据”**。数据结构决定了数据怎么存（比如数组连续存、链表分散存），算法决定了数据怎么用（比如排序、查找）。它们俩就像“仓库”和“搬运工”的关系——选对仓库，搬运工才能干得快！核心目标就是：**用最少的时间、最少的空间，解决实际问题**。比如你要找最便宜的商品，用堆排序就比冒泡排序快多啦！要不要小慧给你推荐一个经典例子，比如“如何用栈实现浏览器的前进后退”？|指令：无', '数据结构与算法的核心', '5c15249c-d5aa-4821-a446-f1c8806e7a22', '2026-06-13 21:37:08');
+INSERT INTO `sp_qa_history` VALUES (2065791022849572865, 3, '请解释动态规划的核心思想', '表情：开心|动作：右手放胸前|回复文本：好的好的，小慧再说一遍哦！动态规划的核心思想就是**把大问题拆成小问题，记住小问题的答案，避免重复计算**。它有两个关键步骤：**定义状态**（比如dp[i]表示到第i步的答案）和**状态转移方程**（比如dp[i]=dp[i-1]+dp[i-2]）。这样就能用“空间换时间”，把指数级的复杂度降到多项式级啦！比如爬楼梯、背包问题都是经典例子。你还有什么不懂的吗？小慧可以给你举个具体的例子哦！|指令：无', '请解释动态规划的核心思想', '5c15249c-d5aa-4821-a446-f1c8806e7a22', '2026-06-13 21:38:55');
+INSERT INTO `sp_qa_history` VALUES (2065791739861647361, 3, '过拟合和欠拟合有什么区别？怎么解决？', '表情：有趣|动作：右手放头上|回复文本：哎呀，这个问题问得真好！小慧来给你讲个形象的比喻吧——**欠拟合就像你学得太少，考试时连课本基础都没记住；过拟合就像你死记硬背了所有例题，结果题目换个数字就懵了**！区别就是：欠拟合是模型太简单，训练集和测试集都表现差；过拟合是模型太复杂，训练集满分但测试集翻车。解决办法嘛——欠拟合就**增加模型复杂度**（比如加隐藏层、加特征）；过拟合就**简化模型**（比如用正则化、降维、增加数据量或早停法）。你平时做项目时遇到过哪种情况呀？|指令：无', '过拟合和欠拟合有什么区别？怎么解决？', '5c15249c-d5aa-4821-a446-f1c8806e7a22', '2026-06-13 21:41:46');
+INSERT INTO `sp_qa_history` VALUES (2065793194223976449, 3, '喂喂喂喂喂喂。听得到听得到我听得到我说话听得到我说话吗听得到我说话吗', '表情：困惑|动作：右手放胸前|回复文本：诶嘿，听到啦听到啦～小慧耳朵可灵啦！你是在测试我有没有在线吗？放心，我随时都在哦！有什么学习上的问题或者想让我帮你导航到哪个页面，尽管说～|指令：无', '喂喂喂喂喂喂。听得到听得到我听得到我说话听得到我说话吗听得到我说话吗', '5c15249c-d5aa-4821-a446-f1c8806e7a22', '2026-06-13 21:47:33');
+INSERT INTO `sp_qa_history` VALUES (2065793998565654529, 3, '过拟合和欠拟合有什么区别？怎么解决？', '表情：有趣|动作：右手放头上|回复文本：哎呀，你又问了一遍，看来真的很想搞懂呢！那小慧再换个萌萌的比喻讲一次～**欠拟合就像你只看了半页书就去考试，啥都不会；过拟合就像你把所有例题的答案都背下来，结果题目改个数字你就傻眼啦！**  \n区别就是：欠拟合是模型太简单，训练集和测试集都表现差；过拟合是模型太复杂，训练集满分但测试集翻车。  \n解决办法：欠拟合就**加复杂度**（比如加层数、加特征）；过拟合就**减复杂度**（比如正则化、加数据、早停法）。现在是不是更清楚啦？要不要我帮你打开课程平台，找点实战案例练练手？|指令：无', '过拟合和欠拟合有什么区别？怎么解决？', '5c15249c-d5aa-4821-a446-f1c8806e7a22', '2026-06-13 21:50:45');
+INSERT INTO `sp_qa_history` VALUES (2065800100573331458, 3, 'llmssm', '表情：困惑|动作：右手放胸前|回复文本：嗯？LLMSSM？这是啥新词呀？小慧的知识库里还没有这个术语呢～你是不是想说“LLM”（大语言模型）或者“SSM”（状态空间模型）呀？如果是的话，我可以帮你解释它们之间的关系和区别哦！或者你想让我帮你打开课程平台，找找相关的学习资料？|指令：无', 'llmssm', '5c15249c-d5aa-4821-a446-f1c8806e7a22', '2026-06-13 22:14:59');
+INSERT INTO `sp_qa_history` VALUES (2065800800191627266, 3, 'LLMS和LLM是什么意思', '表情：开心|动作：右手放身前|回复文本：哈哈，原来你是想问这个！小慧来给你科普一下～  \n**LLM** 是“Large Language Model”的缩写，中文叫“大语言模型”，就是像小慧这样的超聪明AI模型，能理解语言、写文章、回答问题！  \n而 **LLMS** 嘛，如果是指复数的话，就是“多个大语言模型”的意思，或者有时也指“大语言模型系统”。不过更常见的缩写是 **LLM** 哦！  \n如果你想深入了解，我可以帮你打开课程平台，找相关课程看看！|指令：无', 'LLMS和LLM是什么意思', '5c15249c-d5aa-4821-a446-f1c8806e7a22', '2026-06-13 22:17:46');
+INSERT INTO `sp_qa_history` VALUES (2066168621748121602, 3, '根据以下课程内容出20道练习题，包含选择题(choice)、判断题(truefalse)、填空题(fill)至少三种。输出纯JSON数组：\n[{\"type\":\"choice\",\"question\":\"题目\",\"options\":[\"A\",\"B\",\"C\",\"D\"],\"answer\":0,\"explanation\":\"解析\"},{\"type\":\"truefalse\",\"question\":\"题目\",\"answer\":0},...]\n判断题answer:0=正确1=错误。填空answer为答案文本。直接输出[]数组。\n\n课程：2-组成原理-计算机系统的层次结构\n内容：# 计算机系统的层次结构\n\n## 课程概述\n本课时讲解计算机系统的层次结构，从硬件到软件的抽象层级，帮助理解计算机系统的工作原理。时长18分钟，适合计算机组成原理入门学习。\n\n## 一、计算机系统的层次模型\n### 1.1 层次结构概述\n- **定义**：计算机系统由硬件和软件组成，按功能分为多个抽象层级，每层为上层提供接口，隐藏下层细节。\n- **重要性**：理解层次结构有助于掌握系统设计、性能优化和问题定位。\n\n### 1.2 经典六层结构\n| 层级编号 | 层级名称 | 主要组成 | 示例 |\n|----------|----------|----------|------|\n| 0 | 微程序层 | 微指令、微程序 | CPU微指令集 |\n| 1 | 机器语言层 | 指令集架构（ISA） | x86指令集 |\n| 2 | 操作系统层 | 系统调用、资源管理 | Windows/Linux内核 |\n| 3 | 汇编语言层 | 汇编指令、伪指令 | MOV, ADD指令 |\n| 4 | 高级语言层 | 编程语言、编译器 | C, Java代码 |\n| 5 | 应用层 | 应用程序、用户界面 | Word, 浏览器 |\n\n> **重点**：记忆各层名称和功能，理解层间接口作用。\n\n## 二、各层次详解\n### 2.1 微程序层（第0层）\n- **定义**：直接控制硬件电路的微指令序列，实现机器指令。\n- **特点**：硬件实现，速度最快，但编程复杂。\n- **难点**：微程序与机器指令的映射关系。\n\n### 2.2 机器语言层（第1层）\n- **定义**：CPU直接执行的指令集，包括操作码、地址码。\n- **特点**：二进制形式，依赖具体CPU架构。\n- **示例**：x86的`ADD EAX, 1`。\n\n### 2.3 操作系统层（第2层）\n- **功能**：管理硬件资源，提供系统调用接口（如文件读写、进程调度）。\n- **作用**：屏蔽硬件差异，为上层提供统一服务。\n- **重点**：理解操作系统作为“资源管理者”的角色。\n\n### 2.4 汇编语言层（第3层）\n- **定义**：用助记符表示机器指令，通过汇编器转换为机器码。\n- **特点**：与硬件紧密相关，但比机器语言易读。\n- **难点**：寄存器分配、指令寻址方式。\n\n### 2.5 高级语言层（第4层）\n- **定义**：使用自然语言风格编写代码，通过编译器或解释器执行。\n- **特点**：跨平台、易维护。\n- **示例**：`int a = 5;`。\n\n### 2.6 应用层（第5层）\n- **定义**：用户直接交互的软件，如办公软件、游戏。\n- **特点**：面向特定需求，依赖下层服务。\n\n## 三、层次间的关系与转换\n### 3.1 数据流方向\n- **用户请求**：应用层 -> 高级语言 -> 操作系统 -> 机器语言 -> 微程序 -> 硬件执行。\n- **结果返回**：反向传递。\n\n### 3.2 关键转换机制\n- **编译**：高级语言 -> 汇编/机器语言（如GCC编译器）。\n- **解释**：逐行翻译执行（如Python解释器）。\n- **汇编**：助记符 -> 机器码（如NASM汇编器）。\n- **微程序解释**：机器指令 -> 微指令序列。\n\n> **难点**：区分编译与解释，理解微程序控制器的运作。\n\n## 四、层次结构的应用\n- **性能优化**：通过减少层次切换（如使用汇编优化关键代码）提升效率。\n- **系统设计**：模块化开发，每层独立设计。\n- **故障排查**：从高层向下层逐层定位问题。\n\n## 五、总结\n- **核心要点**：计算机系统六层结构，每层功能与接口。\n- **重点**：各层定义、转换机制、应用场景。\n- **难点**：微程序层与机器语言层的区分，编译与解释的差异。\n\n---\n\n# 课后练习题\n\n**1. 在计算机系统的层次结构中，哪一层直接负责将高级语言代码转换为机器指令？**\nA. 操作系统层\nB. 汇编语言层\nC. 高级语言层\nD. 机器语言层\n\n**正确答案**：C\n**解析**：高级语言层通过编译器或解释器将代码转换为机器语言或汇编语言。操作系统层管理资源，汇编语言层处理助记符，机器语言层是执行层，不负责转换。\n\n**2. 以下关于微程序层的描述，正确的是？**\nA. 微程序层是用户直接交互的界面\nB. 微程序层由操作系统实现\nC. 微程序层直接控制硬件电路\nD. 微程序层使用高级语言编写\n\n**正确答案**：C\n**解析**：微程序层位于最底层，由硬件中的微指令控制电路。用户交互在应用层，操作系统层管理资源，微程序层使用微指令而非高级语言。\n\n**3. 在计算机系统层次结构中，操作系统层的主要作用是什么？**\nA. 执行用户编写的应用程序\nB. 将汇编语言转换为机器语言\nC. 管理硬件资源并提供系统调用接口\nD. 直接控制CPU的微指令执行\n\n**正确答案**：C\n**解析**：操作系统层负责管理CPU、内存、I/O等硬件资源，并通过系统调用为上层提供服务。执行应用是应用层，汇编转换是汇编层，微指令执行是微程序层。\n\n# 知识点标签\n- 计算机系统层次结构\n- 微程序层\n- 操作系统层\n- 编译与解释\n- 指令集架构（ISA）', '### 智能辅导回答\n**问题识别：** 根据以下课程内容出20道练习题，包含选择题(choice)、判断题(truefalse)、填空题(fill)至少三种。输出纯JSON数组：\n[{\"type\":\"choice\",\"question\":\"题目\",\"options\":[\"A\",\"B\",\"C\",\"D\"],\"answer\":0,\"explanation\":\"解析\"},{\"type\":\"truefalse\",\"question\":\"题目\",\"answer\":0},...]\n判断题answer:0=正确1=错误。填空answer为答案文本。直接输出[]数组。\n\n课程：2-组成原理-计算机系统的层次结构\n内容：# 计算机系统的层次结构\n\n## 课程概述\n本课时讲解计算机系统的层次结构，从硬件到软件的抽象层级，帮助理解计算机系统的工作原理。时长18分钟，适合计算机组成原理入门学习。\n\n## 一、计算机系统的层次模型\n### 1.1 层次结构概述\n- **定义**：计算机系统由硬件和软件组成，按功能分为多个抽象层级，每层为上层提供接口，隐藏下层细节。\n- **重要性**：理解层次结构有助于掌握系统设计、性能优化和问题定位。\n\n### 1.2 经典六层结构\n| 层级编号 | 层级名称 | 主要组成 | 示例 |\n|----------|----------|----------|------|\n| 0 | 微程序层 | 微指令、微程序 | CPU微指令集 |\n| 1 | 机器语言层 | 指令集架构（ISA） | x86指令集 |\n| 2 | 操作系统层 | 系统调用、资源管理 | Windows/Linux内核 |\n| 3 | 汇编语言层 | 汇编指令、伪指令 | MOV, ADD指令 |\n| 4 | 高级语言层 | 编程语言、编译器 | C, Java代码 |\n| 5 | 应用层 | 应用程序、用户界面 | Word, 浏览器 |\n\n> **重点**：记忆各层名称和功能，理解层间接口作用。\n\n## 二、各层次详解\n### 2.1 微程序层（第0层）\n- **定义**：直接控制硬件电路的微指令序列，实现机器指令。\n- **特点**：硬件实现，速度最快，但编程复杂。\n- **难点**：微程序与机器指令的映射关系。\n\n### 2.2 机器语言层（第1层）\n- **定义**：CPU直接执行的指令集，包括操作码、地址码。\n- **特点**：二进制形式，依赖具体CPU架构。\n- **示例**：x86的`ADD EAX, 1`。\n\n### 2.3 操作系统层（第2层）\n- **功能**：管理硬件资源，提供系统调用接口（如文件读写、进程调度）。\n- **作用**：屏蔽硬件差异，为上层提供统一服务。\n- **重点**：理解操作系统作为“资源管理者”的角色。\n\n### 2.4 汇编语言层（第3层）\n- **定义**：用助记符表示机器指令，通过汇编器转换为机器码。\n- **特点**：与硬件紧密相关，但比机器语言易读。\n- **难点**：寄存器分配、指令寻址方式。\n\n### 2.5 高级语言层（第4层）\n- **定义**：使用自然语言风格编写代码，通过编译器或解释器执行。\n- **特点**：跨平台、易维护。\n- **示例**：`int a = 5;`。\n\n### 2.6 应用层（第5层）\n- **定义**：用户直接交互的软件，如办公软件、游戏。\n- **特点**：面向特定需求，依赖下层服务。\n\n## 三、层次间的关系与转换\n### 3.1 数据流方向\n- **用户请求**：应用层 -> 高级语言 -> 操作系统 -> 机器语言 -> 微程序 -> 硬件执行。\n- **结果返回**：反向传递。\n\n### 3.2 关键转换机制\n- **编译**：高级语言 -> 汇编/机器语言（如GCC编译器）。\n- **解释**：逐行翻译执行（如Python解释器）。\n- **汇编**：助记符 -> 机器码（如NASM汇编器）。\n- **微程序解释**：机器指令 -> 微指令序列。\n\n> **难点**：区分编译与解释，理解微程序控制器的运作。\n\n## 四、层次结构的应用\n- **性能优化**：通过减少层次切换（如使用汇编优化关键代码）提升效率。\n- **系统设计**：模块化开发，每层独立设计。\n- **故障排查**：从高层向下层逐层定位问题。\n\n## 五、总结\n- **核心要点**：计算机系统六层结构，每层功能与接口。\n- **重点**：各层定义、转换机制、应用场景。\n- **难点**：微程序层与机器语言层的区分，编译与解释的差异。\n\n---\n\n# 课后练习题\n\n**1. 在计算机系统的层次结构中，哪一层直接负责将高级语言代码转换为机器指令？**\nA. 操作系统层\nB. 汇编语言层\nC. 高级语言层\nD. 机器语言层\n\n**正确答案**：C\n**解析**：高级语言层通过编译器或解释器将代码转换为机器语言或汇编语言。操作系统层管理资源，汇编语言层处理助记符，机器语言层是执行层，不负责转换。\n\n**2. 以下关于微程序层的描述，正确的是？**\nA. 微程序层是用户直接交互的界面\nB. 微程序层由操作系统实现\nC. 微程序层直接控制硬件电路\nD. 微程序层使用高级语言编写\n\n**正确答案**：C\n**解析**：微程序层位于最底层，由硬件中的微指令控制电路。用户交互在应用层，操作系统层管理资源，微程序层使用微指令而非高级语言。\n\n**3. 在计算机系统层次结构中，操作系统层的主要作用是什么？**\nA. 执行用户编写的应用程序\nB. 将汇编语言转换为机器语言\nC. 管理硬件资源并提供系统调用接口\nD. 直接控制CPU的微指令执行\n\n**正确答案**：C\n**解析**：操作系统层负责管理CPU、内存、I/O等硬件资源，并通过系统调用为上层提供服务。执行应用是应用层，汇编转换是汇编层，微指令执行是微程序层。\n\n# 知识点标签\n- 计算机系统层次结构\n- 微程序层\n- 操作系统层\n- 编译与解释\n- 指令集架构（ISA）\n\n> 系统已结合课程知识库、学生画像与教学场景生成讲解建议，并已进行内容安全过滤。\n\n#### 1. 概念拆解\n- 先理解定义与应用场景。\n- 再理解关键步骤与输入输出。\n- 最后通过例题或代码验证理解。\n\n#### 2. 学习建议\n1. 看 5 分钟图解或微课，建立整体印象。\n2. 阅读结构化讲义，标出关键词。\n3. 完成 3 道基础题 + 1 道综合题。\n4. 用自己的语言复述，形成长期记忆。\n\n#### 3. 常见误区\n- 只背定义，不理解使用条件。\n- 只看答案，不做步骤推导。\n- 只做单题，不做知识迁移。\n\n#### 4. 多模态辅导建议\n- 文字：精讲讲义\n- 图解：流程图 / 思维导图\n- 视频：3分钟微课脚本\n', '根据以下课程内容出20道练习题，包含选择题(choice)、判断题(truefalse)、填空题(f...', NULL, '2026-06-14 14:39:22');
+INSERT INTO `sp_qa_history` VALUES (2066168622398238721, 3, '根据以下内容出10道练习题（选择+判断+填空混合）。输出JSON数组：[{\"type\":\"choice\",\"question\":\"...\",\"options\":[\"A\",\"B\",\"C\",\"D\"],\"answer\":0,\"explanation\":\"...\"},...]\n\n课程：2-组成原理-计算机系统的层次结构\n内容：# 计算机系统的层次结构\n\n## 课程概述\n本课时讲解计算机系统的层次结构，从硬件到软件的抽象层级，帮助理解计算机系统的工作原理。时长18分钟，适合计算机组成原理入门学习。\n\n## 一、计算机系统的层次模型\n### 1.1 层次结构概述\n- **定义**：计算机系统由硬件和软件组成，按功能分为多个抽象层级，每层为上层提供接口，隐藏下层细节。\n- **重要性**：理解层次结构有助于掌握系统设计、性能优化和问题定位。\n\n### 1.2 经典六层结构\n| 层级编号 | 层级名称 | 主要组成 | 示例 |\n|----------|----------|----------|------|\n| 0 | 微程序层 | 微指令、微程序 | CPU微指令集 |\n| 1 | 机器语言层 | 指令集架构（ISA） | x86指令集 |\n| 2 | 操作系统层 | 系统调用、资源管理 | Windows/Linux内核 |\n| 3 | 汇编语言层 | 汇编指令、伪指令 | MOV, ADD指令 |\n| 4 | 高级语言层 | 编程语言、编译器 | C, Java代码 |\n| 5 | 应用层 | 应用程序、用户界面 | Word, 浏览器 |\n\n> **重点**：记忆各层名称和功能，理解层间接口作用。\n\n## 二、各层次详解\n### 2.1 微程序层（第0层）\n- **定义**：直接控制硬件电路的微指令序列，实现机器指令。\n- **特点**：硬件实现，速度最快，但编程复杂。\n- **难点**：微程序与机器指令的映射关系。\n\n### 2.2 机器语言层（第1层）\n- **定义**：CPU直接执行的指令集，包括操作码、地址码。\n- **特点**：二进制形式，依赖具体CPU架构。\n- **示例**：x86的`ADD EAX, 1`。\n\n### 2.3 操作系统层（第2层）\n- **功能**：管理硬件资源，提供系统调用接口（如文件读写、进程调度）。\n- **作用**：屏蔽硬件差异，为上层提供统一服务。\n- **重点**：理解操作系统作为“资源管理者”的角色。\n\n### 2.4 汇编语言层（第3层）\n- **定义**：用助记符表示机器指令，通过汇编器转换为机器码。\n- **特点**：与硬件紧密相关，但比机器语言易读。\n- **难点**：寄存器分配、指令寻址方式。\n\n### 2.5 高级语言层（第4层）\n- **定义**：使用自然语言风格编写代码，通过编译器或解释器执行。\n- **特点**：跨平台、易维护。\n- **示例**：`int a = 5;`。\n\n### 2.6 应用层（第5层）\n- **定义**：用户直接交互的软件，如办公软件、游戏。\n- **特点**：面向特定需求，依赖下层服务。\n\n## 三、层次间的关系与转换\n### 3.1 数据流方向\n- **用户请求**：应用层 -> 高级语言 -> 操作系统 -> 机器语言 -> 微程序 -> 硬件执行。\n- **结果返回**：反向传递。\n\n### 3.2 关键转换机制\n- **编译**：高级语言 -> 汇编/机器语言（如GCC编译器）。\n- **解释**：逐行翻译执行（如Python解释器）。\n- **汇编**：助记符 -> 机器码（如NASM汇编器）。\n- **微程序解释**：机器指令 -> 微指令序列。\n\n> **难点**：区分编译与解释，理解微程序控制器的运作。\n\n## 四、层次结构的应用\n- **性能优化**：通过减少层次切换（如使用汇编优化关键代码）提升效率。\n- **系统设计**：模块化开发，每层独立设计。\n- **故障排查**：从高层向下层逐层定位问题。\n\n## 五、总结\n- **核心要点**：计算机系统六层结构，每层功能与接口。\n- **重点**：各层定义、转换机制、应用场景。\n- **难点**：微程序层与机器语言层的区分，编译与解释的差异。\n\n---\n\n# 课后练习题\n\n**1. 在计算机系统的层次结构中，哪一层直接负责将高级语言代码转换为机器指令？**\nA. 操作系统层\nB. 汇编语言层\nC. 高级语言层\nD. 机器语言层\n\n**正确答案**：C\n**解析**：高级语言层通过编译器或解释器将代码转换为机器语言或汇编语言。操作系统层管理资源，汇编语言层处理助记符，机器语言层是执行层，不负责转换。\n\n**2. 以下关于微程序层的描述，正确的是？**\nA. 微程序层是用户直接交互的界面\nB. 微程序层由操作系统实现\nC. 微程序层直接控制硬件电路\nD. 微程序层使用高级语言编写\n\n**正确答案**：C\n**解析**：微程序层位于最底层，由硬件中的微指令控制电路。用户交互在应用层，操作系统层管理资源，微程序层使用微指令而非高级语言。\n\n**3. 在计算机系统层次结构中，操作系统层的主要作用是什', '### 智能辅导回答\n**问题识别：** 根据以下内容出10道练习题（选择+判断+填空混合）。输出JSON数组：[{\"type\":\"choice\",\"question\":\"...\",\"options\":[\"A\",\"B\",\"C\",\"D\"],\"answer\":0,\"explanation\":\"...\"},...]\n\n课程：2-组成原理-计算机系统的层次结构\n内容：# 计算机系统的层次结构\n\n## 课程概述\n本课时讲解计算机系统的层次结构，从硬件到软件的抽象层级，帮助理解计算机系统的工作原理。时长18分钟，适合计算机组成原理入门学习。\n\n## 一、计算机系统的层次模型\n### 1.1 层次结构概述\n- **定义**：计算机系统由硬件和软件组成，按功能分为多个抽象层级，每层为上层提供接口，隐藏下层细节。\n- **重要性**：理解层次结构有助于掌握系统设计、性能优化和问题定位。\n\n### 1.2 经典六层结构\n| 层级编号 | 层级名称 | 主要组成 | 示例 |\n|----------|----------|----------|------|\n| 0 | 微程序层 | 微指令、微程序 | CPU微指令集 |\n| 1 | 机器语言层 | 指令集架构（ISA） | x86指令集 |\n| 2 | 操作系统层 | 系统调用、资源管理 | Windows/Linux内核 |\n| 3 | 汇编语言层 | 汇编指令、伪指令 | MOV, ADD指令 |\n| 4 | 高级语言层 | 编程语言、编译器 | C, Java代码 |\n| 5 | 应用层 | 应用程序、用户界面 | Word, 浏览器 |\n\n> **重点**：记忆各层名称和功能，理解层间接口作用。\n\n## 二、各层次详解\n### 2.1 微程序层（第0层）\n- **定义**：直接控制硬件电路的微指令序列，实现机器指令。\n- **特点**：硬件实现，速度最快，但编程复杂。\n- **难点**：微程序与机器指令的映射关系。\n\n### 2.2 机器语言层（第1层）\n- **定义**：CPU直接执行的指令集，包括操作码、地址码。\n- **特点**：二进制形式，依赖具体CPU架构。\n- **示例**：x86的`ADD EAX, 1`。\n\n### 2.3 操作系统层（第2层）\n- **功能**：管理硬件资源，提供系统调用接口（如文件读写、进程调度）。\n- **作用**：屏蔽硬件差异，为上层提供统一服务。\n- **重点**：理解操作系统作为“资源管理者”的角色。\n\n### 2.4 汇编语言层（第3层）\n- **定义**：用助记符表示机器指令，通过汇编器转换为机器码。\n- **特点**：与硬件紧密相关，但比机器语言易读。\n- **难点**：寄存器分配、指令寻址方式。\n\n### 2.5 高级语言层（第4层）\n- **定义**：使用自然语言风格编写代码，通过编译器或解释器执行。\n- **特点**：跨平台、易维护。\n- **示例**：`int a = 5;`。\n\n### 2.6 应用层（第5层）\n- **定义**：用户直接交互的软件，如办公软件、游戏。\n- **特点**：面向特定需求，依赖下层服务。\n\n## 三、层次间的关系与转换\n### 3.1 数据流方向\n- **用户请求**：应用层 -> 高级语言 -> 操作系统 -> 机器语言 -> 微程序 -> 硬件执行。\n- **结果返回**：反向传递。\n\n### 3.2 关键转换机制\n- **编译**：高级语言 -> 汇编/机器语言（如GCC编译器）。\n- **解释**：逐行翻译执行（如Python解释器）。\n- **汇编**：助记符 -> 机器码（如NASM汇编器）。\n- **微程序解释**：机器指令 -> 微指令序列。\n\n> **难点**：区分编译与解释，理解微程序控制器的运作。\n\n## 四、层次结构的应用\n- **性能优化**：通过减少层次切换（如使用汇编优化关键代码）提升效率。\n- **系统设计**：模块化开发，每层独立设计。\n- **故障排查**：从高层向下层逐层定位问题。\n\n## 五、总结\n- **核心要点**：计算机系统六层结构，每层功能与接口。\n- **重点**：各层定义、转换机制、应用场景。\n- **难点**：微程序层与机器语言层的区分，编译与解释的差异。\n\n---\n\n# 课后练习题\n\n**1. 在计算机系统的层次结构中，哪一层直接负责将高级语言代码转换为机器指令？**\nA. 操作系统层\nB. 汇编语言层\nC. 高级语言层\nD. 机器语言层\n\n**正确答案**：C\n**解析**：高级语言层通过编译器或解释器将代码转换为机器语言或汇编语言。操作系统层管理资源，汇编语言层处理助记符，机器语言层是执行层，不负责转换。\n\n**2. 以下关于微程序层的描述，正确的是？**\nA. 微程序层是用户直接交互的界面\nB. 微程序层由操作系统实现\nC. 微程序层直接控制硬件电路\nD. 微程序层使用高级语言编写\n\n**正确答案**：C\n**解析**：微程序层位于最底层，由硬件中的微指令控制电路。用户交互在应用层，操作系统层管理资源，微程序层使用微指令而非高级语言。\n\n**3. 在计算机系统层次结构中，操作系统层的主要作用是什\n\n> 系统已结合课程知识库、学生画像与教学场景生成讲解建议，并已进行内容安全过滤。\n\n#### 1. 概念拆解\n- 先理解定义与应用场景。\n- 再理解关键步骤与输入输出。\n- 最后通过例题或代码验证理解。\n\n#### 2. 学习建议\n1. 看 5 分钟图解或微课，建立整体印象。\n2. 阅读结构化讲义，标出关键词。\n3. 完成 3 道基础题 + 1 道综合题。\n4. 用自己的语言复述，形成长期记忆。\n\n#### 3. 常见误区\n- 只背定义，不理解使用条件。\n- 只看答案，不做步骤推导。\n- 只做单题，不做知识迁移。\n\n#### 4. 多模态辅导建议\n- 文字：精讲讲义\n- 图解：流程图 / 思维导图\n- 视频：3分钟微课脚本\n', '根据以下内容出10道练习题（选择+判断+填空混合）。输出JSON数组：[{\"type\":\"choic...', NULL, '2026-06-14 14:39:22');
+INSERT INTO `sp_qa_history` VALUES (2066168636180721665, 3, '你是一位课程助教。请根据以下讲义内容，生成一份\"视频讲解稿\"——模拟老师对着黑板讲课的口语化讲稿，包含开场白、知识点逐个讲解、举例说明和小结。使用自然的课堂教学语言，适当加入\"同学们注意\"\"我们来看\"等过渡语。输出Markdown格式。\n\n课程标题：2-组成原理-计算机系统的层次结构\n讲义内容：\n# 计算机系统的层次结构\n\n## 课程概述\n本课时讲解计算机系统的层次结构，从硬件到软件的抽象层级，帮助理解计算机系统的工作原理。时长18分钟，适合计算机组成原理入门学习。\n\n## 一、计算机系统的层次模型\n### 1.1 层次结构概述\n- **定义**：计算机系统由硬件和软件组成，按功能分为多个抽象层级，每层为上层提供接口，隐藏下层细节。\n- **重要性**：理解层次结构有助于掌握系统设计、性能优化和问题定位。\n\n### 1.2 经典六层结构\n| 层级编号 | 层级名称 | 主要组成 | 示例 |\n|----------|----------|----------|------|\n| 0 | 微程序层 | 微指令、微程序 | CPU微指令集 |\n| 1 | 机器语言层 | 指令集架构（ISA） | x86指令集 |\n| 2 | 操作系统层 | 系统调用、资源管理 | Windows/Linux内核 |\n| 3 | 汇编语言层 | 汇编指令、伪指令 | MOV, ADD指令 |\n| 4 | 高级语言层 | 编程语言、编译器 | C, Java代码 |\n| 5 | 应用层 | 应用程序、用户界面 | Word, 浏览器 |\n\n> **重点**：记忆各层名称和功能，理解层间接口作用。\n\n## 二、各层次详解\n### 2.1 微程序层（第0层）\n- **定义**：直接控制硬件电路的微指令序列，实现机器指令。\n- **特点**：硬件实现，速度最快，但编程复杂。\n- **难点**：微程序与机器指令的映射关系。\n\n### 2.2 机器语言层（第1层）\n- **定义**：CPU直接执行的指令集，包括操作码、地址码。\n- **特点**：二进制形式，依赖具体CPU架构。\n- **示例**：x86的`ADD EAX, 1`。\n\n### 2.3 操作系统层（第2层）\n- **功能**：管理硬件资源，提供系统调用接口（如文件读写、进程调度）。\n- **作用**：屏蔽硬件差异，为上层提供统一服务。\n- **重点**：理解操作系统作为“资源管理者”的角色。\n\n### 2.4 汇编语言层（第3层）\n- **定义**：用助记符表示机器指令，通过汇编器转换为机器码。\n- **特点**：与硬件紧密相关，但比机器语言易读。\n- **难点**：寄存器分配、指令寻址方式。\n\n### 2.5 高级语言层（第4层）\n- **定义**：使用自然语言风格编写代码，通过编译器或解释器执行。\n- **特点**：跨平台、易维护。\n- **示例**：`int a = 5;`。\n\n### 2.6 应用层（第5层）\n- **定义**：用户直接交互的软件，如办公软件、游戏。\n- **特点**：面向特定需求，依赖下层服务。\n\n## 三、层次间的关系与转换\n### 3.1 数据流方向\n- **用户请求**：应用层 -> 高级语言 -> 操作系统 -> 机器语言 -> 微程序 -> 硬件执行。\n- **结果返回**：反向传递。\n\n### 3.2 关键转换机制\n- **编译**：高级语言 -> 汇编/机器语言（如GCC编译器）。\n- **解释**：逐行翻译执行（如Python解释器）。\n- **汇编**：助记符 -> 机器码（如NASM汇编器）。\n- **微程序解释**：机器指令 -> 微指令序列。\n\n> **难点**：区分编译与解释，理解微程序控制器的运作。\n\n## 四、层次结构的应用\n- **性能优化**：通过减少层次切换（如使用汇编优化关键代码）提升效率。\n- **系统设计**：模块化开发，每层独立设计。\n- **故障排查**：从高层向下层逐层定位问题。\n\n## 五、总结\n- **核心要点**：计算机系统六层结构，每层功能与接口。\n- **重点**：各层定义、转换机制、应用场景。\n- **难点**：微程序层与机器语言层的区分，编译与解释的差异。\n\n---\n\n# 课后练习题\n\n**1. 在计算机系统的层次结构中，哪一层直接负责将高级语言代码转换为机器指令？**\nA. 操作系统层\nB. 汇编语言层\nC. 高级语言层\nD. 机器语言层\n\n**正确答案**：C\n**解析**：高级语言层通过编译器或解释器将代码转换为机器语言或汇编语言。操作系统层管理资源，汇编语言层处理助记符，机器语言层是执行层，不负责转换。\n\n**2. 以下关于微程序层的描述，正确的是？**\nA. 微程序层是用户直接交互的界面\nB. 微程序层由操作系统实现\nC. 微程序层直接控制硬件电路\nD. 微程序层使用高级语言编写\n\n**正确答案**：C\n**解析**：微程序层位于最底层，由硬件中的微指令控制电路。用户交互在应用层，操作系统层管理资源，微程序层使用微指令而非高级语言。\n\n**3. 在计算机系统层次结构中，操作系统层的主要作用是什么？**\nA. 执行用户编写的应用程序\nB. 将汇编语言转换为机器语言\nC. 管理硬件资源并提供系统调用接口\nD. 直接控制CPU的微指令执行\n\n**正确答案**：C\n**解析**：操作系统层负责管理CPU、内存、I/O等硬件资源，并通过系统调用为上层提供服务。执行应用是应用层，汇编转换是汇编层，微指令执行是微程序层。\n\n# 知识点标签\n- 计算机系统层次结构\n- 微程序层\n- 操作系统层\n- 编译与解释\n- 指令集架构（ISA）', '### 智能辅导回答\n**问题识别：** 你是一位课程助教。请根据以下讲义内容，生成一份\"视频讲解稿\"——模拟老师对着黑板讲课的口语化讲稿，包含开场白、知识点逐个讲解、举例说明和小结。使用自然的课堂教学语言，适当加入\"同学们注意\"\"我们来看\"等过渡语。输出Markdown格式。\n\n课程标题：2-组成原理-计算机系统的层次结构\n讲义内容：\n# 计算机系统的层次结构\n\n## 课程概述\n本课时讲解计算机系统的层次结构，从硬件到软件的抽象层级，帮助理解计算机系统的工作原理。时长18分钟，适合计算机组成原理入门学习。\n\n## 一、计算机系统的层次模型\n### 1.1 层次结构概述\n- **定义**：计算机系统由硬件和软件组成，按功能分为多个抽象层级，每层为上层提供接口，隐藏下层细节。\n- **重要性**：理解层次结构有助于掌握系统设计、性能优化和问题定位。\n\n### 1.2 经典六层结构\n| 层级编号 | 层级名称 | 主要组成 | 示例 |\n|----------|----------|----------|------|\n| 0 | 微程序层 | 微指令、微程序 | CPU微指令集 |\n| 1 | 机器语言层 | 指令集架构（ISA） | x86指令集 |\n| 2 | 操作系统层 | 系统调用、资源管理 | Windows/Linux内核 |\n| 3 | 汇编语言层 | 汇编指令、伪指令 | MOV, ADD指令 |\n| 4 | 高级语言层 | 编程语言、编译器 | C, Java代码 |\n| 5 | 应用层 | 应用程序、用户界面 | Word, 浏览器 |\n\n> **重点**：记忆各层名称和功能，理解层间接口作用。\n\n## 二、各层次详解\n### 2.1 微程序层（第0层）\n- **定义**：直接控制硬件电路的微指令序列，实现机器指令。\n- **特点**：硬件实现，速度最快，但编程复杂。\n- **难点**：微程序与机器指令的映射关系。\n\n### 2.2 机器语言层（第1层）\n- **定义**：CPU直接执行的指令集，包括操作码、地址码。\n- **特点**：二进制形式，依赖具体CPU架构。\n- **示例**：x86的`ADD EAX, 1`。\n\n### 2.3 操作系统层（第2层）\n- **功能**：管理硬件资源，提供系统调用接口（如文件读写、进程调度）。\n- **作用**：屏蔽硬件差异，为上层提供统一服务。\n- **重点**：理解操作系统作为“资源管理者”的角色。\n\n### 2.4 汇编语言层（第3层）\n- **定义**：用助记符表示机器指令，通过汇编器转换为机器码。\n- **特点**：与硬件紧密相关，但比机器语言易读。\n- **难点**：寄存器分配、指令寻址方式。\n\n### 2.5 高级语言层（第4层）\n- **定义**：使用自然语言风格编写代码，通过编译器或解释器执行。\n- **特点**：跨平台、易维护。\n- **示例**：`int a = 5;`。\n\n### 2.6 应用层（第5层）\n- **定义**：用户直接交互的软件，如办公软件、游戏。\n- **特点**：面向特定需求，依赖下层服务。\n\n## 三、层次间的关系与转换\n### 3.1 数据流方向\n- **用户请求**：应用层 -> 高级语言 -> 操作系统 -> 机器语言 -> 微程序 -> 硬件执行。\n- **结果返回**：反向传递。\n\n### 3.2 关键转换机制\n- **编译**：高级语言 -> 汇编/机器语言（如GCC编译器）。\n- **解释**：逐行翻译执行（如Python解释器）。\n- **汇编**：助记符 -> 机器码（如NASM汇编器）。\n- **微程序解释**：机器指令 -> 微指令序列。\n\n> **难点**：区分编译与解释，理解微程序控制器的运作。\n\n## 四、层次结构的应用\n- **性能优化**：通过减少层次切换（如使用汇编优化关键代码）提升效率。\n- **系统设计**：模块化开发，每层独立设计。\n- **故障排查**：从高层向下层逐层定位问题。\n\n## 五、总结\n- **核心要点**：计算机系统六层结构，每层功能与接口。\n- **重点**：各层定义、转换机制、应用场景。\n- **难点**：微程序层与机器语言层的区分，编译与解释的差异。\n\n---\n\n# 课后练习题\n\n**1. 在计算机系统的层次结构中，哪一层直接负责将高级语言代码转换为机器指令？**\nA. 操作系统层\nB. 汇编语言层\nC. 高级语言层\nD. 机器语言层\n\n**正确答案**：C\n**解析**：高级语言层通过编译器或解释器将代码转换为机器语言或汇编语言。操作系统层管理资源，汇编语言层处理助记符，机器语言层是执行层，不负责转换。\n\n**2. 以下关于微程序层的描述，正确的是？**\nA. 微程序层是用户直接交互的界面\nB. 微程序层由操作系统实现\nC. 微程序层直接控制硬件电路\nD. 微程序层使用高级语言编写\n\n**正确答案**：C\n**解析**：微程序层位于最底层，由硬件中的微指令控制电路。用户交互在应用层，操作系统层管理资源，微程序层使用微指令而非高级语言。\n\n**3. 在计算机系统层次结构中，操作系统层的主要作用是什么？**\nA. 执行用户编写的应用程序\nB. 将汇编语言转换为机器语言\nC. 管理硬件资源并提供系统调用接口\nD. 直接控制CPU的微指令执行\n\n**正确答案**：C\n**解析**：操作系统层负责管理CPU、内存、I/O等硬件资源，并通过系统调用为上层提供服务。执行应用是应用层，汇编转换是汇编层，微指令执行是微程序层。\n\n# 知识点标签\n- 计算机系统层次结构\n- 微程序层\n- 操作系统层\n- 编译与解释\n- 指令集架构（ISA）\n\n> 系统已结合课程知识库、学生画像与教学场景生成讲解建议，并已进行内容安全过滤。\n\n#### 1. 概念拆解\n- 先理解定义与应用场景。\n- 再理解关键步骤与输入输出。\n- 最后通过例题或代码验证理解。\n\n#### 2. 学习建议\n1. 看 5 分钟图解或微课，建立整体印象。\n2. 阅读结构化讲义，标出关键词。\n3. 完成 3 道基础题 + 1 道综合题。\n4. 用自己的语言复述，形成长期记忆。\n\n#### 3. 常见误区\n- 只背定义，不理解使用条件。\n- 只看答案，不做步骤推导。\n- 只做单题，不做知识迁移。\n\n#### 4. 多模态辅导建议\n- 文字：精讲讲义\n- 图解：流程图 / 思维导图\n- 视频：3分钟微课脚本\n', '你是一位课程助教。请根据以下讲义内容，生成一份\"视频讲解稿\"——模拟老师对着黑板讲课的口语化讲稿，包...', NULL, '2026-06-14 14:39:25');
+INSERT INTO `sp_qa_history` VALUES (2066168672071380993, 3, '根据以下课程内容出20道练习题，包含选择题(choice)、判断题(truefalse)、填空题(fill)至少三种。输出纯JSON数组：\n[{\"type\":\"choice\",\"question\":\"题目\",\"options\":[\"A\",\"B\",\"C\",\"D\"],\"answer\":0,\"explanation\":\"解析\"},{\"type\":\"truefalse\",\"question\":\"题目\",\"answer\":0},...]\n判断题answer:0=正确1=错误。填空answer为答案文本。直接输出[]数组。\n\n课程：2-组成原理-计算机系统的层次结构\n内容：# 计算机系统的层次结构\n\n## 课程概述\n本课时讲解计算机系统的层次结构，从硬件到软件的抽象层级，帮助理解计算机系统的工作原理。时长18分钟，适合计算机组成原理入门学习。\n\n## 一、计算机系统的层次模型\n### 1.1 层次结构概述\n- **定义**：计算机系统由硬件和软件组成，按功能分为多个抽象层级，每层为上层提供接口，隐藏下层细节。\n- **重要性**：理解层次结构有助于掌握系统设计、性能优化和问题定位。\n\n### 1.2 经典六层结构\n| 层级编号 | 层级名称 | 主要组成 | 示例 |\n|----------|----------|----------|------|\n| 0 | 微程序层 | 微指令、微程序 | CPU微指令集 |\n| 1 | 机器语言层 | 指令集架构（ISA） | x86指令集 |\n| 2 | 操作系统层 | 系统调用、资源管理 | Windows/Linux内核 |\n| 3 | 汇编语言层 | 汇编指令、伪指令 | MOV, ADD指令 |\n| 4 | 高级语言层 | 编程语言、编译器 | C, Java代码 |\n| 5 | 应用层 | 应用程序、用户界面 | Word, 浏览器 |\n\n> **重点**：记忆各层名称和功能，理解层间接口作用。\n\n## 二、各层次详解\n### 2.1 微程序层（第0层）\n- **定义**：直接控制硬件电路的微指令序列，实现机器指令。\n- **特点**：硬件实现，速度最快，但编程复杂。\n- **难点**：微程序与机器指令的映射关系。\n\n### 2.2 机器语言层（第1层）\n- **定义**：CPU直接执行的指令集，包括操作码、地址码。\n- **特点**：二进制形式，依赖具体CPU架构。\n- **示例**：x86的`ADD EAX, 1`。\n\n### 2.3 操作系统层（第2层）\n- **功能**：管理硬件资源，提供系统调用接口（如文件读写、进程调度）。\n- **作用**：屏蔽硬件差异，为上层提供统一服务。\n- **重点**：理解操作系统作为“资源管理者”的角色。\n\n### 2.4 汇编语言层（第3层）\n- **定义**：用助记符表示机器指令，通过汇编器转换为机器码。\n- **特点**：与硬件紧密相关，但比机器语言易读。\n- **难点**：寄存器分配、指令寻址方式。\n\n### 2.5 高级语言层（第4层）\n- **定义**：使用自然语言风格编写代码，通过编译器或解释器执行。\n- **特点**：跨平台、易维护。\n- **示例**：`int a = 5;`。\n\n### 2.6 应用层（第5层）\n- **定义**：用户直接交互的软件，如办公软件、游戏。\n- **特点**：面向特定需求，依赖下层服务。\n\n## 三、层次间的关系与转换\n### 3.1 数据流方向\n- **用户请求**：应用层 -> 高级语言 -> 操作系统 -> 机器语言 -> 微程序 -> 硬件执行。\n- **结果返回**：反向传递。\n\n### 3.2 关键转换机制\n- **编译**：高级语言 -> 汇编/机器语言（如GCC编译器）。\n- **解释**：逐行翻译执行（如Python解释器）。\n- **汇编**：助记符 -> 机器码（如NASM汇编器）。\n- **微程序解释**：机器指令 -> 微指令序列。\n\n> **难点**：区分编译与解释，理解微程序控制器的运作。\n\n## 四、层次结构的应用\n- **性能优化**：通过减少层次切换（如使用汇编优化关键代码）提升效率。\n- **系统设计**：模块化开发，每层独立设计。\n- **故障排查**：从高层向下层逐层定位问题。\n\n## 五、总结\n- **核心要点**：计算机系统六层结构，每层功能与接口。\n- **重点**：各层定义、转换机制、应用场景。\n- **难点**：微程序层与机器语言层的区分，编译与解释的差异。\n\n---\n\n# 课后练习题\n\n**1. 在计算机系统的层次结构中，哪一层直接负责将高级语言代码转换为机器指令？**\nA. 操作系统层\nB. 汇编语言层\nC. 高级语言层\nD. 机器语言层\n\n**正确答案**：C\n**解析**：高级语言层通过编译器或解释器将代码转换为机器语言或汇编语言。操作系统层管理资源，汇编语言层处理助记符，机器语言层是执行层，不负责转换。\n\n**2. 以下关于微程序层的描述，正确的是？**\nA. 微程序层是用户直接交互的界面\nB. 微程序层由操作系统实现\nC. 微程序层直接控制硬件电路\nD. 微程序层使用高级语言编写\n\n**正确答案**：C\n**解析**：微程序层位于最底层，由硬件中的微指令控制电路。用户交互在应用层，操作系统层管理资源，微程序层使用微指令而非高级语言。\n\n**3. 在计算机系统层次结构中，操作系统层的主要作用是什么？**\nA. 执行用户编写的应用程序\nB. 将汇编语言转换为机器语言\nC. 管理硬件资源并提供系统调用接口\nD. 直接控制CPU的微指令执行\n\n**正确答案**：C\n**解析**：操作系统层负责管理CPU、内存、I/O等硬件资源，并通过系统调用为上层提供服务。执行应用是应用层，汇编转换是汇编层，微指令执行是微程序层。\n\n# 知识点标签\n- 计算机系统层次结构\n- 微程序层\n- 操作系统层\n- 编译与解释\n- 指令集架构（ISA）', '### 智能辅导回答\n**问题识别：** 根据以下课程内容出20道练习题，包含选择题(choice)、判断题(truefalse)、填空题(fill)至少三种。输出纯JSON数组：\n[{\"type\":\"choice\",\"question\":\"题目\",\"options\":[\"A\",\"B\",\"C\",\"D\"],\"answer\":0,\"explanation\":\"解析\"},{\"type\":\"truefalse\",\"question\":\"题目\",\"answer\":0},...]\n判断题answer:0=正确1=错误。填空answer为答案文本。直接输出[]数组。\n\n课程：2-组成原理-计算机系统的层次结构\n内容：# 计算机系统的层次结构\n\n## 课程概述\n本课时讲解计算机系统的层次结构，从硬件到软件的抽象层级，帮助理解计算机系统的工作原理。时长18分钟，适合计算机组成原理入门学习。\n\n## 一、计算机系统的层次模型\n### 1.1 层次结构概述\n- **定义**：计算机系统由硬件和软件组成，按功能分为多个抽象层级，每层为上层提供接口，隐藏下层细节。\n- **重要性**：理解层次结构有助于掌握系统设计、性能优化和问题定位。\n\n### 1.2 经典六层结构\n| 层级编号 | 层级名称 | 主要组成 | 示例 |\n|----------|----------|----------|------|\n| 0 | 微程序层 | 微指令、微程序 | CPU微指令集 |\n| 1 | 机器语言层 | 指令集架构（ISA） | x86指令集 |\n| 2 | 操作系统层 | 系统调用、资源管理 | Windows/Linux内核 |\n| 3 | 汇编语言层 | 汇编指令、伪指令 | MOV, ADD指令 |\n| 4 | 高级语言层 | 编程语言、编译器 | C, Java代码 |\n| 5 | 应用层 | 应用程序、用户界面 | Word, 浏览器 |\n\n> **重点**：记忆各层名称和功能，理解层间接口作用。\n\n## 二、各层次详解\n### 2.1 微程序层（第0层）\n- **定义**：直接控制硬件电路的微指令序列，实现机器指令。\n- **特点**：硬件实现，速度最快，但编程复杂。\n- **难点**：微程序与机器指令的映射关系。\n\n### 2.2 机器语言层（第1层）\n- **定义**：CPU直接执行的指令集，包括操作码、地址码。\n- **特点**：二进制形式，依赖具体CPU架构。\n- **示例**：x86的`ADD EAX, 1`。\n\n### 2.3 操作系统层（第2层）\n- **功能**：管理硬件资源，提供系统调用接口（如文件读写、进程调度）。\n- **作用**：屏蔽硬件差异，为上层提供统一服务。\n- **重点**：理解操作系统作为“资源管理者”的角色。\n\n### 2.4 汇编语言层（第3层）\n- **定义**：用助记符表示机器指令，通过汇编器转换为机器码。\n- **特点**：与硬件紧密相关，但比机器语言易读。\n- **难点**：寄存器分配、指令寻址方式。\n\n### 2.5 高级语言层（第4层）\n- **定义**：使用自然语言风格编写代码，通过编译器或解释器执行。\n- **特点**：跨平台、易维护。\n- **示例**：`int a = 5;`。\n\n### 2.6 应用层（第5层）\n- **定义**：用户直接交互的软件，如办公软件、游戏。\n- **特点**：面向特定需求，依赖下层服务。\n\n## 三、层次间的关系与转换\n### 3.1 数据流方向\n- **用户请求**：应用层 -> 高级语言 -> 操作系统 -> 机器语言 -> 微程序 -> 硬件执行。\n- **结果返回**：反向传递。\n\n### 3.2 关键转换机制\n- **编译**：高级语言 -> 汇编/机器语言（如GCC编译器）。\n- **解释**：逐行翻译执行（如Python解释器）。\n- **汇编**：助记符 -> 机器码（如NASM汇编器）。\n- **微程序解释**：机器指令 -> 微指令序列。\n\n> **难点**：区分编译与解释，理解微程序控制器的运作。\n\n## 四、层次结构的应用\n- **性能优化**：通过减少层次切换（如使用汇编优化关键代码）提升效率。\n- **系统设计**：模块化开发，每层独立设计。\n- **故障排查**：从高层向下层逐层定位问题。\n\n## 五、总结\n- **核心要点**：计算机系统六层结构，每层功能与接口。\n- **重点**：各层定义、转换机制、应用场景。\n- **难点**：微程序层与机器语言层的区分，编译与解释的差异。\n\n---\n\n# 课后练习题\n\n**1. 在计算机系统的层次结构中，哪一层直接负责将高级语言代码转换为机器指令？**\nA. 操作系统层\nB. 汇编语言层\nC. 高级语言层\nD. 机器语言层\n\n**正确答案**：C\n**解析**：高级语言层通过编译器或解释器将代码转换为机器语言或汇编语言。操作系统层管理资源，汇编语言层处理助记符，机器语言层是执行层，不负责转换。\n\n**2. 以下关于微程序层的描述，正确的是？**\nA. 微程序层是用户直接交互的界面\nB. 微程序层由操作系统实现\nC. 微程序层直接控制硬件电路\nD. 微程序层使用高级语言编写\n\n**正确答案**：C\n**解析**：微程序层位于最底层，由硬件中的微指令控制电路。用户交互在应用层，操作系统层管理资源，微程序层使用微指令而非高级语言。\n\n**3. 在计算机系统层次结构中，操作系统层的主要作用是什么？**\nA. 执行用户编写的应用程序\nB. 将汇编语言转换为机器语言\nC. 管理硬件资源并提供系统调用接口\nD. 直接控制CPU的微指令执行\n\n**正确答案**：C\n**解析**：操作系统层负责管理CPU、内存、I/O等硬件资源，并通过系统调用为上层提供服务。执行应用是应用层，汇编转换是汇编层，微指令执行是微程序层。\n\n# 知识点标签\n- 计算机系统层次结构\n- 微程序层\n- 操作系统层\n- 编译与解释\n- 指令集架构（ISA）\n\n> 系统已结合课程知识库、学生画像与教学场景生成讲解建议，并已进行内容安全过滤。\n\n#### 1. 概念拆解\n- 先理解定义与应用场景。\n- 再理解关键步骤与输入输出。\n- 最后通过例题或代码验证理解。\n\n#### 2. 学习建议\n1. 看 5 分钟图解或微课，建立整体印象。\n2. 阅读结构化讲义，标出关键词。\n3. 完成 3 道基础题 + 1 道综合题。\n4. 用自己的语言复述，形成长期记忆。\n\n#### 3. 常见误区\n- 只背定义，不理解使用条件。\n- 只看答案，不做步骤推导。\n- 只做单题，不做知识迁移。\n\n#### 4. 多模态辅导建议\n- 文字：精讲讲义\n- 图解：流程图 / 思维导图\n- 视频：3分钟微课脚本\n', '根据以下课程内容出20道练习题，包含选择题(choice)、判断题(truefalse)、填空题(f...', NULL, '2026-06-14 14:39:34');
+INSERT INTO `sp_qa_history` VALUES (2066168672578891778, 3, '根据以下内容出10道练习题（选择+判断+填空混合）。输出JSON数组：[{\"type\":\"choice\",\"question\":\"...\",\"options\":[\"A\",\"B\",\"C\",\"D\"],\"answer\":0,\"explanation\":\"...\"},...]\n\n课程：2-组成原理-计算机系统的层次结构\n内容：# 计算机系统的层次结构\n\n## 课程概述\n本课时讲解计算机系统的层次结构，从硬件到软件的抽象层级，帮助理解计算机系统的工作原理。时长18分钟，适合计算机组成原理入门学习。\n\n## 一、计算机系统的层次模型\n### 1.1 层次结构概述\n- **定义**：计算机系统由硬件和软件组成，按功能分为多个抽象层级，每层为上层提供接口，隐藏下层细节。\n- **重要性**：理解层次结构有助于掌握系统设计、性能优化和问题定位。\n\n### 1.2 经典六层结构\n| 层级编号 | 层级名称 | 主要组成 | 示例 |\n|----------|----------|----------|------|\n| 0 | 微程序层 | 微指令、微程序 | CPU微指令集 |\n| 1 | 机器语言层 | 指令集架构（ISA） | x86指令集 |\n| 2 | 操作系统层 | 系统调用、资源管理 | Windows/Linux内核 |\n| 3 | 汇编语言层 | 汇编指令、伪指令 | MOV, ADD指令 |\n| 4 | 高级语言层 | 编程语言、编译器 | C, Java代码 |\n| 5 | 应用层 | 应用程序、用户界面 | Word, 浏览器 |\n\n> **重点**：记忆各层名称和功能，理解层间接口作用。\n\n## 二、各层次详解\n### 2.1 微程序层（第0层）\n- **定义**：直接控制硬件电路的微指令序列，实现机器指令。\n- **特点**：硬件实现，速度最快，但编程复杂。\n- **难点**：微程序与机器指令的映射关系。\n\n### 2.2 机器语言层（第1层）\n- **定义**：CPU直接执行的指令集，包括操作码、地址码。\n- **特点**：二进制形式，依赖具体CPU架构。\n- **示例**：x86的`ADD EAX, 1`。\n\n### 2.3 操作系统层（第2层）\n- **功能**：管理硬件资源，提供系统调用接口（如文件读写、进程调度）。\n- **作用**：屏蔽硬件差异，为上层提供统一服务。\n- **重点**：理解操作系统作为“资源管理者”的角色。\n\n### 2.4 汇编语言层（第3层）\n- **定义**：用助记符表示机器指令，通过汇编器转换为机器码。\n- **特点**：与硬件紧密相关，但比机器语言易读。\n- **难点**：寄存器分配、指令寻址方式。\n\n### 2.5 高级语言层（第4层）\n- **定义**：使用自然语言风格编写代码，通过编译器或解释器执行。\n- **特点**：跨平台、易维护。\n- **示例**：`int a = 5;`。\n\n### 2.6 应用层（第5层）\n- **定义**：用户直接交互的软件，如办公软件、游戏。\n- **特点**：面向特定需求，依赖下层服务。\n\n## 三、层次间的关系与转换\n### 3.1 数据流方向\n- **用户请求**：应用层 -> 高级语言 -> 操作系统 -> 机器语言 -> 微程序 -> 硬件执行。\n- **结果返回**：反向传递。\n\n### 3.2 关键转换机制\n- **编译**：高级语言 -> 汇编/机器语言（如GCC编译器）。\n- **解释**：逐行翻译执行（如Python解释器）。\n- **汇编**：助记符 -> 机器码（如NASM汇编器）。\n- **微程序解释**：机器指令 -> 微指令序列。\n\n> **难点**：区分编译与解释，理解微程序控制器的运作。\n\n## 四、层次结构的应用\n- **性能优化**：通过减少层次切换（如使用汇编优化关键代码）提升效率。\n- **系统设计**：模块化开发，每层独立设计。\n- **故障排查**：从高层向下层逐层定位问题。\n\n## 五、总结\n- **核心要点**：计算机系统六层结构，每层功能与接口。\n- **重点**：各层定义、转换机制、应用场景。\n- **难点**：微程序层与机器语言层的区分，编译与解释的差异。\n\n---\n\n# 课后练习题\n\n**1. 在计算机系统的层次结构中，哪一层直接负责将高级语言代码转换为机器指令？**\nA. 操作系统层\nB. 汇编语言层\nC. 高级语言层\nD. 机器语言层\n\n**正确答案**：C\n**解析**：高级语言层通过编译器或解释器将代码转换为机器语言或汇编语言。操作系统层管理资源，汇编语言层处理助记符，机器语言层是执行层，不负责转换。\n\n**2. 以下关于微程序层的描述，正确的是？**\nA. 微程序层是用户直接交互的界面\nB. 微程序层由操作系统实现\nC. 微程序层直接控制硬件电路\nD. 微程序层使用高级语言编写\n\n**正确答案**：C\n**解析**：微程序层位于最底层，由硬件中的微指令控制电路。用户交互在应用层，操作系统层管理资源，微程序层使用微指令而非高级语言。\n\n**3. 在计算机系统层次结构中，操作系统层的主要作用是什', '### 智能辅导回答\n**问题识别：** 根据以下内容出10道练习题（选择+判断+填空混合）。输出JSON数组：[{\"type\":\"choice\",\"question\":\"...\",\"options\":[\"A\",\"B\",\"C\",\"D\"],\"answer\":0,\"explanation\":\"...\"},...]\n\n课程：2-组成原理-计算机系统的层次结构\n内容：# 计算机系统的层次结构\n\n## 课程概述\n本课时讲解计算机系统的层次结构，从硬件到软件的抽象层级，帮助理解计算机系统的工作原理。时长18分钟，适合计算机组成原理入门学习。\n\n## 一、计算机系统的层次模型\n### 1.1 层次结构概述\n- **定义**：计算机系统由硬件和软件组成，按功能分为多个抽象层级，每层为上层提供接口，隐藏下层细节。\n- **重要性**：理解层次结构有助于掌握系统设计、性能优化和问题定位。\n\n### 1.2 经典六层结构\n| 层级编号 | 层级名称 | 主要组成 | 示例 |\n|----------|----------|----------|------|\n| 0 | 微程序层 | 微指令、微程序 | CPU微指令集 |\n| 1 | 机器语言层 | 指令集架构（ISA） | x86指令集 |\n| 2 | 操作系统层 | 系统调用、资源管理 | Windows/Linux内核 |\n| 3 | 汇编语言层 | 汇编指令、伪指令 | MOV, ADD指令 |\n| 4 | 高级语言层 | 编程语言、编译器 | C, Java代码 |\n| 5 | 应用层 | 应用程序、用户界面 | Word, 浏览器 |\n\n> **重点**：记忆各层名称和功能，理解层间接口作用。\n\n## 二、各层次详解\n### 2.1 微程序层（第0层）\n- **定义**：直接控制硬件电路的微指令序列，实现机器指令。\n- **特点**：硬件实现，速度最快，但编程复杂。\n- **难点**：微程序与机器指令的映射关系。\n\n### 2.2 机器语言层（第1层）\n- **定义**：CPU直接执行的指令集，包括操作码、地址码。\n- **特点**：二进制形式，依赖具体CPU架构。\n- **示例**：x86的`ADD EAX, 1`。\n\n### 2.3 操作系统层（第2层）\n- **功能**：管理硬件资源，提供系统调用接口（如文件读写、进程调度）。\n- **作用**：屏蔽硬件差异，为上层提供统一服务。\n- **重点**：理解操作系统作为“资源管理者”的角色。\n\n### 2.4 汇编语言层（第3层）\n- **定义**：用助记符表示机器指令，通过汇编器转换为机器码。\n- **特点**：与硬件紧密相关，但比机器语言易读。\n- **难点**：寄存器分配、指令寻址方式。\n\n### 2.5 高级语言层（第4层）\n- **定义**：使用自然语言风格编写代码，通过编译器或解释器执行。\n- **特点**：跨平台、易维护。\n- **示例**：`int a = 5;`。\n\n### 2.6 应用层（第5层）\n- **定义**：用户直接交互的软件，如办公软件、游戏。\n- **特点**：面向特定需求，依赖下层服务。\n\n## 三、层次间的关系与转换\n### 3.1 数据流方向\n- **用户请求**：应用层 -> 高级语言 -> 操作系统 -> 机器语言 -> 微程序 -> 硬件执行。\n- **结果返回**：反向传递。\n\n### 3.2 关键转换机制\n- **编译**：高级语言 -> 汇编/机器语言（如GCC编译器）。\n- **解释**：逐行翻译执行（如Python解释器）。\n- **汇编**：助记符 -> 机器码（如NASM汇编器）。\n- **微程序解释**：机器指令 -> 微指令序列。\n\n> **难点**：区分编译与解释，理解微程序控制器的运作。\n\n## 四、层次结构的应用\n- **性能优化**：通过减少层次切换（如使用汇编优化关键代码）提升效率。\n- **系统设计**：模块化开发，每层独立设计。\n- **故障排查**：从高层向下层逐层定位问题。\n\n## 五、总结\n- **核心要点**：计算机系统六层结构，每层功能与接口。\n- **重点**：各层定义、转换机制、应用场景。\n- **难点**：微程序层与机器语言层的区分，编译与解释的差异。\n\n---\n\n# 课后练习题\n\n**1. 在计算机系统的层次结构中，哪一层直接负责将高级语言代码转换为机器指令？**\nA. 操作系统层\nB. 汇编语言层\nC. 高级语言层\nD. 机器语言层\n\n**正确答案**：C\n**解析**：高级语言层通过编译器或解释器将代码转换为机器语言或汇编语言。操作系统层管理资源，汇编语言层处理助记符，机器语言层是执行层，不负责转换。\n\n**2. 以下关于微程序层的描述，正确的是？**\nA. 微程序层是用户直接交互的界面\nB. 微程序层由操作系统实现\nC. 微程序层直接控制硬件电路\nD. 微程序层使用高级语言编写\n\n**正确答案**：C\n**解析**：微程序层位于最底层，由硬件中的微指令控制电路。用户交互在应用层，操作系统层管理资源，微程序层使用微指令而非高级语言。\n\n**3. 在计算机系统层次结构中，操作系统层的主要作用是什\n\n> 系统已结合课程知识库、学生画像与教学场景生成讲解建议，并已进行内容安全过滤。\n\n#### 1. 概念拆解\n- 先理解定义与应用场景。\n- 再理解关键步骤与输入输出。\n- 最后通过例题或代码验证理解。\n\n#### 2. 学习建议\n1. 看 5 分钟图解或微课，建立整体印象。\n2. 阅读结构化讲义，标出关键词。\n3. 完成 3 道基础题 + 1 道综合题。\n4. 用自己的语言复述，形成长期记忆。\n\n#### 3. 常见误区\n- 只背定义，不理解使用条件。\n- 只看答案，不做步骤推导。\n- 只做单题，不做知识迁移。\n\n#### 4. 多模态辅导建议\n- 文字：精讲讲义\n- 图解：流程图 / 思维导图\n- 视频：3分钟微课脚本\n', '根据以下内容出10道练习题（选择+判断+填空混合）。输出JSON数组：[{\"type\":\"choic...', NULL, '2026-06-14 14:39:34');
+INSERT INTO `sp_qa_history` VALUES (2066168676076941314, 3, '根据以下课程内容出20道练习题，包含选择题(choice)、判断题(truefalse)、填空题(fill)至少三种。输出纯JSON数组：\n[{\"type\":\"choice\",\"question\":\"题目\",\"options\":[\"A\",\"B\",\"C\",\"D\"],\"answer\":0,\"explanation\":\"解析\"},{\"type\":\"truefalse\",\"question\":\"题目\",\"answer\":0},...]\n判断题answer:0=正确1=错误。填空answer为答案文本。直接输出[]数组。\n\n课程：2-组成原理-计算机系统的层次结构\n内容：# 计算机系统的层次结构\n\n## 课程概述\n本课时讲解计算机系统的层次结构，从硬件到软件的抽象层级，帮助理解计算机系统的工作原理。时长18分钟，适合计算机组成原理入门学习。\n\n## 一、计算机系统的层次模型\n### 1.1 层次结构概述\n- **定义**：计算机系统由硬件和软件组成，按功能分为多个抽象层级，每层为上层提供接口，隐藏下层细节。\n- **重要性**：理解层次结构有助于掌握系统设计、性能优化和问题定位。\n\n### 1.2 经典六层结构\n| 层级编号 | 层级名称 | 主要组成 | 示例 |\n|----------|----------|----------|------|\n| 0 | 微程序层 | 微指令、微程序 | CPU微指令集 |\n| 1 | 机器语言层 | 指令集架构（ISA） | x86指令集 |\n| 2 | 操作系统层 | 系统调用、资源管理 | Windows/Linux内核 |\n| 3 | 汇编语言层 | 汇编指令、伪指令 | MOV, ADD指令 |\n| 4 | 高级语言层 | 编程语言、编译器 | C, Java代码 |\n| 5 | 应用层 | 应用程序、用户界面 | Word, 浏览器 |\n\n> **重点**：记忆各层名称和功能，理解层间接口作用。\n\n## 二、各层次详解\n### 2.1 微程序层（第0层）\n- **定义**：直接控制硬件电路的微指令序列，实现机器指令。\n- **特点**：硬件实现，速度最快，但编程复杂。\n- **难点**：微程序与机器指令的映射关系。\n\n### 2.2 机器语言层（第1层）\n- **定义**：CPU直接执行的指令集，包括操作码、地址码。\n- **特点**：二进制形式，依赖具体CPU架构。\n- **示例**：x86的`ADD EAX, 1`。\n\n### 2.3 操作系统层（第2层）\n- **功能**：管理硬件资源，提供系统调用接口（如文件读写、进程调度）。\n- **作用**：屏蔽硬件差异，为上层提供统一服务。\n- **重点**：理解操作系统作为“资源管理者”的角色。\n\n### 2.4 汇编语言层（第3层）\n- **定义**：用助记符表示机器指令，通过汇编器转换为机器码。\n- **特点**：与硬件紧密相关，但比机器语言易读。\n- **难点**：寄存器分配、指令寻址方式。\n\n### 2.5 高级语言层（第4层）\n- **定义**：使用自然语言风格编写代码，通过编译器或解释器执行。\n- **特点**：跨平台、易维护。\n- **示例**：`int a = 5;`。\n\n### 2.6 应用层（第5层）\n- **定义**：用户直接交互的软件，如办公软件、游戏。\n- **特点**：面向特定需求，依赖下层服务。\n\n## 三、层次间的关系与转换\n### 3.1 数据流方向\n- **用户请求**：应用层 -> 高级语言 -> 操作系统 -> 机器语言 -> 微程序 -> 硬件执行。\n- **结果返回**：反向传递。\n\n### 3.2 关键转换机制\n- **编译**：高级语言 -> 汇编/机器语言（如GCC编译器）。\n- **解释**：逐行翻译执行（如Python解释器）。\n- **汇编**：助记符 -> 机器码（如NASM汇编器）。\n- **微程序解释**：机器指令 -> 微指令序列。\n\n> **难点**：区分编译与解释，理解微程序控制器的运作。\n\n## 四、层次结构的应用\n- **性能优化**：通过减少层次切换（如使用汇编优化关键代码）提升效率。\n- **系统设计**：模块化开发，每层独立设计。\n- **故障排查**：从高层向下层逐层定位问题。\n\n## 五、总结\n- **核心要点**：计算机系统六层结构，每层功能与接口。\n- **重点**：各层定义、转换机制、应用场景。\n- **难点**：微程序层与机器语言层的区分，编译与解释的差异。\n\n---\n\n# 课后练习题\n\n**1. 在计算机系统的层次结构中，哪一层直接负责将高级语言代码转换为机器指令？**\nA. 操作系统层\nB. 汇编语言层\nC. 高级语言层\nD. 机器语言层\n\n**正确答案**：C\n**解析**：高级语言层通过编译器或解释器将代码转换为机器语言或汇编语言。操作系统层管理资源，汇编语言层处理助记符，机器语言层是执行层，不负责转换。\n\n**2. 以下关于微程序层的描述，正确的是？**\nA. 微程序层是用户直接交互的界面\nB. 微程序层由操作系统实现\nC. 微程序层直接控制硬件电路\nD. 微程序层使用高级语言编写\n\n**正确答案**：C\n**解析**：微程序层位于最底层，由硬件中的微指令控制电路。用户交互在应用层，操作系统层管理资源，微程序层使用微指令而非高级语言。\n\n**3. 在计算机系统层次结构中，操作系统层的主要作用是什么？**\nA. 执行用户编写的应用程序\nB. 将汇编语言转换为机器语言\nC. 管理硬件资源并提供系统调用接口\nD. 直接控制CPU的微指令执行\n\n**正确答案**：C\n**解析**：操作系统层负责管理CPU、内存、I/O等硬件资源，并通过系统调用为上层提供服务。执行应用是应用层，汇编转换是汇编层，微指令执行是微程序层。\n\n# 知识点标签\n- 计算机系统层次结构\n- 微程序层\n- 操作系统层\n- 编译与解释\n- 指令集架构（ISA）', '### 智能辅导回答\n**问题识别：** 根据以下课程内容出20道练习题，包含选择题(choice)、判断题(truefalse)、填空题(fill)至少三种。输出纯JSON数组：\n[{\"type\":\"choice\",\"question\":\"题目\",\"options\":[\"A\",\"B\",\"C\",\"D\"],\"answer\":0,\"explanation\":\"解析\"},{\"type\":\"truefalse\",\"question\":\"题目\",\"answer\":0},...]\n判断题answer:0=正确1=错误。填空answer为答案文本。直接输出[]数组。\n\n课程：2-组成原理-计算机系统的层次结构\n内容：# 计算机系统的层次结构\n\n## 课程概述\n本课时讲解计算机系统的层次结构，从硬件到软件的抽象层级，帮助理解计算机系统的工作原理。时长18分钟，适合计算机组成原理入门学习。\n\n## 一、计算机系统的层次模型\n### 1.1 层次结构概述\n- **定义**：计算机系统由硬件和软件组成，按功能分为多个抽象层级，每层为上层提供接口，隐藏下层细节。\n- **重要性**：理解层次结构有助于掌握系统设计、性能优化和问题定位。\n\n### 1.2 经典六层结构\n| 层级编号 | 层级名称 | 主要组成 | 示例 |\n|----------|----------|----------|------|\n| 0 | 微程序层 | 微指令、微程序 | CPU微指令集 |\n| 1 | 机器语言层 | 指令集架构（ISA） | x86指令集 |\n| 2 | 操作系统层 | 系统调用、资源管理 | Windows/Linux内核 |\n| 3 | 汇编语言层 | 汇编指令、伪指令 | MOV, ADD指令 |\n| 4 | 高级语言层 | 编程语言、编译器 | C, Java代码 |\n| 5 | 应用层 | 应用程序、用户界面 | Word, 浏览器 |\n\n> **重点**：记忆各层名称和功能，理解层间接口作用。\n\n## 二、各层次详解\n### 2.1 微程序层（第0层）\n- **定义**：直接控制硬件电路的微指令序列，实现机器指令。\n- **特点**：硬件实现，速度最快，但编程复杂。\n- **难点**：微程序与机器指令的映射关系。\n\n### 2.2 机器语言层（第1层）\n- **定义**：CPU直接执行的指令集，包括操作码、地址码。\n- **特点**：二进制形式，依赖具体CPU架构。\n- **示例**：x86的`ADD EAX, 1`。\n\n### 2.3 操作系统层（第2层）\n- **功能**：管理硬件资源，提供系统调用接口（如文件读写、进程调度）。\n- **作用**：屏蔽硬件差异，为上层提供统一服务。\n- **重点**：理解操作系统作为“资源管理者”的角色。\n\n### 2.4 汇编语言层（第3层）\n- **定义**：用助记符表示机器指令，通过汇编器转换为机器码。\n- **特点**：与硬件紧密相关，但比机器语言易读。\n- **难点**：寄存器分配、指令寻址方式。\n\n### 2.5 高级语言层（第4层）\n- **定义**：使用自然语言风格编写代码，通过编译器或解释器执行。\n- **特点**：跨平台、易维护。\n- **示例**：`int a = 5;`。\n\n### 2.6 应用层（第5层）\n- **定义**：用户直接交互的软件，如办公软件、游戏。\n- **特点**：面向特定需求，依赖下层服务。\n\n## 三、层次间的关系与转换\n### 3.1 数据流方向\n- **用户请求**：应用层 -> 高级语言 -> 操作系统 -> 机器语言 -> 微程序 -> 硬件执行。\n- **结果返回**：反向传递。\n\n### 3.2 关键转换机制\n- **编译**：高级语言 -> 汇编/机器语言（如GCC编译器）。\n- **解释**：逐行翻译执行（如Python解释器）。\n- **汇编**：助记符 -> 机器码（如NASM汇编器）。\n- **微程序解释**：机器指令 -> 微指令序列。\n\n> **难点**：区分编译与解释，理解微程序控制器的运作。\n\n## 四、层次结构的应用\n- **性能优化**：通过减少层次切换（如使用汇编优化关键代码）提升效率。\n- **系统设计**：模块化开发，每层独立设计。\n- **故障排查**：从高层向下层逐层定位问题。\n\n## 五、总结\n- **核心要点**：计算机系统六层结构，每层功能与接口。\n- **重点**：各层定义、转换机制、应用场景。\n- **难点**：微程序层与机器语言层的区分，编译与解释的差异。\n\n---\n\n# 课后练习题\n\n**1. 在计算机系统的层次结构中，哪一层直接负责将高级语言代码转换为机器指令？**\nA. 操作系统层\nB. 汇编语言层\nC. 高级语言层\nD. 机器语言层\n\n**正确答案**：C\n**解析**：高级语言层通过编译器或解释器将代码转换为机器语言或汇编语言。操作系统层管理资源，汇编语言层处理助记符，机器语言层是执行层，不负责转换。\n\n**2. 以下关于微程序层的描述，正确的是？**\nA. 微程序层是用户直接交互的界面\nB. 微程序层由操作系统实现\nC. 微程序层直接控制硬件电路\nD. 微程序层使用高级语言编写\n\n**正确答案**：C\n**解析**：微程序层位于最底层，由硬件中的微指令控制电路。用户交互在应用层，操作系统层管理资源，微程序层使用微指令而非高级语言。\n\n**3. 在计算机系统层次结构中，操作系统层的主要作用是什么？**\nA. 执行用户编写的应用程序\nB. 将汇编语言转换为机器语言\nC. 管理硬件资源并提供系统调用接口\nD. 直接控制CPU的微指令执行\n\n**正确答案**：C\n**解析**：操作系统层负责管理CPU、内存、I/O等硬件资源，并通过系统调用为上层提供服务。执行应用是应用层，汇编转换是汇编层，微指令执行是微程序层。\n\n# 知识点标签\n- 计算机系统层次结构\n- 微程序层\n- 操作系统层\n- 编译与解释\n- 指令集架构（ISA）\n\n> 系统已结合课程知识库、学生画像与教学场景生成讲解建议，并已进行内容安全过滤。\n\n#### 1. 概念拆解\n- 先理解定义与应用场景。\n- 再理解关键步骤与输入输出。\n- 最后通过例题或代码验证理解。\n\n#### 2. 学习建议\n1. 看 5 分钟图解或微课，建立整体印象。\n2. 阅读结构化讲义，标出关键词。\n3. 完成 3 道基础题 + 1 道综合题。\n4. 用自己的语言复述，形成长期记忆。\n\n#### 3. 常见误区\n- 只背定义，不理解使用条件。\n- 只看答案，不做步骤推导。\n- 只做单题，不做知识迁移。\n\n#### 4. 多模态辅导建议\n- 文字：精讲讲义\n- 图解：流程图 / 思维导图\n- 视频：3分钟微课脚本\n', '根据以下课程内容出20道练习题，包含选择题(choice)、判断题(truefalse)、填空题(f...', NULL, '2026-06-14 14:39:35');
+INSERT INTO `sp_qa_history` VALUES (2066168676576063489, 3, '根据以下内容出10道练习题（选择+判断+填空混合）。输出JSON数组：[{\"type\":\"choice\",\"question\":\"...\",\"options\":[\"A\",\"B\",\"C\",\"D\"],\"answer\":0,\"explanation\":\"...\"},...]\n\n课程：2-组成原理-计算机系统的层次结构\n内容：# 计算机系统的层次结构\n\n## 课程概述\n本课时讲解计算机系统的层次结构，从硬件到软件的抽象层级，帮助理解计算机系统的工作原理。时长18分钟，适合计算机组成原理入门学习。\n\n## 一、计算机系统的层次模型\n### 1.1 层次结构概述\n- **定义**：计算机系统由硬件和软件组成，按功能分为多个抽象层级，每层为上层提供接口，隐藏下层细节。\n- **重要性**：理解层次结构有助于掌握系统设计、性能优化和问题定位。\n\n### 1.2 经典六层结构\n| 层级编号 | 层级名称 | 主要组成 | 示例 |\n|----------|----------|----------|------|\n| 0 | 微程序层 | 微指令、微程序 | CPU微指令集 |\n| 1 | 机器语言层 | 指令集架构（ISA） | x86指令集 |\n| 2 | 操作系统层 | 系统调用、资源管理 | Windows/Linux内核 |\n| 3 | 汇编语言层 | 汇编指令、伪指令 | MOV, ADD指令 |\n| 4 | 高级语言层 | 编程语言、编译器 | C, Java代码 |\n| 5 | 应用层 | 应用程序、用户界面 | Word, 浏览器 |\n\n> **重点**：记忆各层名称和功能，理解层间接口作用。\n\n## 二、各层次详解\n### 2.1 微程序层（第0层）\n- **定义**：直接控制硬件电路的微指令序列，实现机器指令。\n- **特点**：硬件实现，速度最快，但编程复杂。\n- **难点**：微程序与机器指令的映射关系。\n\n### 2.2 机器语言层（第1层）\n- **定义**：CPU直接执行的指令集，包括操作码、地址码。\n- **特点**：二进制形式，依赖具体CPU架构。\n- **示例**：x86的`ADD EAX, 1`。\n\n### 2.3 操作系统层（第2层）\n- **功能**：管理硬件资源，提供系统调用接口（如文件读写、进程调度）。\n- **作用**：屏蔽硬件差异，为上层提供统一服务。\n- **重点**：理解操作系统作为“资源管理者”的角色。\n\n### 2.4 汇编语言层（第3层）\n- **定义**：用助记符表示机器指令，通过汇编器转换为机器码。\n- **特点**：与硬件紧密相关，但比机器语言易读。\n- **难点**：寄存器分配、指令寻址方式。\n\n### 2.5 高级语言层（第4层）\n- **定义**：使用自然语言风格编写代码，通过编译器或解释器执行。\n- **特点**：跨平台、易维护。\n- **示例**：`int a = 5;`。\n\n### 2.6 应用层（第5层）\n- **定义**：用户直接交互的软件，如办公软件、游戏。\n- **特点**：面向特定需求，依赖下层服务。\n\n## 三、层次间的关系与转换\n### 3.1 数据流方向\n- **用户请求**：应用层 -> 高级语言 -> 操作系统 -> 机器语言 -> 微程序 -> 硬件执行。\n- **结果返回**：反向传递。\n\n### 3.2 关键转换机制\n- **编译**：高级语言 -> 汇编/机器语言（如GCC编译器）。\n- **解释**：逐行翻译执行（如Python解释器）。\n- **汇编**：助记符 -> 机器码（如NASM汇编器）。\n- **微程序解释**：机器指令 -> 微指令序列。\n\n> **难点**：区分编译与解释，理解微程序控制器的运作。\n\n## 四、层次结构的应用\n- **性能优化**：通过减少层次切换（如使用汇编优化关键代码）提升效率。\n- **系统设计**：模块化开发，每层独立设计。\n- **故障排查**：从高层向下层逐层定位问题。\n\n## 五、总结\n- **核心要点**：计算机系统六层结构，每层功能与接口。\n- **重点**：各层定义、转换机制、应用场景。\n- **难点**：微程序层与机器语言层的区分，编译与解释的差异。\n\n---\n\n# 课后练习题\n\n**1. 在计算机系统的层次结构中，哪一层直接负责将高级语言代码转换为机器指令？**\nA. 操作系统层\nB. 汇编语言层\nC. 高级语言层\nD. 机器语言层\n\n**正确答案**：C\n**解析**：高级语言层通过编译器或解释器将代码转换为机器语言或汇编语言。操作系统层管理资源，汇编语言层处理助记符，机器语言层是执行层，不负责转换。\n\n**2. 以下关于微程序层的描述，正确的是？**\nA. 微程序层是用户直接交互的界面\nB. 微程序层由操作系统实现\nC. 微程序层直接控制硬件电路\nD. 微程序层使用高级语言编写\n\n**正确答案**：C\n**解析**：微程序层位于最底层，由硬件中的微指令控制电路。用户交互在应用层，操作系统层管理资源，微程序层使用微指令而非高级语言。\n\n**3. 在计算机系统层次结构中，操作系统层的主要作用是什', '### 智能辅导回答\n**问题识别：** 根据以下内容出10道练习题（选择+判断+填空混合）。输出JSON数组：[{\"type\":\"choice\",\"question\":\"...\",\"options\":[\"A\",\"B\",\"C\",\"D\"],\"answer\":0,\"explanation\":\"...\"},...]\n\n课程：2-组成原理-计算机系统的层次结构\n内容：# 计算机系统的层次结构\n\n## 课程概述\n本课时讲解计算机系统的层次结构，从硬件到软件的抽象层级，帮助理解计算机系统的工作原理。时长18分钟，适合计算机组成原理入门学习。\n\n## 一、计算机系统的层次模型\n### 1.1 层次结构概述\n- **定义**：计算机系统由硬件和软件组成，按功能分为多个抽象层级，每层为上层提供接口，隐藏下层细节。\n- **重要性**：理解层次结构有助于掌握系统设计、性能优化和问题定位。\n\n### 1.2 经典六层结构\n| 层级编号 | 层级名称 | 主要组成 | 示例 |\n|----------|----------|----------|------|\n| 0 | 微程序层 | 微指令、微程序 | CPU微指令集 |\n| 1 | 机器语言层 | 指令集架构（ISA） | x86指令集 |\n| 2 | 操作系统层 | 系统调用、资源管理 | Windows/Linux内核 |\n| 3 | 汇编语言层 | 汇编指令、伪指令 | MOV, ADD指令 |\n| 4 | 高级语言层 | 编程语言、编译器 | C, Java代码 |\n| 5 | 应用层 | 应用程序、用户界面 | Word, 浏览器 |\n\n> **重点**：记忆各层名称和功能，理解层间接口作用。\n\n## 二、各层次详解\n### 2.1 微程序层（第0层）\n- **定义**：直接控制硬件电路的微指令序列，实现机器指令。\n- **特点**：硬件实现，速度最快，但编程复杂。\n- **难点**：微程序与机器指令的映射关系。\n\n### 2.2 机器语言层（第1层）\n- **定义**：CPU直接执行的指令集，包括操作码、地址码。\n- **特点**：二进制形式，依赖具体CPU架构。\n- **示例**：x86的`ADD EAX, 1`。\n\n### 2.3 操作系统层（第2层）\n- **功能**：管理硬件资源，提供系统调用接口（如文件读写、进程调度）。\n- **作用**：屏蔽硬件差异，为上层提供统一服务。\n- **重点**：理解操作系统作为“资源管理者”的角色。\n\n### 2.4 汇编语言层（第3层）\n- **定义**：用助记符表示机器指令，通过汇编器转换为机器码。\n- **特点**：与硬件紧密相关，但比机器语言易读。\n- **难点**：寄存器分配、指令寻址方式。\n\n### 2.5 高级语言层（第4层）\n- **定义**：使用自然语言风格编写代码，通过编译器或解释器执行。\n- **特点**：跨平台、易维护。\n- **示例**：`int a = 5;`。\n\n### 2.6 应用层（第5层）\n- **定义**：用户直接交互的软件，如办公软件、游戏。\n- **特点**：面向特定需求，依赖下层服务。\n\n## 三、层次间的关系与转换\n### 3.1 数据流方向\n- **用户请求**：应用层 -> 高级语言 -> 操作系统 -> 机器语言 -> 微程序 -> 硬件执行。\n- **结果返回**：反向传递。\n\n### 3.2 关键转换机制\n- **编译**：高级语言 -> 汇编/机器语言（如GCC编译器）。\n- **解释**：逐行翻译执行（如Python解释器）。\n- **汇编**：助记符 -> 机器码（如NASM汇编器）。\n- **微程序解释**：机器指令 -> 微指令序列。\n\n> **难点**：区分编译与解释，理解微程序控制器的运作。\n\n## 四、层次结构的应用\n- **性能优化**：通过减少层次切换（如使用汇编优化关键代码）提升效率。\n- **系统设计**：模块化开发，每层独立设计。\n- **故障排查**：从高层向下层逐层定位问题。\n\n## 五、总结\n- **核心要点**：计算机系统六层结构，每层功能与接口。\n- **重点**：各层定义、转换机制、应用场景。\n- **难点**：微程序层与机器语言层的区分，编译与解释的差异。\n\n---\n\n# 课后练习题\n\n**1. 在计算机系统的层次结构中，哪一层直接负责将高级语言代码转换为机器指令？**\nA. 操作系统层\nB. 汇编语言层\nC. 高级语言层\nD. 机器语言层\n\n**正确答案**：C\n**解析**：高级语言层通过编译器或解释器将代码转换为机器语言或汇编语言。操作系统层管理资源，汇编语言层处理助记符，机器语言层是执行层，不负责转换。\n\n**2. 以下关于微程序层的描述，正确的是？**\nA. 微程序层是用户直接交互的界面\nB. 微程序层由操作系统实现\nC. 微程序层直接控制硬件电路\nD. 微程序层使用高级语言编写\n\n**正确答案**：C\n**解析**：微程序层位于最底层，由硬件中的微指令控制电路。用户交互在应用层，操作系统层管理资源，微程序层使用微指令而非高级语言。\n\n**3. 在计算机系统层次结构中，操作系统层的主要作用是什\n\n> 系统已结合课程知识库、学生画像与教学场景生成讲解建议，并已进行内容安全过滤。\n\n#### 1. 概念拆解\n- 先理解定义与应用场景。\n- 再理解关键步骤与输入输出。\n- 最后通过例题或代码验证理解。\n\n#### 2. 学习建议\n1. 看 5 分钟图解或微课，建立整体印象。\n2. 阅读结构化讲义，标出关键词。\n3. 完成 3 道基础题 + 1 道综合题。\n4. 用自己的语言复述，形成长期记忆。\n\n#### 3. 常见误区\n- 只背定义，不理解使用条件。\n- 只看答案，不做步骤推导。\n- 只做单题，不做知识迁移。\n\n#### 4. 多模态辅导建议\n- 文字：精讲讲义\n- 图解：流程图 / 思维导图\n- 视频：3分钟微课脚本\n', '根据以下内容出10道练习题（选择+判断+填空混合）。输出JSON数组：[{\"type\":\"choic...', NULL, '2026-06-14 14:39:35');
+INSERT INTO `sp_qa_history` VALUES (2066168683341475841, 3, '根据以下课程内容出20道练习题，包含选择题(choice)、判断题(truefalse)、填空题(fill)至少三种。输出纯JSON数组：\n[{\"type\":\"choice\",\"question\":\"题目\",\"options\":[\"A\",\"B\",\"C\",\"D\"],\"answer\":0,\"explanation\":\"解析\"},{\"type\":\"truefalse\",\"question\":\"题目\",\"answer\":0},...]\n判断题answer:0=正确1=错误。填空answer为答案文本。直接输出[]数组。\n\n课程：2-组成原理-计算机系统的层次结构\n内容：# 计算机系统的层次结构\n\n## 课程概述\n本课时讲解计算机系统的层次结构，从硬件到软件的抽象层级，帮助理解计算机系统的工作原理。时长18分钟，适合计算机组成原理入门学习。\n\n## 一、计算机系统的层次模型\n### 1.1 层次结构概述\n- **定义**：计算机系统由硬件和软件组成，按功能分为多个抽象层级，每层为上层提供接口，隐藏下层细节。\n- **重要性**：理解层次结构有助于掌握系统设计、性能优化和问题定位。\n\n### 1.2 经典六层结构\n| 层级编号 | 层级名称 | 主要组成 | 示例 |\n|----------|----------|----------|------|\n| 0 | 微程序层 | 微指令、微程序 | CPU微指令集 |\n| 1 | 机器语言层 | 指令集架构（ISA） | x86指令集 |\n| 2 | 操作系统层 | 系统调用、资源管理 | Windows/Linux内核 |\n| 3 | 汇编语言层 | 汇编指令、伪指令 | MOV, ADD指令 |\n| 4 | 高级语言层 | 编程语言、编译器 | C, Java代码 |\n| 5 | 应用层 | 应用程序、用户界面 | Word, 浏览器 |\n\n> **重点**：记忆各层名称和功能，理解层间接口作用。\n\n## 二、各层次详解\n### 2.1 微程序层（第0层）\n- **定义**：直接控制硬件电路的微指令序列，实现机器指令。\n- **特点**：硬件实现，速度最快，但编程复杂。\n- **难点**：微程序与机器指令的映射关系。\n\n### 2.2 机器语言层（第1层）\n- **定义**：CPU直接执行的指令集，包括操作码、地址码。\n- **特点**：二进制形式，依赖具体CPU架构。\n- **示例**：x86的`ADD EAX, 1`。\n\n### 2.3 操作系统层（第2层）\n- **功能**：管理硬件资源，提供系统调用接口（如文件读写、进程调度）。\n- **作用**：屏蔽硬件差异，为上层提供统一服务。\n- **重点**：理解操作系统作为“资源管理者”的角色。\n\n### 2.4 汇编语言层（第3层）\n- **定义**：用助记符表示机器指令，通过汇编器转换为机器码。\n- **特点**：与硬件紧密相关，但比机器语言易读。\n- **难点**：寄存器分配、指令寻址方式。\n\n### 2.5 高级语言层（第4层）\n- **定义**：使用自然语言风格编写代码，通过编译器或解释器执行。\n- **特点**：跨平台、易维护。\n- **示例**：`int a = 5;`。\n\n### 2.6 应用层（第5层）\n- **定义**：用户直接交互的软件，如办公软件、游戏。\n- **特点**：面向特定需求，依赖下层服务。\n\n## 三、层次间的关系与转换\n### 3.1 数据流方向\n- **用户请求**：应用层 -> 高级语言 -> 操作系统 -> 机器语言 -> 微程序 -> 硬件执行。\n- **结果返回**：反向传递。\n\n### 3.2 关键转换机制\n- **编译**：高级语言 -> 汇编/机器语言（如GCC编译器）。\n- **解释**：逐行翻译执行（如Python解释器）。\n- **汇编**：助记符 -> 机器码（如NASM汇编器）。\n- **微程序解释**：机器指令 -> 微指令序列。\n\n> **难点**：区分编译与解释，理解微程序控制器的运作。\n\n## 四、层次结构的应用\n- **性能优化**：通过减少层次切换（如使用汇编优化关键代码）提升效率。\n- **系统设计**：模块化开发，每层独立设计。\n- **故障排查**：从高层向下层逐层定位问题。\n\n## 五、总结\n- **核心要点**：计算机系统六层结构，每层功能与接口。\n- **重点**：各层定义、转换机制、应用场景。\n- **难点**：微程序层与机器语言层的区分，编译与解释的差异。\n\n---\n\n# 课后练习题\n\n**1. 在计算机系统的层次结构中，哪一层直接负责将高级语言代码转换为机器指令？**\nA. 操作系统层\nB. 汇编语言层\nC. 高级语言层\nD. 机器语言层\n\n**正确答案**：C\n**解析**：高级语言层通过编译器或解释器将代码转换为机器语言或汇编语言。操作系统层管理资源，汇编语言层处理助记符，机器语言层是执行层，不负责转换。\n\n**2. 以下关于微程序层的描述，正确的是？**\nA. 微程序层是用户直接交互的界面\nB. 微程序层由操作系统实现\nC. 微程序层直接控制硬件电路\nD. 微程序层使用高级语言编写\n\n**正确答案**：C\n**解析**：微程序层位于最底层，由硬件中的微指令控制电路。用户交互在应用层，操作系统层管理资源，微程序层使用微指令而非高级语言。\n\n**3. 在计算机系统层次结构中，操作系统层的主要作用是什么？**\nA. 执行用户编写的应用程序\nB. 将汇编语言转换为机器语言\nC. 管理硬件资源并提供系统调用接口\nD. 直接控制CPU的微指令执行\n\n**正确答案**：C\n**解析**：操作系统层负责管理CPU、内存、I/O等硬件资源，并通过系统调用为上层提供服务。执行应用是应用层，汇编转换是汇编层，微指令执行是微程序层。\n\n# 知识点标签\n- 计算机系统层次结构\n- 微程序层\n- 操作系统层\n- 编译与解释\n- 指令集架构（ISA）', '### 智能辅导回答\n**问题识别：** 根据以下课程内容出20道练习题，包含选择题(choice)、判断题(truefalse)、填空题(fill)至少三种。输出纯JSON数组：\n[{\"type\":\"choice\",\"question\":\"题目\",\"options\":[\"A\",\"B\",\"C\",\"D\"],\"answer\":0,\"explanation\":\"解析\"},{\"type\":\"truefalse\",\"question\":\"题目\",\"answer\":0},...]\n判断题answer:0=正确1=错误。填空answer为答案文本。直接输出[]数组。\n\n课程：2-组成原理-计算机系统的层次结构\n内容：# 计算机系统的层次结构\n\n## 课程概述\n本课时讲解计算机系统的层次结构，从硬件到软件的抽象层级，帮助理解计算机系统的工作原理。时长18分钟，适合计算机组成原理入门学习。\n\n## 一、计算机系统的层次模型\n### 1.1 层次结构概述\n- **定义**：计算机系统由硬件和软件组成，按功能分为多个抽象层级，每层为上层提供接口，隐藏下层细节。\n- **重要性**：理解层次结构有助于掌握系统设计、性能优化和问题定位。\n\n### 1.2 经典六层结构\n| 层级编号 | 层级名称 | 主要组成 | 示例 |\n|----------|----------|----------|------|\n| 0 | 微程序层 | 微指令、微程序 | CPU微指令集 |\n| 1 | 机器语言层 | 指令集架构（ISA） | x86指令集 |\n| 2 | 操作系统层 | 系统调用、资源管理 | Windows/Linux内核 |\n| 3 | 汇编语言层 | 汇编指令、伪指令 | MOV, ADD指令 |\n| 4 | 高级语言层 | 编程语言、编译器 | C, Java代码 |\n| 5 | 应用层 | 应用程序、用户界面 | Word, 浏览器 |\n\n> **重点**：记忆各层名称和功能，理解层间接口作用。\n\n## 二、各层次详解\n### 2.1 微程序层（第0层）\n- **定义**：直接控制硬件电路的微指令序列，实现机器指令。\n- **特点**：硬件实现，速度最快，但编程复杂。\n- **难点**：微程序与机器指令的映射关系。\n\n### 2.2 机器语言层（第1层）\n- **定义**：CPU直接执行的指令集，包括操作码、地址码。\n- **特点**：二进制形式，依赖具体CPU架构。\n- **示例**：x86的`ADD EAX, 1`。\n\n### 2.3 操作系统层（第2层）\n- **功能**：管理硬件资源，提供系统调用接口（如文件读写、进程调度）。\n- **作用**：屏蔽硬件差异，为上层提供统一服务。\n- **重点**：理解操作系统作为“资源管理者”的角色。\n\n### 2.4 汇编语言层（第3层）\n- **定义**：用助记符表示机器指令，通过汇编器转换为机器码。\n- **特点**：与硬件紧密相关，但比机器语言易读。\n- **难点**：寄存器分配、指令寻址方式。\n\n### 2.5 高级语言层（第4层）\n- **定义**：使用自然语言风格编写代码，通过编译器或解释器执行。\n- **特点**：跨平台、易维护。\n- **示例**：`int a = 5;`。\n\n### 2.6 应用层（第5层）\n- **定义**：用户直接交互的软件，如办公软件、游戏。\n- **特点**：面向特定需求，依赖下层服务。\n\n## 三、层次间的关系与转换\n### 3.1 数据流方向\n- **用户请求**：应用层 -> 高级语言 -> 操作系统 -> 机器语言 -> 微程序 -> 硬件执行。\n- **结果返回**：反向传递。\n\n### 3.2 关键转换机制\n- **编译**：高级语言 -> 汇编/机器语言（如GCC编译器）。\n- **解释**：逐行翻译执行（如Python解释器）。\n- **汇编**：助记符 -> 机器码（如NASM汇编器）。\n- **微程序解释**：机器指令 -> 微指令序列。\n\n> **难点**：区分编译与解释，理解微程序控制器的运作。\n\n## 四、层次结构的应用\n- **性能优化**：通过减少层次切换（如使用汇编优化关键代码）提升效率。\n- **系统设计**：模块化开发，每层独立设计。\n- **故障排查**：从高层向下层逐层定位问题。\n\n## 五、总结\n- **核心要点**：计算机系统六层结构，每层功能与接口。\n- **重点**：各层定义、转换机制、应用场景。\n- **难点**：微程序层与机器语言层的区分，编译与解释的差异。\n\n---\n\n# 课后练习题\n\n**1. 在计算机系统的层次结构中，哪一层直接负责将高级语言代码转换为机器指令？**\nA. 操作系统层\nB. 汇编语言层\nC. 高级语言层\nD. 机器语言层\n\n**正确答案**：C\n**解析**：高级语言层通过编译器或解释器将代码转换为机器语言或汇编语言。操作系统层管理资源，汇编语言层处理助记符，机器语言层是执行层，不负责转换。\n\n**2. 以下关于微程序层的描述，正确的是？**\nA. 微程序层是用户直接交互的界面\nB. 微程序层由操作系统实现\nC. 微程序层直接控制硬件电路\nD. 微程序层使用高级语言编写\n\n**正确答案**：C\n**解析**：微程序层位于最底层，由硬件中的微指令控制电路。用户交互在应用层，操作系统层管理资源，微程序层使用微指令而非高级语言。\n\n**3. 在计算机系统层次结构中，操作系统层的主要作用是什么？**\nA. 执行用户编写的应用程序\nB. 将汇编语言转换为机器语言\nC. 管理硬件资源并提供系统调用接口\nD. 直接控制CPU的微指令执行\n\n**正确答案**：C\n**解析**：操作系统层负责管理CPU、内存、I/O等硬件资源，并通过系统调用为上层提供服务。执行应用是应用层，汇编转换是汇编层，微指令执行是微程序层。\n\n# 知识点标签\n- 计算机系统层次结构\n- 微程序层\n- 操作系统层\n- 编译与解释\n- 指令集架构（ISA）\n\n> 系统已结合课程知识库、学生画像与教学场景生成讲解建议，并已进行内容安全过滤。\n\n#### 1. 概念拆解\n- 先理解定义与应用场景。\n- 再理解关键步骤与输入输出。\n- 最后通过例题或代码验证理解。\n\n#### 2. 学习建议\n1. 看 5 分钟图解或微课，建立整体印象。\n2. 阅读结构化讲义，标出关键词。\n3. 完成 3 道基础题 + 1 道综合题。\n4. 用自己的语言复述，形成长期记忆。\n\n#### 3. 常见误区\n- 只背定义，不理解使用条件。\n- 只看答案，不做步骤推导。\n- 只做单题，不做知识迁移。\n\n#### 4. 多模态辅导建议\n- 文字：精讲讲义\n- 图解：流程图 / 思维导图\n- 视频：3分钟微课脚本\n', '根据以下课程内容出20道练习题，包含选择题(choice)、判断题(truefalse)、填空题(f...', NULL, '2026-06-14 14:39:36');
+INSERT INTO `sp_qa_history` VALUES (2066168683874152449, 3, '根据以下内容出10道练习题（选择+判断+填空混合）。输出JSON数组：[{\"type\":\"choice\",\"question\":\"...\",\"options\":[\"A\",\"B\",\"C\",\"D\"],\"answer\":0,\"explanation\":\"...\"},...]\n\n课程：2-组成原理-计算机系统的层次结构\n内容：# 计算机系统的层次结构\n\n## 课程概述\n本课时讲解计算机系统的层次结构，从硬件到软件的抽象层级，帮助理解计算机系统的工作原理。时长18分钟，适合计算机组成原理入门学习。\n\n## 一、计算机系统的层次模型\n### 1.1 层次结构概述\n- **定义**：计算机系统由硬件和软件组成，按功能分为多个抽象层级，每层为上层提供接口，隐藏下层细节。\n- **重要性**：理解层次结构有助于掌握系统设计、性能优化和问题定位。\n\n### 1.2 经典六层结构\n| 层级编号 | 层级名称 | 主要组成 | 示例 |\n|----------|----------|----------|------|\n| 0 | 微程序层 | 微指令、微程序 | CPU微指令集 |\n| 1 | 机器语言层 | 指令集架构（ISA） | x86指令集 |\n| 2 | 操作系统层 | 系统调用、资源管理 | Windows/Linux内核 |\n| 3 | 汇编语言层 | 汇编指令、伪指令 | MOV, ADD指令 |\n| 4 | 高级语言层 | 编程语言、编译器 | C, Java代码 |\n| 5 | 应用层 | 应用程序、用户界面 | Word, 浏览器 |\n\n> **重点**：记忆各层名称和功能，理解层间接口作用。\n\n## 二、各层次详解\n### 2.1 微程序层（第0层）\n- **定义**：直接控制硬件电路的微指令序列，实现机器指令。\n- **特点**：硬件实现，速度最快，但编程复杂。\n- **难点**：微程序与机器指令的映射关系。\n\n### 2.2 机器语言层（第1层）\n- **定义**：CPU直接执行的指令集，包括操作码、地址码。\n- **特点**：二进制形式，依赖具体CPU架构。\n- **示例**：x86的`ADD EAX, 1`。\n\n### 2.3 操作系统层（第2层）\n- **功能**：管理硬件资源，提供系统调用接口（如文件读写、进程调度）。\n- **作用**：屏蔽硬件差异，为上层提供统一服务。\n- **重点**：理解操作系统作为“资源管理者”的角色。\n\n### 2.4 汇编语言层（第3层）\n- **定义**：用助记符表示机器指令，通过汇编器转换为机器码。\n- **特点**：与硬件紧密相关，但比机器语言易读。\n- **难点**：寄存器分配、指令寻址方式。\n\n### 2.5 高级语言层（第4层）\n- **定义**：使用自然语言风格编写代码，通过编译器或解释器执行。\n- **特点**：跨平台、易维护。\n- **示例**：`int a = 5;`。\n\n### 2.6 应用层（第5层）\n- **定义**：用户直接交互的软件，如办公软件、游戏。\n- **特点**：面向特定需求，依赖下层服务。\n\n## 三、层次间的关系与转换\n### 3.1 数据流方向\n- **用户请求**：应用层 -> 高级语言 -> 操作系统 -> 机器语言 -> 微程序 -> 硬件执行。\n- **结果返回**：反向传递。\n\n### 3.2 关键转换机制\n- **编译**：高级语言 -> 汇编/机器语言（如GCC编译器）。\n- **解释**：逐行翻译执行（如Python解释器）。\n- **汇编**：助记符 -> 机器码（如NASM汇编器）。\n- **微程序解释**：机器指令 -> 微指令序列。\n\n> **难点**：区分编译与解释，理解微程序控制器的运作。\n\n## 四、层次结构的应用\n- **性能优化**：通过减少层次切换（如使用汇编优化关键代码）提升效率。\n- **系统设计**：模块化开发，每层独立设计。\n- **故障排查**：从高层向下层逐层定位问题。\n\n## 五、总结\n- **核心要点**：计算机系统六层结构，每层功能与接口。\n- **重点**：各层定义、转换机制、应用场景。\n- **难点**：微程序层与机器语言层的区分，编译与解释的差异。\n\n---\n\n# 课后练习题\n\n**1. 在计算机系统的层次结构中，哪一层直接负责将高级语言代码转换为机器指令？**\nA. 操作系统层\nB. 汇编语言层\nC. 高级语言层\nD. 机器语言层\n\n**正确答案**：C\n**解析**：高级语言层通过编译器或解释器将代码转换为机器语言或汇编语言。操作系统层管理资源，汇编语言层处理助记符，机器语言层是执行层，不负责转换。\n\n**2. 以下关于微程序层的描述，正确的是？**\nA. 微程序层是用户直接交互的界面\nB. 微程序层由操作系统实现\nC. 微程序层直接控制硬件电路\nD. 微程序层使用高级语言编写\n\n**正确答案**：C\n**解析**：微程序层位于最底层，由硬件中的微指令控制电路。用户交互在应用层，操作系统层管理资源，微程序层使用微指令而非高级语言。\n\n**3. 在计算机系统层次结构中，操作系统层的主要作用是什', '### 智能辅导回答\n**问题识别：** 根据以下内容出10道练习题（选择+判断+填空混合）。输出JSON数组：[{\"type\":\"choice\",\"question\":\"...\",\"options\":[\"A\",\"B\",\"C\",\"D\"],\"answer\":0,\"explanation\":\"...\"},...]\n\n课程：2-组成原理-计算机系统的层次结构\n内容：# 计算机系统的层次结构\n\n## 课程概述\n本课时讲解计算机系统的层次结构，从硬件到软件的抽象层级，帮助理解计算机系统的工作原理。时长18分钟，适合计算机组成原理入门学习。\n\n## 一、计算机系统的层次模型\n### 1.1 层次结构概述\n- **定义**：计算机系统由硬件和软件组成，按功能分为多个抽象层级，每层为上层提供接口，隐藏下层细节。\n- **重要性**：理解层次结构有助于掌握系统设计、性能优化和问题定位。\n\n### 1.2 经典六层结构\n| 层级编号 | 层级名称 | 主要组成 | 示例 |\n|----------|----------|----------|------|\n| 0 | 微程序层 | 微指令、微程序 | CPU微指令集 |\n| 1 | 机器语言层 | 指令集架构（ISA） | x86指令集 |\n| 2 | 操作系统层 | 系统调用、资源管理 | Windows/Linux内核 |\n| 3 | 汇编语言层 | 汇编指令、伪指令 | MOV, ADD指令 |\n| 4 | 高级语言层 | 编程语言、编译器 | C, Java代码 |\n| 5 | 应用层 | 应用程序、用户界面 | Word, 浏览器 |\n\n> **重点**：记忆各层名称和功能，理解层间接口作用。\n\n## 二、各层次详解\n### 2.1 微程序层（第0层）\n- **定义**：直接控制硬件电路的微指令序列，实现机器指令。\n- **特点**：硬件实现，速度最快，但编程复杂。\n- **难点**：微程序与机器指令的映射关系。\n\n### 2.2 机器语言层（第1层）\n- **定义**：CPU直接执行的指令集，包括操作码、地址码。\n- **特点**：二进制形式，依赖具体CPU架构。\n- **示例**：x86的`ADD EAX, 1`。\n\n### 2.3 操作系统层（第2层）\n- **功能**：管理硬件资源，提供系统调用接口（如文件读写、进程调度）。\n- **作用**：屏蔽硬件差异，为上层提供统一服务。\n- **重点**：理解操作系统作为“资源管理者”的角色。\n\n### 2.4 汇编语言层（第3层）\n- **定义**：用助记符表示机器指令，通过汇编器转换为机器码。\n- **特点**：与硬件紧密相关，但比机器语言易读。\n- **难点**：寄存器分配、指令寻址方式。\n\n### 2.5 高级语言层（第4层）\n- **定义**：使用自然语言风格编写代码，通过编译器或解释器执行。\n- **特点**：跨平台、易维护。\n- **示例**：`int a = 5;`。\n\n### 2.6 应用层（第5层）\n- **定义**：用户直接交互的软件，如办公软件、游戏。\n- **特点**：面向特定需求，依赖下层服务。\n\n## 三、层次间的关系与转换\n### 3.1 数据流方向\n- **用户请求**：应用层 -> 高级语言 -> 操作系统 -> 机器语言 -> 微程序 -> 硬件执行。\n- **结果返回**：反向传递。\n\n### 3.2 关键转换机制\n- **编译**：高级语言 -> 汇编/机器语言（如GCC编译器）。\n- **解释**：逐行翻译执行（如Python解释器）。\n- **汇编**：助记符 -> 机器码（如NASM汇编器）。\n- **微程序解释**：机器指令 -> 微指令序列。\n\n> **难点**：区分编译与解释，理解微程序控制器的运作。\n\n## 四、层次结构的应用\n- **性能优化**：通过减少层次切换（如使用汇编优化关键代码）提升效率。\n- **系统设计**：模块化开发，每层独立设计。\n- **故障排查**：从高层向下层逐层定位问题。\n\n## 五、总结\n- **核心要点**：计算机系统六层结构，每层功能与接口。\n- **重点**：各层定义、转换机制、应用场景。\n- **难点**：微程序层与机器语言层的区分，编译与解释的差异。\n\n---\n\n# 课后练习题\n\n**1. 在计算机系统的层次结构中，哪一层直接负责将高级语言代码转换为机器指令？**\nA. 操作系统层\nB. 汇编语言层\nC. 高级语言层\nD. 机器语言层\n\n**正确答案**：C\n**解析**：高级语言层通过编译器或解释器将代码转换为机器语言或汇编语言。操作系统层管理资源，汇编语言层处理助记符，机器语言层是执行层，不负责转换。\n\n**2. 以下关于微程序层的描述，正确的是？**\nA. 微程序层是用户直接交互的界面\nB. 微程序层由操作系统实现\nC. 微程序层直接控制硬件电路\nD. 微程序层使用高级语言编写\n\n**正确答案**：C\n**解析**：微程序层位于最底层，由硬件中的微指令控制电路。用户交互在应用层，操作系统层管理资源，微程序层使用微指令而非高级语言。\n\n**3. 在计算机系统层次结构中，操作系统层的主要作用是什\n\n> 系统已结合课程知识库、学生画像与教学场景生成讲解建议，并已进行内容安全过滤。\n\n#### 1. 概念拆解\n- 先理解定义与应用场景。\n- 再理解关键步骤与输入输出。\n- 最后通过例题或代码验证理解。\n\n#### 2. 学习建议\n1. 看 5 分钟图解或微课，建立整体印象。\n2. 阅读结构化讲义，标出关键词。\n3. 完成 3 道基础题 + 1 道综合题。\n4. 用自己的语言复述，形成长期记忆。\n\n#### 3. 常见误区\n- 只背定义，不理解使用条件。\n- 只看答案，不做步骤推导。\n- 只做单题，不做知识迁移。\n\n#### 4. 多模态辅导建议\n- 文字：精讲讲义\n- 图解：流程图 / 思维导图\n- 视频：3分钟微课脚本\n', '根据以下内容出10道练习题（选择+判断+填空混合）。输出JSON数组：[{\"type\":\"choic...', NULL, '2026-06-14 14:39:36');
+INSERT INTO `sp_qa_history` VALUES (2066168689049923585, 3, '根据以下课程内容出20道练习题，包含选择题(choice)、判断题(truefalse)、填空题(fill)至少三种。输出纯JSON数组：\n[{\"type\":\"choice\",\"question\":\"题目\",\"options\":[\"A\",\"B\",\"C\",\"D\"],\"answer\":0,\"explanation\":\"解析\"},{\"type\":\"truefalse\",\"question\":\"题目\",\"answer\":0},...]\n判断题answer:0=正确1=错误。填空answer为答案文本。直接输出[]数组。\n\n课程：2-组成原理-计算机系统的层次结构\n内容：# 计算机系统的层次结构\n\n## 课程概述\n本课时讲解计算机系统的层次结构，从硬件到软件的抽象层级，帮助理解计算机系统的工作原理。时长18分钟，适合计算机组成原理入门学习。\n\n## 一、计算机系统的层次模型\n### 1.1 层次结构概述\n- **定义**：计算机系统由硬件和软件组成，按功能分为多个抽象层级，每层为上层提供接口，隐藏下层细节。\n- **重要性**：理解层次结构有助于掌握系统设计、性能优化和问题定位。\n\n### 1.2 经典六层结构\n| 层级编号 | 层级名称 | 主要组成 | 示例 |\n|----------|----------|----------|------|\n| 0 | 微程序层 | 微指令、微程序 | CPU微指令集 |\n| 1 | 机器语言层 | 指令集架构（ISA） | x86指令集 |\n| 2 | 操作系统层 | 系统调用、资源管理 | Windows/Linux内核 |\n| 3 | 汇编语言层 | 汇编指令、伪指令 | MOV, ADD指令 |\n| 4 | 高级语言层 | 编程语言、编译器 | C, Java代码 |\n| 5 | 应用层 | 应用程序、用户界面 | Word, 浏览器 |\n\n> **重点**：记忆各层名称和功能，理解层间接口作用。\n\n## 二、各层次详解\n### 2.1 微程序层（第0层）\n- **定义**：直接控制硬件电路的微指令序列，实现机器指令。\n- **特点**：硬件实现，速度最快，但编程复杂。\n- **难点**：微程序与机器指令的映射关系。\n\n### 2.2 机器语言层（第1层）\n- **定义**：CPU直接执行的指令集，包括操作码、地址码。\n- **特点**：二进制形式，依赖具体CPU架构。\n- **示例**：x86的`ADD EAX, 1`。\n\n### 2.3 操作系统层（第2层）\n- **功能**：管理硬件资源，提供系统调用接口（如文件读写、进程调度）。\n- **作用**：屏蔽硬件差异，为上层提供统一服务。\n- **重点**：理解操作系统作为“资源管理者”的角色。\n\n### 2.4 汇编语言层（第3层）\n- **定义**：用助记符表示机器指令，通过汇编器转换为机器码。\n- **特点**：与硬件紧密相关，但比机器语言易读。\n- **难点**：寄存器分配、指令寻址方式。\n\n### 2.5 高级语言层（第4层）\n- **定义**：使用自然语言风格编写代码，通过编译器或解释器执行。\n- **特点**：跨平台、易维护。\n- **示例**：`int a = 5;`。\n\n### 2.6 应用层（第5层）\n- **定义**：用户直接交互的软件，如办公软件、游戏。\n- **特点**：面向特定需求，依赖下层服务。\n\n## 三、层次间的关系与转换\n### 3.1 数据流方向\n- **用户请求**：应用层 -> 高级语言 -> 操作系统 -> 机器语言 -> 微程序 -> 硬件执行。\n- **结果返回**：反向传递。\n\n### 3.2 关键转换机制\n- **编译**：高级语言 -> 汇编/机器语言（如GCC编译器）。\n- **解释**：逐行翻译执行（如Python解释器）。\n- **汇编**：助记符 -> 机器码（如NASM汇编器）。\n- **微程序解释**：机器指令 -> 微指令序列。\n\n> **难点**：区分编译与解释，理解微程序控制器的运作。\n\n## 四、层次结构的应用\n- **性能优化**：通过减少层次切换（如使用汇编优化关键代码）提升效率。\n- **系统设计**：模块化开发，每层独立设计。\n- **故障排查**：从高层向下层逐层定位问题。\n\n## 五、总结\n- **核心要点**：计算机系统六层结构，每层功能与接口。\n- **重点**：各层定义、转换机制、应用场景。\n- **难点**：微程序层与机器语言层的区分，编译与解释的差异。\n\n---\n\n# 课后练习题\n\n**1. 在计算机系统的层次结构中，哪一层直接负责将高级语言代码转换为机器指令？**\nA. 操作系统层\nB. 汇编语言层\nC. 高级语言层\nD. 机器语言层\n\n**正确答案**：C\n**解析**：高级语言层通过编译器或解释器将代码转换为机器语言或汇编语言。操作系统层管理资源，汇编语言层处理助记符，机器语言层是执行层，不负责转换。\n\n**2. 以下关于微程序层的描述，正确的是？**\nA. 微程序层是用户直接交互的界面\nB. 微程序层由操作系统实现\nC. 微程序层直接控制硬件电路\nD. 微程序层使用高级语言编写\n\n**正确答案**：C\n**解析**：微程序层位于最底层，由硬件中的微指令控制电路。用户交互在应用层，操作系统层管理资源，微程序层使用微指令而非高级语言。\n\n**3. 在计算机系统层次结构中，操作系统层的主要作用是什么？**\nA. 执行用户编写的应用程序\nB. 将汇编语言转换为机器语言\nC. 管理硬件资源并提供系统调用接口\nD. 直接控制CPU的微指令执行\n\n**正确答案**：C\n**解析**：操作系统层负责管理CPU、内存、I/O等硬件资源，并通过系统调用为上层提供服务。执行应用是应用层，汇编转换是汇编层，微指令执行是微程序层。\n\n# 知识点标签\n- 计算机系统层次结构\n- 微程序层\n- 操作系统层\n- 编译与解释\n- 指令集架构（ISA）', '### 智能辅导回答\n**问题识别：** 根据以下课程内容出20道练习题，包含选择题(choice)、判断题(truefalse)、填空题(fill)至少三种。输出纯JSON数组：\n[{\"type\":\"choice\",\"question\":\"题目\",\"options\":[\"A\",\"B\",\"C\",\"D\"],\"answer\":0,\"explanation\":\"解析\"},{\"type\":\"truefalse\",\"question\":\"题目\",\"answer\":0},...]\n判断题answer:0=正确1=错误。填空answer为答案文本。直接输出[]数组。\n\n课程：2-组成原理-计算机系统的层次结构\n内容：# 计算机系统的层次结构\n\n## 课程概述\n本课时讲解计算机系统的层次结构，从硬件到软件的抽象层级，帮助理解计算机系统的工作原理。时长18分钟，适合计算机组成原理入门学习。\n\n## 一、计算机系统的层次模型\n### 1.1 层次结构概述\n- **定义**：计算机系统由硬件和软件组成，按功能分为多个抽象层级，每层为上层提供接口，隐藏下层细节。\n- **重要性**：理解层次结构有助于掌握系统设计、性能优化和问题定位。\n\n### 1.2 经典六层结构\n| 层级编号 | 层级名称 | 主要组成 | 示例 |\n|----------|----------|----------|------|\n| 0 | 微程序层 | 微指令、微程序 | CPU微指令集 |\n| 1 | 机器语言层 | 指令集架构（ISA） | x86指令集 |\n| 2 | 操作系统层 | 系统调用、资源管理 | Windows/Linux内核 |\n| 3 | 汇编语言层 | 汇编指令、伪指令 | MOV, ADD指令 |\n| 4 | 高级语言层 | 编程语言、编译器 | C, Java代码 |\n| 5 | 应用层 | 应用程序、用户界面 | Word, 浏览器 |\n\n> **重点**：记忆各层名称和功能，理解层间接口作用。\n\n## 二、各层次详解\n### 2.1 微程序层（第0层）\n- **定义**：直接控制硬件电路的微指令序列，实现机器指令。\n- **特点**：硬件实现，速度最快，但编程复杂。\n- **难点**：微程序与机器指令的映射关系。\n\n### 2.2 机器语言层（第1层）\n- **定义**：CPU直接执行的指令集，包括操作码、地址码。\n- **特点**：二进制形式，依赖具体CPU架构。\n- **示例**：x86的`ADD EAX, 1`。\n\n### 2.3 操作系统层（第2层）\n- **功能**：管理硬件资源，提供系统调用接口（如文件读写、进程调度）。\n- **作用**：屏蔽硬件差异，为上层提供统一服务。\n- **重点**：理解操作系统作为“资源管理者”的角色。\n\n### 2.4 汇编语言层（第3层）\n- **定义**：用助记符表示机器指令，通过汇编器转换为机器码。\n- **特点**：与硬件紧密相关，但比机器语言易读。\n- **难点**：寄存器分配、指令寻址方式。\n\n### 2.5 高级语言层（第4层）\n- **定义**：使用自然语言风格编写代码，通过编译器或解释器执行。\n- **特点**：跨平台、易维护。\n- **示例**：`int a = 5;`。\n\n### 2.6 应用层（第5层）\n- **定义**：用户直接交互的软件，如办公软件、游戏。\n- **特点**：面向特定需求，依赖下层服务。\n\n## 三、层次间的关系与转换\n### 3.1 数据流方向\n- **用户请求**：应用层 -> 高级语言 -> 操作系统 -> 机器语言 -> 微程序 -> 硬件执行。\n- **结果返回**：反向传递。\n\n### 3.2 关键转换机制\n- **编译**：高级语言 -> 汇编/机器语言（如GCC编译器）。\n- **解释**：逐行翻译执行（如Python解释器）。\n- **汇编**：助记符 -> 机器码（如NASM汇编器）。\n- **微程序解释**：机器指令 -> 微指令序列。\n\n> **难点**：区分编译与解释，理解微程序控制器的运作。\n\n## 四、层次结构的应用\n- **性能优化**：通过减少层次切换（如使用汇编优化关键代码）提升效率。\n- **系统设计**：模块化开发，每层独立设计。\n- **故障排查**：从高层向下层逐层定位问题。\n\n## 五、总结\n- **核心要点**：计算机系统六层结构，每层功能与接口。\n- **重点**：各层定义、转换机制、应用场景。\n- **难点**：微程序层与机器语言层的区分，编译与解释的差异。\n\n---\n\n# 课后练习题\n\n**1. 在计算机系统的层次结构中，哪一层直接负责将高级语言代码转换为机器指令？**\nA. 操作系统层\nB. 汇编语言层\nC. 高级语言层\nD. 机器语言层\n\n**正确答案**：C\n**解析**：高级语言层通过编译器或解释器将代码转换为机器语言或汇编语言。操作系统层管理资源，汇编语言层处理助记符，机器语言层是执行层，不负责转换。\n\n**2. 以下关于微程序层的描述，正确的是？**\nA. 微程序层是用户直接交互的界面\nB. 微程序层由操作系统实现\nC. 微程序层直接控制硬件电路\nD. 微程序层使用高级语言编写\n\n**正确答案**：C\n**解析**：微程序层位于最底层，由硬件中的微指令控制电路。用户交互在应用层，操作系统层管理资源，微程序层使用微指令而非高级语言。\n\n**3. 在计算机系统层次结构中，操作系统层的主要作用是什么？**\nA. 执行用户编写的应用程序\nB. 将汇编语言转换为机器语言\nC. 管理硬件资源并提供系统调用接口\nD. 直接控制CPU的微指令执行\n\n**正确答案**：C\n**解析**：操作系统层负责管理CPU、内存、I/O等硬件资源，并通过系统调用为上层提供服务。执行应用是应用层，汇编转换是汇编层，微指令执行是微程序层。\n\n# 知识点标签\n- 计算机系统层次结构\n- 微程序层\n- 操作系统层\n- 编译与解释\n- 指令集架构（ISA）\n\n> 系统已结合课程知识库、学生画像与教学场景生成讲解建议，并已进行内容安全过滤。\n\n#### 1. 概念拆解\n- 先理解定义与应用场景。\n- 再理解关键步骤与输入输出。\n- 最后通过例题或代码验证理解。\n\n#### 2. 学习建议\n1. 看 5 分钟图解或微课，建立整体印象。\n2. 阅读结构化讲义，标出关键词。\n3. 完成 3 道基础题 + 1 道综合题。\n4. 用自己的语言复述，形成长期记忆。\n\n#### 3. 常见误区\n- 只背定义，不理解使用条件。\n- 只看答案，不做步骤推导。\n- 只做单题，不做知识迁移。\n\n#### 4. 多模态辅导建议\n- 文字：精讲讲义\n- 图解：流程图 / 思维导图\n- 视频：3分钟微课脚本\n', '根据以下课程内容出20道练习题，包含选择题(choice)、判断题(truefalse)、填空题(f...', NULL, '2026-06-14 14:39:38');
+INSERT INTO `sp_qa_history` VALUES (2066168689578405889, 3, '根据以下内容出10道练习题（选择+判断+填空混合）。输出JSON数组：[{\"type\":\"choice\",\"question\":\"...\",\"options\":[\"A\",\"B\",\"C\",\"D\"],\"answer\":0,\"explanation\":\"...\"},...]\n\n课程：2-组成原理-计算机系统的层次结构\n内容：# 计算机系统的层次结构\n\n## 课程概述\n本课时讲解计算机系统的层次结构，从硬件到软件的抽象层级，帮助理解计算机系统的工作原理。时长18分钟，适合计算机组成原理入门学习。\n\n## 一、计算机系统的层次模型\n### 1.1 层次结构概述\n- **定义**：计算机系统由硬件和软件组成，按功能分为多个抽象层级，每层为上层提供接口，隐藏下层细节。\n- **重要性**：理解层次结构有助于掌握系统设计、性能优化和问题定位。\n\n### 1.2 经典六层结构\n| 层级编号 | 层级名称 | 主要组成 | 示例 |\n|----------|----------|----------|------|\n| 0 | 微程序层 | 微指令、微程序 | CPU微指令集 |\n| 1 | 机器语言层 | 指令集架构（ISA） | x86指令集 |\n| 2 | 操作系统层 | 系统调用、资源管理 | Windows/Linux内核 |\n| 3 | 汇编语言层 | 汇编指令、伪指令 | MOV, ADD指令 |\n| 4 | 高级语言层 | 编程语言、编译器 | C, Java代码 |\n| 5 | 应用层 | 应用程序、用户界面 | Word, 浏览器 |\n\n> **重点**：记忆各层名称和功能，理解层间接口作用。\n\n## 二、各层次详解\n### 2.1 微程序层（第0层）\n- **定义**：直接控制硬件电路的微指令序列，实现机器指令。\n- **特点**：硬件实现，速度最快，但编程复杂。\n- **难点**：微程序与机器指令的映射关系。\n\n### 2.2 机器语言层（第1层）\n- **定义**：CPU直接执行的指令集，包括操作码、地址码。\n- **特点**：二进制形式，依赖具体CPU架构。\n- **示例**：x86的`ADD EAX, 1`。\n\n### 2.3 操作系统层（第2层）\n- **功能**：管理硬件资源，提供系统调用接口（如文件读写、进程调度）。\n- **作用**：屏蔽硬件差异，为上层提供统一服务。\n- **重点**：理解操作系统作为“资源管理者”的角色。\n\n### 2.4 汇编语言层（第3层）\n- **定义**：用助记符表示机器指令，通过汇编器转换为机器码。\n- **特点**：与硬件紧密相关，但比机器语言易读。\n- **难点**：寄存器分配、指令寻址方式。\n\n### 2.5 高级语言层（第4层）\n- **定义**：使用自然语言风格编写代码，通过编译器或解释器执行。\n- **特点**：跨平台、易维护。\n- **示例**：`int a = 5;`。\n\n### 2.6 应用层（第5层）\n- **定义**：用户直接交互的软件，如办公软件、游戏。\n- **特点**：面向特定需求，依赖下层服务。\n\n## 三、层次间的关系与转换\n### 3.1 数据流方向\n- **用户请求**：应用层 -> 高级语言 -> 操作系统 -> 机器语言 -> 微程序 -> 硬件执行。\n- **结果返回**：反向传递。\n\n### 3.2 关键转换机制\n- **编译**：高级语言 -> 汇编/机器语言（如GCC编译器）。\n- **解释**：逐行翻译执行（如Python解释器）。\n- **汇编**：助记符 -> 机器码（如NASM汇编器）。\n- **微程序解释**：机器指令 -> 微指令序列。\n\n> **难点**：区分编译与解释，理解微程序控制器的运作。\n\n## 四、层次结构的应用\n- **性能优化**：通过减少层次切换（如使用汇编优化关键代码）提升效率。\n- **系统设计**：模块化开发，每层独立设计。\n- **故障排查**：从高层向下层逐层定位问题。\n\n## 五、总结\n- **核心要点**：计算机系统六层结构，每层功能与接口。\n- **重点**：各层定义、转换机制、应用场景。\n- **难点**：微程序层与机器语言层的区分，编译与解释的差异。\n\n---\n\n# 课后练习题\n\n**1. 在计算机系统的层次结构中，哪一层直接负责将高级语言代码转换为机器指令？**\nA. 操作系统层\nB. 汇编语言层\nC. 高级语言层\nD. 机器语言层\n\n**正确答案**：C\n**解析**：高级语言层通过编译器或解释器将代码转换为机器语言或汇编语言。操作系统层管理资源，汇编语言层处理助记符，机器语言层是执行层，不负责转换。\n\n**2. 以下关于微程序层的描述，正确的是？**\nA. 微程序层是用户直接交互的界面\nB. 微程序层由操作系统实现\nC. 微程序层直接控制硬件电路\nD. 微程序层使用高级语言编写\n\n**正确答案**：C\n**解析**：微程序层位于最底层，由硬件中的微指令控制电路。用户交互在应用层，操作系统层管理资源，微程序层使用微指令而非高级语言。\n\n**3. 在计算机系统层次结构中，操作系统层的主要作用是什', '### 智能辅导回答\n**问题识别：** 根据以下内容出10道练习题（选择+判断+填空混合）。输出JSON数组：[{\"type\":\"choice\",\"question\":\"...\",\"options\":[\"A\",\"B\",\"C\",\"D\"],\"answer\":0,\"explanation\":\"...\"},...]\n\n课程：2-组成原理-计算机系统的层次结构\n内容：# 计算机系统的层次结构\n\n## 课程概述\n本课时讲解计算机系统的层次结构，从硬件到软件的抽象层级，帮助理解计算机系统的工作原理。时长18分钟，适合计算机组成原理入门学习。\n\n## 一、计算机系统的层次模型\n### 1.1 层次结构概述\n- **定义**：计算机系统由硬件和软件组成，按功能分为多个抽象层级，每层为上层提供接口，隐藏下层细节。\n- **重要性**：理解层次结构有助于掌握系统设计、性能优化和问题定位。\n\n### 1.2 经典六层结构\n| 层级编号 | 层级名称 | 主要组成 | 示例 |\n|----------|----------|----------|------|\n| 0 | 微程序层 | 微指令、微程序 | CPU微指令集 |\n| 1 | 机器语言层 | 指令集架构（ISA） | x86指令集 |\n| 2 | 操作系统层 | 系统调用、资源管理 | Windows/Linux内核 |\n| 3 | 汇编语言层 | 汇编指令、伪指令 | MOV, ADD指令 |\n| 4 | 高级语言层 | 编程语言、编译器 | C, Java代码 |\n| 5 | 应用层 | 应用程序、用户界面 | Word, 浏览器 |\n\n> **重点**：记忆各层名称和功能，理解层间接口作用。\n\n## 二、各层次详解\n### 2.1 微程序层（第0层）\n- **定义**：直接控制硬件电路的微指令序列，实现机器指令。\n- **特点**：硬件实现，速度最快，但编程复杂。\n- **难点**：微程序与机器指令的映射关系。\n\n### 2.2 机器语言层（第1层）\n- **定义**：CPU直接执行的指令集，包括操作码、地址码。\n- **特点**：二进制形式，依赖具体CPU架构。\n- **示例**：x86的`ADD EAX, 1`。\n\n### 2.3 操作系统层（第2层）\n- **功能**：管理硬件资源，提供系统调用接口（如文件读写、进程调度）。\n- **作用**：屏蔽硬件差异，为上层提供统一服务。\n- **重点**：理解操作系统作为“资源管理者”的角色。\n\n### 2.4 汇编语言层（第3层）\n- **定义**：用助记符表示机器指令，通过汇编器转换为机器码。\n- **特点**：与硬件紧密相关，但比机器语言易读。\n- **难点**：寄存器分配、指令寻址方式。\n\n### 2.5 高级语言层（第4层）\n- **定义**：使用自然语言风格编写代码，通过编译器或解释器执行。\n- **特点**：跨平台、易维护。\n- **示例**：`int a = 5;`。\n\n### 2.6 应用层（第5层）\n- **定义**：用户直接交互的软件，如办公软件、游戏。\n- **特点**：面向特定需求，依赖下层服务。\n\n## 三、层次间的关系与转换\n### 3.1 数据流方向\n- **用户请求**：应用层 -> 高级语言 -> 操作系统 -> 机器语言 -> 微程序 -> 硬件执行。\n- **结果返回**：反向传递。\n\n### 3.2 关键转换机制\n- **编译**：高级语言 -> 汇编/机器语言（如GCC编译器）。\n- **解释**：逐行翻译执行（如Python解释器）。\n- **汇编**：助记符 -> 机器码（如NASM汇编器）。\n- **微程序解释**：机器指令 -> 微指令序列。\n\n> **难点**：区分编译与解释，理解微程序控制器的运作。\n\n## 四、层次结构的应用\n- **性能优化**：通过减少层次切换（如使用汇编优化关键代码）提升效率。\n- **系统设计**：模块化开发，每层独立设计。\n- **故障排查**：从高层向下层逐层定位问题。\n\n## 五、总结\n- **核心要点**：计算机系统六层结构，每层功能与接口。\n- **重点**：各层定义、转换机制、应用场景。\n- **难点**：微程序层与机器语言层的区分，编译与解释的差异。\n\n---\n\n# 课后练习题\n\n**1. 在计算机系统的层次结构中，哪一层直接负责将高级语言代码转换为机器指令？**\nA. 操作系统层\nB. 汇编语言层\nC. 高级语言层\nD. 机器语言层\n\n**正确答案**：C\n**解析**：高级语言层通过编译器或解释器将代码转换为机器语言或汇编语言。操作系统层管理资源，汇编语言层处理助记符，机器语言层是执行层，不负责转换。\n\n**2. 以下关于微程序层的描述，正确的是？**\nA. 微程序层是用户直接交互的界面\nB. 微程序层由操作系统实现\nC. 微程序层直接控制硬件电路\nD. 微程序层使用高级语言编写\n\n**正确答案**：C\n**解析**：微程序层位于最底层，由硬件中的微指令控制电路。用户交互在应用层，操作系统层管理资源，微程序层使用微指令而非高级语言。\n\n**3. 在计算机系统层次结构中，操作系统层的主要作用是什\n\n> 系统已结合课程知识库、学生画像与教学场景生成讲解建议，并已进行内容安全过滤。\n\n#### 1. 概念拆解\n- 先理解定义与应用场景。\n- 再理解关键步骤与输入输出。\n- 最后通过例题或代码验证理解。\n\n#### 2. 学习建议\n1. 看 5 分钟图解或微课，建立整体印象。\n2. 阅读结构化讲义，标出关键词。\n3. 完成 3 道基础题 + 1 道综合题。\n4. 用自己的语言复述，形成长期记忆。\n\n#### 3. 常见误区\n- 只背定义，不理解使用条件。\n- 只看答案，不做步骤推导。\n- 只做单题，不做知识迁移。\n\n#### 4. 多模态辅导建议\n- 文字：精讲讲义\n- 图解：流程图 / 思维导图\n- 视频：3分钟微课脚本\n', '根据以下内容出10道练习题（选择+判断+填空混合）。输出JSON数组：[{\"type\":\"choic...', NULL, '2026-06-14 14:39:38');
+INSERT INTO `sp_qa_history` VALUES (2066168715927023618, 3, '根据以下课程内容出20道练习题，包含选择题(choice)、判断题(truefalse)、填空题(fill)至少三种。输出纯JSON数组：\n[{\"type\":\"choice\",\"question\":\"题目\",\"options\":[\"A\",\"B\",\"C\",\"D\"],\"answer\":0,\"explanation\":\"解析\"},{\"type\":\"truefalse\",\"question\":\"题目\",\"answer\":0},...]\n判断题answer:0=正确1=错误。填空answer为答案文本。直接输出[]数组。\n\n课程：2-组成原理-计算机系统的层次结构\n内容：# 计算机系统的层次结构\n\n## 课程概述\n本课时讲解计算机系统的层次结构，从硬件到软件的抽象层级，帮助理解计算机系统的工作原理。时长18分钟，适合计算机组成原理入门学习。\n\n## 一、计算机系统的层次模型\n### 1.1 层次结构概述\n- **定义**：计算机系统由硬件和软件组成，按功能分为多个抽象层级，每层为上层提供接口，隐藏下层细节。\n- **重要性**：理解层次结构有助于掌握系统设计、性能优化和问题定位。\n\n### 1.2 经典六层结构\n| 层级编号 | 层级名称 | 主要组成 | 示例 |\n|----------|----------|----------|------|\n| 0 | 微程序层 | 微指令、微程序 | CPU微指令集 |\n| 1 | 机器语言层 | 指令集架构（ISA） | x86指令集 |\n| 2 | 操作系统层 | 系统调用、资源管理 | Windows/Linux内核 |\n| 3 | 汇编语言层 | 汇编指令、伪指令 | MOV, ADD指令 |\n| 4 | 高级语言层 | 编程语言、编译器 | C, Java代码 |\n| 5 | 应用层 | 应用程序、用户界面 | Word, 浏览器 |\n\n> **重点**：记忆各层名称和功能，理解层间接口作用。\n\n## 二、各层次详解\n### 2.1 微程序层（第0层）\n- **定义**：直接控制硬件电路的微指令序列，实现机器指令。\n- **特点**：硬件实现，速度最快，但编程复杂。\n- **难点**：微程序与机器指令的映射关系。\n\n### 2.2 机器语言层（第1层）\n- **定义**：CPU直接执行的指令集，包括操作码、地址码。\n- **特点**：二进制形式，依赖具体CPU架构。\n- **示例**：x86的`ADD EAX, 1`。\n\n### 2.3 操作系统层（第2层）\n- **功能**：管理硬件资源，提供系统调用接口（如文件读写、进程调度）。\n- **作用**：屏蔽硬件差异，为上层提供统一服务。\n- **重点**：理解操作系统作为“资源管理者”的角色。\n\n### 2.4 汇编语言层（第3层）\n- **定义**：用助记符表示机器指令，通过汇编器转换为机器码。\n- **特点**：与硬件紧密相关，但比机器语言易读。\n- **难点**：寄存器分配、指令寻址方式。\n\n### 2.5 高级语言层（第4层）\n- **定义**：使用自然语言风格编写代码，通过编译器或解释器执行。\n- **特点**：跨平台、易维护。\n- **示例**：`int a = 5;`。\n\n### 2.6 应用层（第5层）\n- **定义**：用户直接交互的软件，如办公软件、游戏。\n- **特点**：面向特定需求，依赖下层服务。\n\n## 三、层次间的关系与转换\n### 3.1 数据流方向\n- **用户请求**：应用层 -> 高级语言 -> 操作系统 -> 机器语言 -> 微程序 -> 硬件执行。\n- **结果返回**：反向传递。\n\n### 3.2 关键转换机制\n- **编译**：高级语言 -> 汇编/机器语言（如GCC编译器）。\n- **解释**：逐行翻译执行（如Python解释器）。\n- **汇编**：助记符 -> 机器码（如NASM汇编器）。\n- **微程序解释**：机器指令 -> 微指令序列。\n\n> **难点**：区分编译与解释，理解微程序控制器的运作。\n\n## 四、层次结构的应用\n- **性能优化**：通过减少层次切换（如使用汇编优化关键代码）提升效率。\n- **系统设计**：模块化开发，每层独立设计。\n- **故障排查**：从高层向下层逐层定位问题。\n\n## 五、总结\n- **核心要点**：计算机系统六层结构，每层功能与接口。\n- **重点**：各层定义、转换机制、应用场景。\n- **难点**：微程序层与机器语言层的区分，编译与解释的差异。\n\n---\n\n# 课后练习题\n\n**1. 在计算机系统的层次结构中，哪一层直接负责将高级语言代码转换为机器指令？**\nA. 操作系统层\nB. 汇编语言层\nC. 高级语言层\nD. 机器语言层\n\n**正确答案**：C\n**解析**：高级语言层通过编译器或解释器将代码转换为机器语言或汇编语言。操作系统层管理资源，汇编语言层处理助记符，机器语言层是执行层，不负责转换。\n\n**2. 以下关于微程序层的描述，正确的是？**\nA. 微程序层是用户直接交互的界面\nB. 微程序层由操作系统实现\nC. 微程序层直接控制硬件电路\nD. 微程序层使用高级语言编写\n\n**正确答案**：C\n**解析**：微程序层位于最底层，由硬件中的微指令控制电路。用户交互在应用层，操作系统层管理资源，微程序层使用微指令而非高级语言。\n\n**3. 在计算机系统层次结构中，操作系统层的主要作用是什么？**\nA. 执行用户编写的应用程序\nB. 将汇编语言转换为机器语言\nC. 管理硬件资源并提供系统调用接口\nD. 直接控制CPU的微指令执行\n\n**正确答案**：C\n**解析**：操作系统层负责管理CPU、内存、I/O等硬件资源，并通过系统调用为上层提供服务。执行应用是应用层，汇编转换是汇编层，微指令执行是微程序层。\n\n# 知识点标签\n- 计算机系统层次结构\n- 微程序层\n- 操作系统层\n- 编译与解释\n- 指令集架构（ISA）', '### 智能辅导回答\n**问题识别：** 根据以下课程内容出20道练习题，包含选择题(choice)、判断题(truefalse)、填空题(fill)至少三种。输出纯JSON数组：\n[{\"type\":\"choice\",\"question\":\"题目\",\"options\":[\"A\",\"B\",\"C\",\"D\"],\"answer\":0,\"explanation\":\"解析\"},{\"type\":\"truefalse\",\"question\":\"题目\",\"answer\":0},...]\n判断题answer:0=正确1=错误。填空answer为答案文本。直接输出[]数组。\n\n课程：2-组成原理-计算机系统的层次结构\n内容：# 计算机系统的层次结构\n\n## 课程概述\n本课时讲解计算机系统的层次结构，从硬件到软件的抽象层级，帮助理解计算机系统的工作原理。时长18分钟，适合计算机组成原理入门学习。\n\n## 一、计算机系统的层次模型\n### 1.1 层次结构概述\n- **定义**：计算机系统由硬件和软件组成，按功能分为多个抽象层级，每层为上层提供接口，隐藏下层细节。\n- **重要性**：理解层次结构有助于掌握系统设计、性能优化和问题定位。\n\n### 1.2 经典六层结构\n| 层级编号 | 层级名称 | 主要组成 | 示例 |\n|----------|----------|----------|------|\n| 0 | 微程序层 | 微指令、微程序 | CPU微指令集 |\n| 1 | 机器语言层 | 指令集架构（ISA） | x86指令集 |\n| 2 | 操作系统层 | 系统调用、资源管理 | Windows/Linux内核 |\n| 3 | 汇编语言层 | 汇编指令、伪指令 | MOV, ADD指令 |\n| 4 | 高级语言层 | 编程语言、编译器 | C, Java代码 |\n| 5 | 应用层 | 应用程序、用户界面 | Word, 浏览器 |\n\n> **重点**：记忆各层名称和功能，理解层间接口作用。\n\n## 二、各层次详解\n### 2.1 微程序层（第0层）\n- **定义**：直接控制硬件电路的微指令序列，实现机器指令。\n- **特点**：硬件实现，速度最快，但编程复杂。\n- **难点**：微程序与机器指令的映射关系。\n\n### 2.2 机器语言层（第1层）\n- **定义**：CPU直接执行的指令集，包括操作码、地址码。\n- **特点**：二进制形式，依赖具体CPU架构。\n- **示例**：x86的`ADD EAX, 1`。\n\n### 2.3 操作系统层（第2层）\n- **功能**：管理硬件资源，提供系统调用接口（如文件读写、进程调度）。\n- **作用**：屏蔽硬件差异，为上层提供统一服务。\n- **重点**：理解操作系统作为“资源管理者”的角色。\n\n### 2.4 汇编语言层（第3层）\n- **定义**：用助记符表示机器指令，通过汇编器转换为机器码。\n- **特点**：与硬件紧密相关，但比机器语言易读。\n- **难点**：寄存器分配、指令寻址方式。\n\n### 2.5 高级语言层（第4层）\n- **定义**：使用自然语言风格编写代码，通过编译器或解释器执行。\n- **特点**：跨平台、易维护。\n- **示例**：`int a = 5;`。\n\n### 2.6 应用层（第5层）\n- **定义**：用户直接交互的软件，如办公软件、游戏。\n- **特点**：面向特定需求，依赖下层服务。\n\n## 三、层次间的关系与转换\n### 3.1 数据流方向\n- **用户请求**：应用层 -> 高级语言 -> 操作系统 -> 机器语言 -> 微程序 -> 硬件执行。\n- **结果返回**：反向传递。\n\n### 3.2 关键转换机制\n- **编译**：高级语言 -> 汇编/机器语言（如GCC编译器）。\n- **解释**：逐行翻译执行（如Python解释器）。\n- **汇编**：助记符 -> 机器码（如NASM汇编器）。\n- **微程序解释**：机器指令 -> 微指令序列。\n\n> **难点**：区分编译与解释，理解微程序控制器的运作。\n\n## 四、层次结构的应用\n- **性能优化**：通过减少层次切换（如使用汇编优化关键代码）提升效率。\n- **系统设计**：模块化开发，每层独立设计。\n- **故障排查**：从高层向下层逐层定位问题。\n\n## 五、总结\n- **核心要点**：计算机系统六层结构，每层功能与接口。\n- **重点**：各层定义、转换机制、应用场景。\n- **难点**：微程序层与机器语言层的区分，编译与解释的差异。\n\n---\n\n# 课后练习题\n\n**1. 在计算机系统的层次结构中，哪一层直接负责将高级语言代码转换为机器指令？**\nA. 操作系统层\nB. 汇编语言层\nC. 高级语言层\nD. 机器语言层\n\n**正确答案**：C\n**解析**：高级语言层通过编译器或解释器将代码转换为机器语言或汇编语言。操作系统层管理资源，汇编语言层处理助记符，机器语言层是执行层，不负责转换。\n\n**2. 以下关于微程序层的描述，正确的是？**\nA. 微程序层是用户直接交互的界面\nB. 微程序层由操作系统实现\nC. 微程序层直接控制硬件电路\nD. 微程序层使用高级语言编写\n\n**正确答案**：C\n**解析**：微程序层位于最底层，由硬件中的微指令控制电路。用户交互在应用层，操作系统层管理资源，微程序层使用微指令而非高级语言。\n\n**3. 在计算机系统层次结构中，操作系统层的主要作用是什么？**\nA. 执行用户编写的应用程序\nB. 将汇编语言转换为机器语言\nC. 管理硬件资源并提供系统调用接口\nD. 直接控制CPU的微指令执行\n\n**正确答案**：C\n**解析**：操作系统层负责管理CPU、内存、I/O等硬件资源，并通过系统调用为上层提供服务。执行应用是应用层，汇编转换是汇编层，微指令执行是微程序层。\n\n# 知识点标签\n- 计算机系统层次结构\n- 微程序层\n- 操作系统层\n- 编译与解释\n- 指令集架构（ISA）\n\n> 系统已结合课程知识库、学生画像与教学场景生成讲解建议，并已进行内容安全过滤。\n\n#### 1. 概念拆解\n- 先理解定义与应用场景。\n- 再理解关键步骤与输入输出。\n- 最后通过例题或代码验证理解。\n\n#### 2. 学习建议\n1. 看 5 分钟图解或微课，建立整体印象。\n2. 阅读结构化讲义，标出关键词。\n3. 完成 3 道基础题 + 1 道综合题。\n4. 用自己的语言复述，形成长期记忆。\n\n#### 3. 常见误区\n- 只背定义，不理解使用条件。\n- 只看答案，不做步骤推导。\n- 只做单题，不做知识迁移。\n\n#### 4. 多模态辅导建议\n- 文字：精讲讲义\n- 图解：流程图 / 思维导图\n- 视频：3分钟微课脚本\n', '根据以下课程内容出20道练习题，包含选择题(choice)、判断题(truefalse)、填空题(f...', NULL, '2026-06-14 14:39:44');
+INSERT INTO `sp_qa_history` VALUES (2066168716711358465, 3, '根据以下内容出10道练习题（选择+判断+填空混合）。输出JSON数组：[{\"type\":\"choice\",\"question\":\"...\",\"options\":[\"A\",\"B\",\"C\",\"D\"],\"answer\":0,\"explanation\":\"...\"},...]\n\n课程：2-组成原理-计算机系统的层次结构\n内容：# 计算机系统的层次结构\n\n## 课程概述\n本课时讲解计算机系统的层次结构，从硬件到软件的抽象层级，帮助理解计算机系统的工作原理。时长18分钟，适合计算机组成原理入门学习。\n\n## 一、计算机系统的层次模型\n### 1.1 层次结构概述\n- **定义**：计算机系统由硬件和软件组成，按功能分为多个抽象层级，每层为上层提供接口，隐藏下层细节。\n- **重要性**：理解层次结构有助于掌握系统设计、性能优化和问题定位。\n\n### 1.2 经典六层结构\n| 层级编号 | 层级名称 | 主要组成 | 示例 |\n|----------|----------|----------|------|\n| 0 | 微程序层 | 微指令、微程序 | CPU微指令集 |\n| 1 | 机器语言层 | 指令集架构（ISA） | x86指令集 |\n| 2 | 操作系统层 | 系统调用、资源管理 | Windows/Linux内核 |\n| 3 | 汇编语言层 | 汇编指令、伪指令 | MOV, ADD指令 |\n| 4 | 高级语言层 | 编程语言、编译器 | C, Java代码 |\n| 5 | 应用层 | 应用程序、用户界面 | Word, 浏览器 |\n\n> **重点**：记忆各层名称和功能，理解层间接口作用。\n\n## 二、各层次详解\n### 2.1 微程序层（第0层）\n- **定义**：直接控制硬件电路的微指令序列，实现机器指令。\n- **特点**：硬件实现，速度最快，但编程复杂。\n- **难点**：微程序与机器指令的映射关系。\n\n### 2.2 机器语言层（第1层）\n- **定义**：CPU直接执行的指令集，包括操作码、地址码。\n- **特点**：二进制形式，依赖具体CPU架构。\n- **示例**：x86的`ADD EAX, 1`。\n\n### 2.3 操作系统层（第2层）\n- **功能**：管理硬件资源，提供系统调用接口（如文件读写、进程调度）。\n- **作用**：屏蔽硬件差异，为上层提供统一服务。\n- **重点**：理解操作系统作为“资源管理者”的角色。\n\n### 2.4 汇编语言层（第3层）\n- **定义**：用助记符表示机器指令，通过汇编器转换为机器码。\n- **特点**：与硬件紧密相关，但比机器语言易读。\n- **难点**：寄存器分配、指令寻址方式。\n\n### 2.5 高级语言层（第4层）\n- **定义**：使用自然语言风格编写代码，通过编译器或解释器执行。\n- **特点**：跨平台、易维护。\n- **示例**：`int a = 5;`。\n\n### 2.6 应用层（第5层）\n- **定义**：用户直接交互的软件，如办公软件、游戏。\n- **特点**：面向特定需求，依赖下层服务。\n\n## 三、层次间的关系与转换\n### 3.1 数据流方向\n- **用户请求**：应用层 -> 高级语言 -> 操作系统 -> 机器语言 -> 微程序 -> 硬件执行。\n- **结果返回**：反向传递。\n\n### 3.2 关键转换机制\n- **编译**：高级语言 -> 汇编/机器语言（如GCC编译器）。\n- **解释**：逐行翻译执行（如Python解释器）。\n- **汇编**：助记符 -> 机器码（如NASM汇编器）。\n- **微程序解释**：机器指令 -> 微指令序列。\n\n> **难点**：区分编译与解释，理解微程序控制器的运作。\n\n## 四、层次结构的应用\n- **性能优化**：通过减少层次切换（如使用汇编优化关键代码）提升效率。\n- **系统设计**：模块化开发，每层独立设计。\n- **故障排查**：从高层向下层逐层定位问题。\n\n## 五、总结\n- **核心要点**：计算机系统六层结构，每层功能与接口。\n- **重点**：各层定义、转换机制、应用场景。\n- **难点**：微程序层与机器语言层的区分，编译与解释的差异。\n\n---\n\n# 课后练习题\n\n**1. 在计算机系统的层次结构中，哪一层直接负责将高级语言代码转换为机器指令？**\nA. 操作系统层\nB. 汇编语言层\nC. 高级语言层\nD. 机器语言层\n\n**正确答案**：C\n**解析**：高级语言层通过编译器或解释器将代码转换为机器语言或汇编语言。操作系统层管理资源，汇编语言层处理助记符，机器语言层是执行层，不负责转换。\n\n**2. 以下关于微程序层的描述，正确的是？**\nA. 微程序层是用户直接交互的界面\nB. 微程序层由操作系统实现\nC. 微程序层直接控制硬件电路\nD. 微程序层使用高级语言编写\n\n**正确答案**：C\n**解析**：微程序层位于最底层，由硬件中的微指令控制电路。用户交互在应用层，操作系统层管理资源，微程序层使用微指令而非高级语言。\n\n**3. 在计算机系统层次结构中，操作系统层的主要作用是什', '### 智能辅导回答\n**问题识别：** 根据以下内容出10道练习题（选择+判断+填空混合）。输出JSON数组：[{\"type\":\"choice\",\"question\":\"...\",\"options\":[\"A\",\"B\",\"C\",\"D\"],\"answer\":0,\"explanation\":\"...\"},...]\n\n课程：2-组成原理-计算机系统的层次结构\n内容：# 计算机系统的层次结构\n\n## 课程概述\n本课时讲解计算机系统的层次结构，从硬件到软件的抽象层级，帮助理解计算机系统的工作原理。时长18分钟，适合计算机组成原理入门学习。\n\n## 一、计算机系统的层次模型\n### 1.1 层次结构概述\n- **定义**：计算机系统由硬件和软件组成，按功能分为多个抽象层级，每层为上层提供接口，隐藏下层细节。\n- **重要性**：理解层次结构有助于掌握系统设计、性能优化和问题定位。\n\n### 1.2 经典六层结构\n| 层级编号 | 层级名称 | 主要组成 | 示例 |\n|----------|----------|----------|------|\n| 0 | 微程序层 | 微指令、微程序 | CPU微指令集 |\n| 1 | 机器语言层 | 指令集架构（ISA） | x86指令集 |\n| 2 | 操作系统层 | 系统调用、资源管理 | Windows/Linux内核 |\n| 3 | 汇编语言层 | 汇编指令、伪指令 | MOV, ADD指令 |\n| 4 | 高级语言层 | 编程语言、编译器 | C, Java代码 |\n| 5 | 应用层 | 应用程序、用户界面 | Word, 浏览器 |\n\n> **重点**：记忆各层名称和功能，理解层间接口作用。\n\n## 二、各层次详解\n### 2.1 微程序层（第0层）\n- **定义**：直接控制硬件电路的微指令序列，实现机器指令。\n- **特点**：硬件实现，速度最快，但编程复杂。\n- **难点**：微程序与机器指令的映射关系。\n\n### 2.2 机器语言层（第1层）\n- **定义**：CPU直接执行的指令集，包括操作码、地址码。\n- **特点**：二进制形式，依赖具体CPU架构。\n- **示例**：x86的`ADD EAX, 1`。\n\n### 2.3 操作系统层（第2层）\n- **功能**：管理硬件资源，提供系统调用接口（如文件读写、进程调度）。\n- **作用**：屏蔽硬件差异，为上层提供统一服务。\n- **重点**：理解操作系统作为“资源管理者”的角色。\n\n### 2.4 汇编语言层（第3层）\n- **定义**：用助记符表示机器指令，通过汇编器转换为机器码。\n- **特点**：与硬件紧密相关，但比机器语言易读。\n- **难点**：寄存器分配、指令寻址方式。\n\n### 2.5 高级语言层（第4层）\n- **定义**：使用自然语言风格编写代码，通过编译器或解释器执行。\n- **特点**：跨平台、易维护。\n- **示例**：`int a = 5;`。\n\n### 2.6 应用层（第5层）\n- **定义**：用户直接交互的软件，如办公软件、游戏。\n- **特点**：面向特定需求，依赖下层服务。\n\n## 三、层次间的关系与转换\n### 3.1 数据流方向\n- **用户请求**：应用层 -> 高级语言 -> 操作系统 -> 机器语言 -> 微程序 -> 硬件执行。\n- **结果返回**：反向传递。\n\n### 3.2 关键转换机制\n- **编译**：高级语言 -> 汇编/机器语言（如GCC编译器）。\n- **解释**：逐行翻译执行（如Python解释器）。\n- **汇编**：助记符 -> 机器码（如NASM汇编器）。\n- **微程序解释**：机器指令 -> 微指令序列。\n\n> **难点**：区分编译与解释，理解微程序控制器的运作。\n\n## 四、层次结构的应用\n- **性能优化**：通过减少层次切换（如使用汇编优化关键代码）提升效率。\n- **系统设计**：模块化开发，每层独立设计。\n- **故障排查**：从高层向下层逐层定位问题。\n\n## 五、总结\n- **核心要点**：计算机系统六层结构，每层功能与接口。\n- **重点**：各层定义、转换机制、应用场景。\n- **难点**：微程序层与机器语言层的区分，编译与解释的差异。\n\n---\n\n# 课后练习题\n\n**1. 在计算机系统的层次结构中，哪一层直接负责将高级语言代码转换为机器指令？**\nA. 操作系统层\nB. 汇编语言层\nC. 高级语言层\nD. 机器语言层\n\n**正确答案**：C\n**解析**：高级语言层通过编译器或解释器将代码转换为机器语言或汇编语言。操作系统层管理资源，汇编语言层处理助记符，机器语言层是执行层，不负责转换。\n\n**2. 以下关于微程序层的描述，正确的是？**\nA. 微程序层是用户直接交互的界面\nB. 微程序层由操作系统实现\nC. 微程序层直接控制硬件电路\nD. 微程序层使用高级语言编写\n\n**正确答案**：C\n**解析**：微程序层位于最底层，由硬件中的微指令控制电路。用户交互在应用层，操作系统层管理资源，微程序层使用微指令而非高级语言。\n\n**3. 在计算机系统层次结构中，操作系统层的主要作用是什\n\n> 系统已结合课程知识库、学生画像与教学场景生成讲解建议，并已进行内容安全过滤。\n\n#### 1. 概念拆解\n- 先理解定义与应用场景。\n- 再理解关键步骤与输入输出。\n- 最后通过例题或代码验证理解。\n\n#### 2. 学习建议\n1. 看 5 分钟图解或微课，建立整体印象。\n2. 阅读结构化讲义，标出关键词。\n3. 完成 3 道基础题 + 1 道综合题。\n4. 用自己的语言复述，形成长期记忆。\n\n#### 3. 常见误区\n- 只背定义，不理解使用条件。\n- 只看答案，不做步骤推导。\n- 只做单题，不做知识迁移。\n\n#### 4. 多模态辅导建议\n- 文字：精讲讲义\n- 图解：流程图 / 思维导图\n- 视频：3分钟微课脚本\n', '根据以下内容出10道练习题（选择+判断+填空混合）。输出JSON数组：[{\"type\":\"choic...', NULL, '2026-06-14 14:39:44');
+INSERT INTO `sp_qa_history` VALUES (2066168758813782018, 3, '根据以下课程内容出20道练习题，包含选择题(choice)、判断题(truefalse)、填空题(fill)至少三种。输出纯JSON数组：\n[{\"type\":\"choice\",\"question\":\"题目\",\"options\":[\"A\",\"B\",\"C\",\"D\"],\"answer\":0,\"explanation\":\"解析\"},{\"type\":\"truefalse\",\"question\":\"题目\",\"answer\":0},...]\n判断题answer:0=正确1=错误。填空answer为答案文本。直接输出[]数组。\n\n课程：2-组成原理-计算机系统的层次结构\n内容：# 计算机系统的层次结构\n\n## 课程概述\n本课时讲解计算机系统的层次结构，从硬件到软件的抽象层级，帮助理解计算机系统的工作原理。时长18分钟，适合计算机组成原理入门学习。\n\n## 一、计算机系统的层次模型\n### 1.1 层次结构概述\n- **定义**：计算机系统由硬件和软件组成，按功能分为多个抽象层级，每层为上层提供接口，隐藏下层细节。\n- **重要性**：理解层次结构有助于掌握系统设计、性能优化和问题定位。\n\n### 1.2 经典六层结构\n| 层级编号 | 层级名称 | 主要组成 | 示例 |\n|----------|----------|----------|------|\n| 0 | 微程序层 | 微指令、微程序 | CPU微指令集 |\n| 1 | 机器语言层 | 指令集架构（ISA） | x86指令集 |\n| 2 | 操作系统层 | 系统调用、资源管理 | Windows/Linux内核 |\n| 3 | 汇编语言层 | 汇编指令、伪指令 | MOV, ADD指令 |\n| 4 | 高级语言层 | 编程语言、编译器 | C, Java代码 |\n| 5 | 应用层 | 应用程序、用户界面 | Word, 浏览器 |\n\n> **重点**：记忆各层名称和功能，理解层间接口作用。\n\n## 二、各层次详解\n### 2.1 微程序层（第0层）\n- **定义**：直接控制硬件电路的微指令序列，实现机器指令。\n- **特点**：硬件实现，速度最快，但编程复杂。\n- **难点**：微程序与机器指令的映射关系。\n\n### 2.2 机器语言层（第1层）\n- **定义**：CPU直接执行的指令集，包括操作码、地址码。\n- **特点**：二进制形式，依赖具体CPU架构。\n- **示例**：x86的`ADD EAX, 1`。\n\n### 2.3 操作系统层（第2层）\n- **功能**：管理硬件资源，提供系统调用接口（如文件读写、进程调度）。\n- **作用**：屏蔽硬件差异，为上层提供统一服务。\n- **重点**：理解操作系统作为“资源管理者”的角色。\n\n### 2.4 汇编语言层（第3层）\n- **定义**：用助记符表示机器指令，通过汇编器转换为机器码。\n- **特点**：与硬件紧密相关，但比机器语言易读。\n- **难点**：寄存器分配、指令寻址方式。\n\n### 2.5 高级语言层（第4层）\n- **定义**：使用自然语言风格编写代码，通过编译器或解释器执行。\n- **特点**：跨平台、易维护。\n- **示例**：`int a = 5;`。\n\n### 2.6 应用层（第5层）\n- **定义**：用户直接交互的软件，如办公软件、游戏。\n- **特点**：面向特定需求，依赖下层服务。\n\n## 三、层次间的关系与转换\n### 3.1 数据流方向\n- **用户请求**：应用层 -> 高级语言 -> 操作系统 -> 机器语言 -> 微程序 -> 硬件执行。\n- **结果返回**：反向传递。\n\n### 3.2 关键转换机制\n- **编译**：高级语言 -> 汇编/机器语言（如GCC编译器）。\n- **解释**：逐行翻译执行（如Python解释器）。\n- **汇编**：助记符 -> 机器码（如NASM汇编器）。\n- **微程序解释**：机器指令 -> 微指令序列。\n\n> **难点**：区分编译与解释，理解微程序控制器的运作。\n\n## 四、层次结构的应用\n- **性能优化**：通过减少层次切换（如使用汇编优化关键代码）提升效率。\n- **系统设计**：模块化开发，每层独立设计。\n- **故障排查**：从高层向下层逐层定位问题。\n\n## 五、总结\n- **核心要点**：计算机系统六层结构，每层功能与接口。\n- **重点**：各层定义、转换机制、应用场景。\n- **难点**：微程序层与机器语言层的区分，编译与解释的差异。\n\n---\n\n# 课后练习题\n\n**1. 在计算机系统的层次结构中，哪一层直接负责将高级语言代码转换为机器指令？**\nA. 操作系统层\nB. 汇编语言层\nC. 高级语言层\nD. 机器语言层\n\n**正确答案**：C\n**解析**：高级语言层通过编译器或解释器将代码转换为机器语言或汇编语言。操作系统层管理资源，汇编语言层处理助记符，机器语言层是执行层，不负责转换。\n\n**2. 以下关于微程序层的描述，正确的是？**\nA. 微程序层是用户直接交互的界面\nB. 微程序层由操作系统实现\nC. 微程序层直接控制硬件电路\nD. 微程序层使用高级语言编写\n\n**正确答案**：C\n**解析**：微程序层位于最底层，由硬件中的微指令控制电路。用户交互在应用层，操作系统层管理资源，微程序层使用微指令而非高级语言。\n\n**3. 在计算机系统层次结构中，操作系统层的主要作用是什么？**\nA. 执行用户编写的应用程序\nB. 将汇编语言转换为机器语言\nC. 管理硬件资源并提供系统调用接口\nD. 直接控制CPU的微指令执行\n\n**正确答案**：C\n**解析**：操作系统层负责管理CPU、内存、I/O等硬件资源，并通过系统调用为上层提供服务。执行应用是应用层，汇编转换是汇编层，微指令执行是微程序层。\n\n# 知识点标签\n- 计算机系统层次结构\n- 微程序层\n- 操作系统层\n- 编译与解释\n- 指令集架构（ISA）', '### 智能辅导回答\n**问题识别：** 根据以下课程内容出20道练习题，包含选择题(choice)、判断题(truefalse)、填空题(fill)至少三种。输出纯JSON数组：\n[{\"type\":\"choice\",\"question\":\"题目\",\"options\":[\"A\",\"B\",\"C\",\"D\"],\"answer\":0,\"explanation\":\"解析\"},{\"type\":\"truefalse\",\"question\":\"题目\",\"answer\":0},...]\n判断题answer:0=正确1=错误。填空answer为答案文本。直接输出[]数组。\n\n课程：2-组成原理-计算机系统的层次结构\n内容：# 计算机系统的层次结构\n\n## 课程概述\n本课时讲解计算机系统的层次结构，从硬件到软件的抽象层级，帮助理解计算机系统的工作原理。时长18分钟，适合计算机组成原理入门学习。\n\n## 一、计算机系统的层次模型\n### 1.1 层次结构概述\n- **定义**：计算机系统由硬件和软件组成，按功能分为多个抽象层级，每层为上层提供接口，隐藏下层细节。\n- **重要性**：理解层次结构有助于掌握系统设计、性能优化和问题定位。\n\n### 1.2 经典六层结构\n| 层级编号 | 层级名称 | 主要组成 | 示例 |\n|----------|----------|----------|------|\n| 0 | 微程序层 | 微指令、微程序 | CPU微指令集 |\n| 1 | 机器语言层 | 指令集架构（ISA） | x86指令集 |\n| 2 | 操作系统层 | 系统调用、资源管理 | Windows/Linux内核 |\n| 3 | 汇编语言层 | 汇编指令、伪指令 | MOV, ADD指令 |\n| 4 | 高级语言层 | 编程语言、编译器 | C, Java代码 |\n| 5 | 应用层 | 应用程序、用户界面 | Word, 浏览器 |\n\n> **重点**：记忆各层名称和功能，理解层间接口作用。\n\n## 二、各层次详解\n### 2.1 微程序层（第0层）\n- **定义**：直接控制硬件电路的微指令序列，实现机器指令。\n- **特点**：硬件实现，速度最快，但编程复杂。\n- **难点**：微程序与机器指令的映射关系。\n\n### 2.2 机器语言层（第1层）\n- **定义**：CPU直接执行的指令集，包括操作码、地址码。\n- **特点**：二进制形式，依赖具体CPU架构。\n- **示例**：x86的`ADD EAX, 1`。\n\n### 2.3 操作系统层（第2层）\n- **功能**：管理硬件资源，提供系统调用接口（如文件读写、进程调度）。\n- **作用**：屏蔽硬件差异，为上层提供统一服务。\n- **重点**：理解操作系统作为“资源管理者”的角色。\n\n### 2.4 汇编语言层（第3层）\n- **定义**：用助记符表示机器指令，通过汇编器转换为机器码。\n- **特点**：与硬件紧密相关，但比机器语言易读。\n- **难点**：寄存器分配、指令寻址方式。\n\n### 2.5 高级语言层（第4层）\n- **定义**：使用自然语言风格编写代码，通过编译器或解释器执行。\n- **特点**：跨平台、易维护。\n- **示例**：`int a = 5;`。\n\n### 2.6 应用层（第5层）\n- **定义**：用户直接交互的软件，如办公软件、游戏。\n- **特点**：面向特定需求，依赖下层服务。\n\n## 三、层次间的关系与转换\n### 3.1 数据流方向\n- **用户请求**：应用层 -> 高级语言 -> 操作系统 -> 机器语言 -> 微程序 -> 硬件执行。\n- **结果返回**：反向传递。\n\n### 3.2 关键转换机制\n- **编译**：高级语言 -> 汇编/机器语言（如GCC编译器）。\n- **解释**：逐行翻译执行（如Python解释器）。\n- **汇编**：助记符 -> 机器码（如NASM汇编器）。\n- **微程序解释**：机器指令 -> 微指令序列。\n\n> **难点**：区分编译与解释，理解微程序控制器的运作。\n\n## 四、层次结构的应用\n- **性能优化**：通过减少层次切换（如使用汇编优化关键代码）提升效率。\n- **系统设计**：模块化开发，每层独立设计。\n- **故障排查**：从高层向下层逐层定位问题。\n\n## 五、总结\n- **核心要点**：计算机系统六层结构，每层功能与接口。\n- **重点**：各层定义、转换机制、应用场景。\n- **难点**：微程序层与机器语言层的区分，编译与解释的差异。\n\n---\n\n# 课后练习题\n\n**1. 在计算机系统的层次结构中，哪一层直接负责将高级语言代码转换为机器指令？**\nA. 操作系统层\nB. 汇编语言层\nC. 高级语言层\nD. 机器语言层\n\n**正确答案**：C\n**解析**：高级语言层通过编译器或解释器将代码转换为机器语言或汇编语言。操作系统层管理资源，汇编语言层处理助记符，机器语言层是执行层，不负责转换。\n\n**2. 以下关于微程序层的描述，正确的是？**\nA. 微程序层是用户直接交互的界面\nB. 微程序层由操作系统实现\nC. 微程序层直接控制硬件电路\nD. 微程序层使用高级语言编写\n\n**正确答案**：C\n**解析**：微程序层位于最底层，由硬件中的微指令控制电路。用户交互在应用层，操作系统层管理资源，微程序层使用微指令而非高级语言。\n\n**3. 在计算机系统层次结构中，操作系统层的主要作用是什么？**\nA. 执行用户编写的应用程序\nB. 将汇编语言转换为机器语言\nC. 管理硬件资源并提供系统调用接口\nD. 直接控制CPU的微指令执行\n\n**正确答案**：C\n**解析**：操作系统层负责管理CPU、内存、I/O等硬件资源，并通过系统调用为上层提供服务。执行应用是应用层，汇编转换是汇编层，微指令执行是微程序层。\n\n# 知识点标签\n- 计算机系统层次结构\n- 微程序层\n- 操作系统层\n- 编译与解释\n- 指令集架构（ISA）\n\n> 系统已结合课程知识库、学生画像与教学场景生成讲解建议，并已进行内容安全过滤。\n\n#### 1. 概念拆解\n- 先理解定义与应用场景。\n- 再理解关键步骤与输入输出。\n- 最后通过例题或代码验证理解。\n\n#### 2. 学习建议\n1. 看 5 分钟图解或微课，建立整体印象。\n2. 阅读结构化讲义，标出关键词。\n3. 完成 3 道基础题 + 1 道综合题。\n4. 用自己的语言复述，形成长期记忆。\n\n#### 3. 常见误区\n- 只背定义，不理解使用条件。\n- 只看答案，不做步骤推导。\n- 只做单题，不做知识迁移。\n\n#### 4. 多模态辅导建议\n- 文字：精讲讲义\n- 图解：流程图 / 思维导图\n- 视频：3分钟微课脚本\n', '根据以下课程内容出20道练习题，包含选择题(choice)、判断题(truefalse)、填空题(f...', NULL, '2026-06-14 14:39:54');
+INSERT INTO `sp_qa_history` VALUES (2066168759501647873, 3, '根据以下内容出10道练习题（选择+判断+填空混合）。输出JSON数组：[{\"type\":\"choice\",\"question\":\"...\",\"options\":[\"A\",\"B\",\"C\",\"D\"],\"answer\":0,\"explanation\":\"...\"},...]\n\n课程：2-组成原理-计算机系统的层次结构\n内容：# 计算机系统的层次结构\n\n## 课程概述\n本课时讲解计算机系统的层次结构，从硬件到软件的抽象层级，帮助理解计算机系统的工作原理。时长18分钟，适合计算机组成原理入门学习。\n\n## 一、计算机系统的层次模型\n### 1.1 层次结构概述\n- **定义**：计算机系统由硬件和软件组成，按功能分为多个抽象层级，每层为上层提供接口，隐藏下层细节。\n- **重要性**：理解层次结构有助于掌握系统设计、性能优化和问题定位。\n\n### 1.2 经典六层结构\n| 层级编号 | 层级名称 | 主要组成 | 示例 |\n|----------|----------|----------|------|\n| 0 | 微程序层 | 微指令、微程序 | CPU微指令集 |\n| 1 | 机器语言层 | 指令集架构（ISA） | x86指令集 |\n| 2 | 操作系统层 | 系统调用、资源管理 | Windows/Linux内核 |\n| 3 | 汇编语言层 | 汇编指令、伪指令 | MOV, ADD指令 |\n| 4 | 高级语言层 | 编程语言、编译器 | C, Java代码 |\n| 5 | 应用层 | 应用程序、用户界面 | Word, 浏览器 |\n\n> **重点**：记忆各层名称和功能，理解层间接口作用。\n\n## 二、各层次详解\n### 2.1 微程序层（第0层）\n- **定义**：直接控制硬件电路的微指令序列，实现机器指令。\n- **特点**：硬件实现，速度最快，但编程复杂。\n- **难点**：微程序与机器指令的映射关系。\n\n### 2.2 机器语言层（第1层）\n- **定义**：CPU直接执行的指令集，包括操作码、地址码。\n- **特点**：二进制形式，依赖具体CPU架构。\n- **示例**：x86的`ADD EAX, 1`。\n\n### 2.3 操作系统层（第2层）\n- **功能**：管理硬件资源，提供系统调用接口（如文件读写、进程调度）。\n- **作用**：屏蔽硬件差异，为上层提供统一服务。\n- **重点**：理解操作系统作为“资源管理者”的角色。\n\n### 2.4 汇编语言层（第3层）\n- **定义**：用助记符表示机器指令，通过汇编器转换为机器码。\n- **特点**：与硬件紧密相关，但比机器语言易读。\n- **难点**：寄存器分配、指令寻址方式。\n\n### 2.5 高级语言层（第4层）\n- **定义**：使用自然语言风格编写代码，通过编译器或解释器执行。\n- **特点**：跨平台、易维护。\n- **示例**：`int a = 5;`。\n\n### 2.6 应用层（第5层）\n- **定义**：用户直接交互的软件，如办公软件、游戏。\n- **特点**：面向特定需求，依赖下层服务。\n\n## 三、层次间的关系与转换\n### 3.1 数据流方向\n- **用户请求**：应用层 -> 高级语言 -> 操作系统 -> 机器语言 -> 微程序 -> 硬件执行。\n- **结果返回**：反向传递。\n\n### 3.2 关键转换机制\n- **编译**：高级语言 -> 汇编/机器语言（如GCC编译器）。\n- **解释**：逐行翻译执行（如Python解释器）。\n- **汇编**：助记符 -> 机器码（如NASM汇编器）。\n- **微程序解释**：机器指令 -> 微指令序列。\n\n> **难点**：区分编译与解释，理解微程序控制器的运作。\n\n## 四、层次结构的应用\n- **性能优化**：通过减少层次切换（如使用汇编优化关键代码）提升效率。\n- **系统设计**：模块化开发，每层独立设计。\n- **故障排查**：从高层向下层逐层定位问题。\n\n## 五、总结\n- **核心要点**：计算机系统六层结构，每层功能与接口。\n- **重点**：各层定义、转换机制、应用场景。\n- **难点**：微程序层与机器语言层的区分，编译与解释的差异。\n\n---\n\n# 课后练习题\n\n**1. 在计算机系统的层次结构中，哪一层直接负责将高级语言代码转换为机器指令？**\nA. 操作系统层\nB. 汇编语言层\nC. 高级语言层\nD. 机器语言层\n\n**正确答案**：C\n**解析**：高级语言层通过编译器或解释器将代码转换为机器语言或汇编语言。操作系统层管理资源，汇编语言层处理助记符，机器语言层是执行层，不负责转换。\n\n**2. 以下关于微程序层的描述，正确的是？**\nA. 微程序层是用户直接交互的界面\nB. 微程序层由操作系统实现\nC. 微程序层直接控制硬件电路\nD. 微程序层使用高级语言编写\n\n**正确答案**：C\n**解析**：微程序层位于最底层，由硬件中的微指令控制电路。用户交互在应用层，操作系统层管理资源，微程序层使用微指令而非高级语言。\n\n**3. 在计算机系统层次结构中，操作系统层的主要作用是什', '### 智能辅导回答\n**问题识别：** 根据以下内容出10道练习题（选择+判断+填空混合）。输出JSON数组：[{\"type\":\"choice\",\"question\":\"...\",\"options\":[\"A\",\"B\",\"C\",\"D\"],\"answer\":0,\"explanation\":\"...\"},...]\n\n课程：2-组成原理-计算机系统的层次结构\n内容：# 计算机系统的层次结构\n\n## 课程概述\n本课时讲解计算机系统的层次结构，从硬件到软件的抽象层级，帮助理解计算机系统的工作原理。时长18分钟，适合计算机组成原理入门学习。\n\n## 一、计算机系统的层次模型\n### 1.1 层次结构概述\n- **定义**：计算机系统由硬件和软件组成，按功能分为多个抽象层级，每层为上层提供接口，隐藏下层细节。\n- **重要性**：理解层次结构有助于掌握系统设计、性能优化和问题定位。\n\n### 1.2 经典六层结构\n| 层级编号 | 层级名称 | 主要组成 | 示例 |\n|----------|----------|----------|------|\n| 0 | 微程序层 | 微指令、微程序 | CPU微指令集 |\n| 1 | 机器语言层 | 指令集架构（ISA） | x86指令集 |\n| 2 | 操作系统层 | 系统调用、资源管理 | Windows/Linux内核 |\n| 3 | 汇编语言层 | 汇编指令、伪指令 | MOV, ADD指令 |\n| 4 | 高级语言层 | 编程语言、编译器 | C, Java代码 |\n| 5 | 应用层 | 应用程序、用户界面 | Word, 浏览器 |\n\n> **重点**：记忆各层名称和功能，理解层间接口作用。\n\n## 二、各层次详解\n### 2.1 微程序层（第0层）\n- **定义**：直接控制硬件电路的微指令序列，实现机器指令。\n- **特点**：硬件实现，速度最快，但编程复杂。\n- **难点**：微程序与机器指令的映射关系。\n\n### 2.2 机器语言层（第1层）\n- **定义**：CPU直接执行的指令集，包括操作码、地址码。\n- **特点**：二进制形式，依赖具体CPU架构。\n- **示例**：x86的`ADD EAX, 1`。\n\n### 2.3 操作系统层（第2层）\n- **功能**：管理硬件资源，提供系统调用接口（如文件读写、进程调度）。\n- **作用**：屏蔽硬件差异，为上层提供统一服务。\n- **重点**：理解操作系统作为“资源管理者”的角色。\n\n### 2.4 汇编语言层（第3层）\n- **定义**：用助记符表示机器指令，通过汇编器转换为机器码。\n- **特点**：与硬件紧密相关，但比机器语言易读。\n- **难点**：寄存器分配、指令寻址方式。\n\n### 2.5 高级语言层（第4层）\n- **定义**：使用自然语言风格编写代码，通过编译器或解释器执行。\n- **特点**：跨平台、易维护。\n- **示例**：`int a = 5;`。\n\n### 2.6 应用层（第5层）\n- **定义**：用户直接交互的软件，如办公软件、游戏。\n- **特点**：面向特定需求，依赖下层服务。\n\n## 三、层次间的关系与转换\n### 3.1 数据流方向\n- **用户请求**：应用层 -> 高级语言 -> 操作系统 -> 机器语言 -> 微程序 -> 硬件执行。\n- **结果返回**：反向传递。\n\n### 3.2 关键转换机制\n- **编译**：高级语言 -> 汇编/机器语言（如GCC编译器）。\n- **解释**：逐行翻译执行（如Python解释器）。\n- **汇编**：助记符 -> 机器码（如NASM汇编器）。\n- **微程序解释**：机器指令 -> 微指令序列。\n\n> **难点**：区分编译与解释，理解微程序控制器的运作。\n\n## 四、层次结构的应用\n- **性能优化**：通过减少层次切换（如使用汇编优化关键代码）提升效率。\n- **系统设计**：模块化开发，每层独立设计。\n- **故障排查**：从高层向下层逐层定位问题。\n\n## 五、总结\n- **核心要点**：计算机系统六层结构，每层功能与接口。\n- **重点**：各层定义、转换机制、应用场景。\n- **难点**：微程序层与机器语言层的区分，编译与解释的差异。\n\n---\n\n# 课后练习题\n\n**1. 在计算机系统的层次结构中，哪一层直接负责将高级语言代码转换为机器指令？**\nA. 操作系统层\nB. 汇编语言层\nC. 高级语言层\nD. 机器语言层\n\n**正确答案**：C\n**解析**：高级语言层通过编译器或解释器将代码转换为机器语言或汇编语言。操作系统层管理资源，汇编语言层处理助记符，机器语言层是执行层，不负责转换。\n\n**2. 以下关于微程序层的描述，正确的是？**\nA. 微程序层是用户直接交互的界面\nB. 微程序层由操作系统实现\nC. 微程序层直接控制硬件电路\nD. 微程序层使用高级语言编写\n\n**正确答案**：C\n**解析**：微程序层位于最底层，由硬件中的微指令控制电路。用户交互在应用层，操作系统层管理资源，微程序层使用微指令而非高级语言。\n\n**3. 在计算机系统层次结构中，操作系统层的主要作用是什\n\n> 系统已结合课程知识库、学生画像与教学场景生成讲解建议，并已进行内容安全过滤。\n\n#### 1. 概念拆解\n- 先理解定义与应用场景。\n- 再理解关键步骤与输入输出。\n- 最后通过例题或代码验证理解。\n\n#### 2. 学习建议\n1. 看 5 分钟图解或微课，建立整体印象。\n2. 阅读结构化讲义，标出关键词。\n3. 完成 3 道基础题 + 1 道综合题。\n4. 用自己的语言复述，形成长期记忆。\n\n#### 3. 常见误区\n- 只背定义，不理解使用条件。\n- 只看答案，不做步骤推导。\n- 只做单题，不做知识迁移。\n\n#### 4. 多模态辅导建议\n- 文字：精讲讲义\n- 图解：流程图 / 思维导图\n- 视频：3分钟微课脚本\n', '根据以下内容出10道练习题（选择+判断+填空混合）。输出JSON数组：[{\"type\":\"choic...', NULL, '2026-06-14 14:39:54');
+INSERT INTO `sp_qa_history` VALUES (2066168918453186562, 3, '神经网络的定义', '表情：开心|动作：右手放胸前|回复文本：你好！我是小慧，当前服务繁忙，请稍后再试。你仍然可以使用文字对话功能。|指令：无', '神经网络的定义', '6539b444-1520-42e2-aced-cfa75c9acba0', '2026-06-14 14:40:32');
+INSERT INTO `sp_qa_history` VALUES (2066169005149450242, 3, '喂喂喂听得到吗？', '表情：开心|动作：右手放胸前|回复文本：你好！我是小慧，当前服务繁忙，请稍后再试。你仍然可以使用文字对话功能。|指令：无', '喂喂喂听得到吗？', '6539b444-1520-42e2-aced-cfa75c9acba0', '2026-06-14 14:40:53');
+INSERT INTO `sp_qa_history` VALUES (2066169701991116802, 3, '主要有哪些课程？数据科学与大数据技术', '表情：开心|动作：右手放胸前|回复文本：你好！我是小慧，当前服务繁忙，请稍后再试。你仍然可以使用文字对话功能。|指令：无', '主要有哪些课程？数据科学与大数据技术', '6539b444-1520-42e2-aced-cfa75c9acba0', '2026-06-14 14:43:39');
+INSERT INTO `sp_qa_history` VALUES (2066171171088289794, 3, '根据以下课程内容出20道练习题，包含选择题(choice)、判断题(truefalse)、填空题(fill)至少三种。输出纯JSON数组：\n[{\"type\":\"choice\",\"question\":\"题目\",\"options\":[\"A\",\"B\",\"C\",\"D\"],\"answer\":0,\"explanation\":\"解析\"},{\"type\":\"truefalse\",\"question\":\"题目\",\"answer\":0},...]\n判断题answer:0=正确1=错误。填空answer为答案文本。直接输出[]数组。\n\n课程：2-组成原理-计算机系统的层次结构\n内容：# 计算机系统的层次结构\n\n## 课程概述\n本课时讲解计算机系统的层次结构，从硬件到软件的抽象层级，帮助理解计算机系统的工作原理。时长18分钟，适合计算机组成原理入门学习。\n\n## 一、计算机系统的层次模型\n### 1.1 层次结构概述\n- **定义**：计算机系统由硬件和软件组成，按功能分为多个抽象层级，每层为上层提供接口，隐藏下层细节。\n- **重要性**：理解层次结构有助于掌握系统设计、性能优化和问题定位。\n\n### 1.2 经典六层结构\n| 层级编号 | 层级名称 | 主要组成 | 示例 |\n|----------|----------|----------|------|\n| 0 | 微程序层 | 微指令、微程序 | CPU微指令集 |\n| 1 | 机器语言层 | 指令集架构（ISA） | x86指令集 |\n| 2 | 操作系统层 | 系统调用、资源管理 | Windows/Linux内核 |\n| 3 | 汇编语言层 | 汇编指令、伪指令 | MOV, ADD指令 |\n| 4 | 高级语言层 | 编程语言、编译器 | C, Java代码 |\n| 5 | 应用层 | 应用程序、用户界面 | Word, 浏览器 |\n\n> **重点**：记忆各层名称和功能，理解层间接口作用。\n\n## 二、各层次详解\n### 2.1 微程序层（第0层）\n- **定义**：直接控制硬件电路的微指令序列，实现机器指令。\n- **特点**：硬件实现，速度最快，但编程复杂。\n- **难点**：微程序与机器指令的映射关系。\n\n### 2.2 机器语言层（第1层）\n- **定义**：CPU直接执行的指令集，包括操作码、地址码。\n- **特点**：二进制形式，依赖具体CPU架构。\n- **示例**：x86的`ADD EAX, 1`。\n\n### 2.3 操作系统层（第2层）\n- **功能**：管理硬件资源，提供系统调用接口（如文件读写、进程调度）。\n- **作用**：屏蔽硬件差异，为上层提供统一服务。\n- **重点**：理解操作系统作为“资源管理者”的角色。\n\n### 2.4 汇编语言层（第3层）\n- **定义**：用助记符表示机器指令，通过汇编器转换为机器码。\n- **特点**：与硬件紧密相关，但比机器语言易读。\n- **难点**：寄存器分配、指令寻址方式。\n\n### 2.5 高级语言层（第4层）\n- **定义**：使用自然语言风格编写代码，通过编译器或解释器执行。\n- **特点**：跨平台、易维护。\n- **示例**：`int a = 5;`。\n\n### 2.6 应用层（第5层）\n- **定义**：用户直接交互的软件，如办公软件、游戏。\n- **特点**：面向特定需求，依赖下层服务。\n\n## 三、层次间的关系与转换\n### 3.1 数据流方向\n- **用户请求**：应用层 -> 高级语言 -> 操作系统 -> 机器语言 -> 微程序 -> 硬件执行。\n- **结果返回**：反向传递。\n\n### 3.2 关键转换机制\n- **编译**：高级语言 -> 汇编/机器语言（如GCC编译器）。\n- **解释**：逐行翻译执行（如Python解释器）。\n- **汇编**：助记符 -> 机器码（如NASM汇编器）。\n- **微程序解释**：机器指令 -> 微指令序列。\n\n> **难点**：区分编译与解释，理解微程序控制器的运作。\n\n## 四、层次结构的应用\n- **性能优化**：通过减少层次切换（如使用汇编优化关键代码）提升效率。\n- **系统设计**：模块化开发，每层独立设计。\n- **故障排查**：从高层向下层逐层定位问题。\n\n## 五、总结\n- **核心要点**：计算机系统六层结构，每层功能与接口。\n- **重点**：各层定义、转换机制、应用场景。\n- **难点**：微程序层与机器语言层的区分，编译与解释的差异。\n\n---\n\n# 课后练习题\n\n**1. 在计算机系统的层次结构中，哪一层直接负责将高级语言代码转换为机器指令？**\nA. 操作系统层\nB. 汇编语言层\nC. 高级语言层\nD. 机器语言层\n\n**正确答案**：C\n**解析**：高级语言层通过编译器或解释器将代码转换为机器语言或汇编语言。操作系统层管理资源，汇编语言层处理助记符，机器语言层是执行层，不负责转换。\n\n**2. 以下关于微程序层的描述，正确的是？**\nA. 微程序层是用户直接交互的界面\nB. 微程序层由操作系统实现\nC. 微程序层直接控制硬件电路\nD. 微程序层使用高级语言编写\n\n**正确答案**：C\n**解析**：微程序层位于最底层，由硬件中的微指令控制电路。用户交互在应用层，操作系统层管理资源，微程序层使用微指令而非高级语言。\n\n**3. 在计算机系统层次结构中，操作系统层的主要作用是什么？**\nA. 执行用户编写的应用程序\nB. 将汇编语言转换为机器语言\nC. 管理硬件资源并提供系统调用接口\nD. 直接控制CPU的微指令执行\n\n**正确答案**：C\n**解析**：操作系统层负责管理CPU、内存、I/O等硬件资源，并通过系统调用为上层提供服务。执行应用是应用层，汇编转换是汇编层，微指令执行是微程序层。\n\n# 知识点标签\n- 计算机系统层次结构\n- 微程序层\n- 操作系统层\n- 编译与解释\n- 指令集架构（ISA）', '```json\n[\n  {\n    \"type\": \"choice\",\n    \"question\": \"在计算机系统的六层结构中，最底层（第0层）是什么？\",\n    \"options\": [\"机器语言层\", \"操作系统层\", \"微程序层\", \"应用层\"],\n    \"answer\": 2,\n    \"explanation\": \"根据课程内容，微程序层是第0层，直接控制硬件电路的微指令序列。机器语言层是第1层，操作系统层是第2层，应用层是第5层。【参考资料1】\"\n  },\n  {\n    \"type\": \"choice\",\n    \"question\": \"以下哪一层直接由CPU执行二进制指令？\",\n    \"options\": [\"汇编语言层\", \"高级语言层\", \"机器语言层\", \"操作系统层\"],\n    \"answer\": 2,\n    \"explanation\": \"机器语言层（第1层）是CPU直接执行的指令集，包括操作码和地址码，以二进制形式存在。【参考资料1】\"\n  },\n  {\n    \"type\": \"choice\",\n    \"question\": \"操作系统层在层次结构中的主要功能是？\",\n    \"options\": [\"执行用户应用程序\", \"将汇编指令转换为机器码\", \"管理硬件资源并提供系统调用接口\", \"直接控制微指令执行\"],\n    \"answer\": 2,\n    \"explanation\": \"操作系统层（第2层）管理CPU、内存、I/O等硬件资源，并通过系统调用为上层提供统一服务，屏蔽硬件差异。【参考资料1】\"\n  },\n  {\n    \"type\": \"choice\",\n    \"question\": \"汇编语言层通过什么工具转换为机器语言？\",\n    \"options\": [\"编译器\", \"解释器\", \"汇编器\", \"链接器\"],\n    \"answer\": 2,\n    \"explanation\": \"汇编语言层（第3层）使用助记符表示机器指令，通过汇编器（如NASM）转换为机器码。【参考资料1】\"\n  },\n  {\n    \"type\": \"choice\",\n    \"question\": \"以下哪个是高级语言层的特点？\",\n    \"options\": [\"与硬件紧密相关\", \"使用二进制形式\", \"跨平台易维护\", \"直接控制硬件电路\"],\n    \"answer\": 2,\n    \"explanation\": \"高级语言层（第4层）使用自然语言风格编写代码，通过编译器或解释器执行，具有跨平台、易维护的特点。【参考资料1】\"\n  },\n  {\n    \"type\": \"choice\",\n    \"question\": \"用户直接交互的软件属于哪一层？\",\n    \"options\": [\"操作系统层\", \"高级语言层\", \"应用层\", \"机器语言层\"],\n    \"answer\": 2,\n    \"explanation\": \"应用层（第5层）是用户直接交互的软件，如办公软件、浏览器等，面向特定需求。【参考资料1】\"\n  },\n  {\n    \"type\": \"choice\",\n    \"question\": \"在数据流方向中，用户请求从应用层开始，最终到达哪一层执行？\",\n    \"options\": [\"操作系统层\", \"高级语言层\", \"微程序层\", \"汇编语言层\"],\n    \"answer\": 2,\n    \"explanation\": \"用户请求经过应用层->高级语言->操作系统->机器语言->微程序，最终由硬件执行，微程序层直接控制硬件电路。【参考资料1】\"\n  },\n  {\n    \"type\": \"choice\",\n    \"question\": \"编译和解释的主要区别在于？\",\n    \"options\": [\"编译逐行执行，解释整体转换\", \"编译一次性转换，解释逐行翻译执行\", \"编译用于汇编语言，解释用于高级语言\", \"编译速度慢于解释\"],\n    \"answer\": 1,\n    \"explanation\": \"编译（如GCC）将高级语言一次性转换为汇编/机器语言，而解释（如Python解释器）逐行翻译执行。【参考资料1】\"\n  },\n  {\n    \"type\": \"choice\",\n    \"question\": \"微程序层与机器语言层的关系是？\",\n    \"options\": [\"微程序层由机器语言层实现\", \"机器语言层由微程序层解释执行\", \"两者功能相同\", \"微程序层在机器语言层之上\"],\n    \"answer\": 1,\n    \"explanation\": \"微程序层通过微指令序列解释执行机器指令，实现机器语言层的指令集。【参考资料1】\"\n  },\n  {\n    \"type\": \"choice\",\n    \"question\": \"以下哪个是性能优化的常见方法？\",\n    \"options\": [\"增加层次数量\", \"使用高级语言编写所有代码\", \"减少层次切换（如用汇编优化关键代码）\", \"完全依赖操作系统层\"],\n    \"answer\": 2,\n    \"explanation\": \"通过减少层次切换（如使用汇编优化关键代码）可以提升效率，因为每层转换都有开销。【参考资料1】\"\n  },\n  {\n    \"type\": \"truefalse\",\n    \"question\": \"计算机系统的层次结构中，每层都为上层提供接口并隐藏下层细节。\",\n    \"answer\": 0,\n    \"explanation\": \"正确。层次结构定义中明确，每层为上层提供接口，隐藏下层细节，实现抽象化。【参考资料1】\"\n  },\n  {\n    \"type\": \"truefalse\",\n    \"question\": \"微程序层使用高级语言编写微指令。\",\n    \"answer\": 1,\n    \"explanation\": \"错误。微程序层使用微指令，是硬件级的低级指令，而非高级语言。【参考资料1】\"\n  },\n  {\n    \"type\": \"truefalse\",\n    \"question\": \"操作系统层直接控制CPU的微指令执行。\",\n    \"answer\": 1,\n    \"explanation\": \"错误。操作系统层管理硬件资源，但不直接控制微指令，微指令由微程序层控制。【参考资料1】\"\n  },\n  {\n    \"type\": \"truefalse\",\n    \"question\": \"汇编语言层与硬件紧密相关，但比机器语言更易读。\",\n    \"answer\": 0,\n    \"explanation\": \"正确。汇编语言使用助记符表示机器指令，比二进制机器码更易读，但仍与特定硬件架构相关。【参考资料1】\"\n  },\n  {\n    \"type\": \"truefalse\",\n    \"question\": \"高级语言层编写的代码可以直接在CPU上执行。\",\n    \"answer\": 1,\n    \"explanation\": \"错误。高级语言代码需要通过编译器或解释器转换为机器语言或汇编语言后才能执行。【参考资料1】\"\n  },\n  {\n    \"type\": \"truefalse\",\n    \"question\": \"应用层依赖下层服务，如操作系统提供的系统调用。\",\n    \"answer\": 0,\n    \"explanation\": \"正确。应用层面向特定需求，依赖操作系统层等下层服务来执行任务。【参考资料1】\"\n  },\n  {\n    \"type\": \"fill\",\n    \"question\": \"计算机系统的六层结构中，第2层是________层。\",\n    \"answer\": \"操作系统\",\n    \"explanation\": \"根据课程经典六层结构，第2层是操作系统层，负责资源管理和系统调用。【参考资料1】\"\n  },\n  {\n    \"type\": \"fill\",\n    \"question\": \"机器语言层由________直接执行，包括操作码和地址码。\",\n    \"answer\": \"CPU\",\n    \"explanation\": \"机器语言层是CPU直接执行的指令集，以二进制形式存在。【参考资料1】\"\n  },\n  {\n    \"type\": \"fill\",\n    \"question\": \"将高级语言代码转换为汇编或机器语言的过程称为________。\",\n    \"answer\": \"编译\",\n    \"explanation\": \"编译是高级语言层通过编译器（如GCC）将代码转换为汇编或机器语言的过程。【参考资料1】\"\n  },\n  {\n    \"type\": \"fill\",\n    \"question\": \"在故障排查中，通常从________层向下层逐层定位问题。\",\n    \"answer\": \"应用\",\n    \"explanation\": \"层次结构应用中提到，故障排查从高层（如应用层）向下层逐层定位。【参考资料1】\"\n  }\n]\n```', '根据以下课程内容出20道练习题，包含选择题(choice)、判断题(truefalse)、填空题(f...', NULL, '2026-06-14 14:49:29');
+INSERT INTO `sp_qa_history` VALUES (2066171241258995713, 3, '你是一位课程助教。请根据以下讲义内容，生成一份\"视频讲解稿\"——模拟老师对着黑板讲课的口语化讲稿，包含开场白、知识点逐个讲解、举例说明和小结。使用自然的课堂教学语言，适当加入\"同学们注意\"\"我们来看\"等过渡语。输出Markdown格式。\n\n课程标题：2-组成原理-计算机系统的层次结构\n讲义内容：\n# 计算机系统的层次结构\n\n## 课程概述\n本课时讲解计算机系统的层次结构，从硬件到软件的抽象层级，帮助理解计算机系统的工作原理。时长18分钟，适合计算机组成原理入门学习。\n\n## 一、计算机系统的层次模型\n### 1.1 层次结构概述\n- **定义**：计算机系统由硬件和软件组成，按功能分为多个抽象层级，每层为上层提供接口，隐藏下层细节。\n- **重要性**：理解层次结构有助于掌握系统设计、性能优化和问题定位。\n\n### 1.2 经典六层结构\n| 层级编号 | 层级名称 | 主要组成 | 示例 |\n|----------|----------|----------|------|\n| 0 | 微程序层 | 微指令、微程序 | CPU微指令集 |\n| 1 | 机器语言层 | 指令集架构（ISA） | x86指令集 |\n| 2 | 操作系统层 | 系统调用、资源管理 | Windows/Linux内核 |\n| 3 | 汇编语言层 | 汇编指令、伪指令 | MOV, ADD指令 |\n| 4 | 高级语言层 | 编程语言、编译器 | C, Java代码 |\n| 5 | 应用层 | 应用程序、用户界面 | Word, 浏览器 |\n\n> **重点**：记忆各层名称和功能，理解层间接口作用。\n\n## 二、各层次详解\n### 2.1 微程序层（第0层）\n- **定义**：直接控制硬件电路的微指令序列，实现机器指令。\n- **特点**：硬件实现，速度最快，但编程复杂。\n- **难点**：微程序与机器指令的映射关系。\n\n### 2.2 机器语言层（第1层）\n- **定义**：CPU直接执行的指令集，包括操作码、地址码。\n- **特点**：二进制形式，依赖具体CPU架构。\n- **示例**：x86的`ADD EAX, 1`。\n\n### 2.3 操作系统层（第2层）\n- **功能**：管理硬件资源，提供系统调用接口（如文件读写、进程调度）。\n- **作用**：屏蔽硬件差异，为上层提供统一服务。\n- **重点**：理解操作系统作为“资源管理者”的角色。\n\n### 2.4 汇编语言层（第3层）\n- **定义**：用助记符表示机器指令，通过汇编器转换为机器码。\n- **特点**：与硬件紧密相关，但比机器语言易读。\n- **难点**：寄存器分配、指令寻址方式。\n\n### 2.5 高级语言层（第4层）\n- **定义**：使用自然语言风格编写代码，通过编译器或解释器执行。\n- **特点**：跨平台、易维护。\n- **示例**：`int a = 5;`。\n\n### 2.6 应用层（第5层）\n- **定义**：用户直接交互的软件，如办公软件、游戏。\n- **特点**：面向特定需求，依赖下层服务。\n\n## 三、层次间的关系与转换\n### 3.1 数据流方向\n- **用户请求**：应用层 -> 高级语言 -> 操作系统 -> 机器语言 -> 微程序 -> 硬件执行。\n- **结果返回**：反向传递。\n\n### 3.2 关键转换机制\n- **编译**：高级语言 -> 汇编/机器语言（如GCC编译器）。\n- **解释**：逐行翻译执行（如Python解释器）。\n- **汇编**：助记符 -> 机器码（如NASM汇编器）。\n- **微程序解释**：机器指令 -> 微指令序列。\n\n> **难点**：区分编译与解释，理解微程序控制器的运作。\n\n## 四、层次结构的应用\n- **性能优化**：通过减少层次切换（如使用汇编优化关键代码）提升效率。\n- **系统设计**：模块化开发，每层独立设计。\n- **故障排查**：从高层向下层逐层定位问题。\n\n## 五、总结\n- **核心要点**：计算机系统六层结构，每层功能与接口。\n- **重点**：各层定义、转换机制、应用场景。\n- **难点**：微程序层与机器语言层的区分，编译与解释的差异。\n\n---\n\n# 课后练习题\n\n**1. 在计算机系统的层次结构中，哪一层直接负责将高级语言代码转换为机器指令？**\nA. 操作系统层\nB. 汇编语言层\nC. 高级语言层\nD. 机器语言层\n\n**正确答案**：C\n**解析**：高级语言层通过编译器或解释器将代码转换为机器语言或汇编语言。操作系统层管理资源，汇编语言层处理助记符，机器语言层是执行层，不负责转换。\n\n**2. 以下关于微程序层的描述，正确的是？**\nA. 微程序层是用户直接交互的界面\nB. 微程序层由操作系统实现\nC. 微程序层直接控制硬件电路\nD. 微程序层使用高级语言编写\n\n**正确答案**：C\n**解析**：微程序层位于最底层，由硬件中的微指令控制电路。用户交互在应用层，操作系统层管理资源，微程序层使用微指令而非高级语言。\n\n**3. 在计算机系统层次结构中，操作系统层的主要作用是什么？**\nA. 执行用户编写的应用程序\nB. 将汇编语言转换为机器语言\nC. 管理硬件资源并提供系统调用接口\nD. 直接控制CPU的微指令执行\n\n**正确答案**：C\n**解析**：操作系统层负责管理CPU、内存、I/O等硬件资源，并通过系统调用为上层提供服务。执行应用是应用层，汇编转换是汇编层，微指令执行是微程序层。\n\n# 知识点标签\n- 计算机系统层次结构\n- 微程序层\n- 操作系统层\n- 编译与解释\n- 指令集架构（ISA）', '好的，同学们，大家好！我是你们这门课的助教。今天我们来讲一个非常核心的概念——计算机系统的层次结构。\n\n---\n\n### 一、开场白：为什么我们要学这个？\n\n同学们注意，我们平时用电脑，从打开一个浏览器到运行一个复杂的游戏，感觉好像很自然。但大家有没有想过，从我们手指的点击，到CPU里电子的流动，这中间到底发生了什么？\n\n这就好比我们要了解一座摩天大楼，不能只看最顶层的风景，也要知道它的地基、框架和每一层楼的作用。计算机系统也是一样，它不是一个单一的、铁板一块的东西，而是一个**分层的结构**。\n\n今天这堂课，我们就来把这个“摩天大楼”一层层拆开来看。理解了它，你以后学习操作系统、编译原理，甚至自己写代码做优化，都会有一个宏观的视角。好，我们正式开始。\n\n### 二、核心讲解：经典六层结构\n\n首先，我们把计算机系统想象成一个**六层的蛋糕**。每一层都建立在下层的基础上，并为上一层提供服务，同时隐藏下层的复杂细节。\n\n我们来看这张表格（对照讲义中的表格）：\n\n#### 1. 最底层：微程序层（第0层）\n\n同学们注意，这是整个系统的**最底层**，直接和硬件电路打交道。它由一些非常微小的指令——我们叫它**微指令**——组成。CPU内部的控制器，就是靠执行这些微指令，来一条一条地控制那些复杂的电路开关。\n\n- **特点**：硬件实现，速度**最快**，但编程也最复杂，我们平时编程基本接触不到。\n- **难点**：大家要理解，我们后面要讲的机器指令，在CPU内部会被“翻译”成一系列更细粒度的微指令来执行。这就是微程序与机器指令的映射关系。\n\n#### 2. 第二层：机器语言层（第1层）\n\n这一层，就是CPU能“听懂”的**母语**了。我们常说的指令集架构（ISA），比如x86、ARM，就是指的这一层。\n\n- **特点**：它由一串串的二进制数字（0和1）组成，比如 `1001 0101` 这样的。不同的CPU有自己不同的“方言”，所以它**依赖具体的CPU架构**。\n- **举例**：我们常说的 `ADD EAX, 1` 这条汇编指令，在机器语言层就是一串特定的二进制码，告诉CPU把寄存器EAX里的数值加1。\n\n#### 3. 第三层：操作系统层（第2层）\n\n这一层大家应该比较熟悉了。操作系统（Windows、Linux、macOS）就是在这里工作的。它的核心作用是**管理硬件资源**，比如CPU、内存、硬盘，并为上层的软件提供一个统一、方便的使用接口。\n\n- **功能**：我们平时说的“打开文件”、“创建进程”，都不是直接去操作硬盘或CPU，而是通过操作系统提供的**系统调用**来完成的。\n- **重点**：理解操作系统就像一个“大管家”，它屏蔽了底层硬件的差异，让我们能更方便地使用电脑。\n\n#### 4. 第四层：汇编语言层（第3层）\n\n同学们，机器语言太难记了对不对？所以人们发明了**汇编语言**。它用一些**助记符**（比如MOV、ADD、SUB）来代替那些枯燥的二进制码。\n\n- **特点**：它和硬件（机器语言）关系非常紧密，但比机器语言好读多了。比如 `MOV AX, 5`，意思就是把5这个数放到AX寄存器里。\n- **难点**：写汇编语言需要你非常了解CPU的寄存器、内存寻址方式，所以它是“低级语言”。\n\n#### 5. 第五层：高级语言层（第4层）\n\n这就是我们最熟悉的层面了，比如C、C++、Java、Python。它们使用类似自然语言的语法，让我们能更专注于解决问题本身，而不是硬件的细节。\n\n- **特点**：**跨平台**、**易维护**。同一份C语言代码，可以在Windows上编译运行，也可以在Linux上编译运行。\n- **举例**：我们写一句 `int a = 5;`，计算机就能明白你的意思。\n\n#### 6. 最顶层：应用层（第5层）\n\n最后，就是我们平时直接使用的软件了，比如Word、浏览器、游戏、微信等。它们是**面向特定需求**的，依赖下面所有层的服务才能运行。\n\n### 三、层次间的关系与转换\n\n好了，这六层我们知道了。那么它们之间是怎么协同工作的呢？\n\n#### 1. 数据流方向\n\n同学们注意，当我们发出一个请求，比如“打开这个文档”，数据是怎么流动的？\n\n- **从上到下**：**应用层（Word）** -> **高级语言层（C++代码）** -> **操作系统层（系统调用）** -> **机器语言层（CPU指令）** -> **微程序层（微指令）** -> **硬件执行**。\n- **结果返回**：硬件执行完，结果再沿着这条路**从下往上**返回给我们。\n\n#### 2. 关键转换机制\n\n每一层之间的转换，都需要一些特殊的“翻译官”：\n\n- **编译**：把高级语言（比如C）一次性全部翻译成汇编或机器语言。就像把整本英文书翻译成中文书。\n- **解释**：高级语言（比如Python）是逐行翻译、逐行执行的。就像你身边有个同声传译，你说一句，他翻译一句。\n- **汇编**：把汇编助记符（比如MOV）翻译成机器码。这个工作由**汇编器**完成。\n- **微程序解释**：CPU内部的控制器，会把机器指令“解释”成更底层的微指令序列。\n\n> **难点**：这里大家要重点区分**编译**和**解释**。编译产生一个独立的可执行文件（.exe），而解释是边翻译边执行。\n\n### 四、易错点提醒\n\n同学们，根据我们课后的练习题，有几个地方特别容易出错，我给大家提个醒：\n\n1.  **微程序层 vs 机器语言层**：微程序层是**硬件实现**的，直接控制电路；而机器语言层是CPU能“理解”的指令集，它由微程序来解释执行。**微程序层是更底层、更“硬”的存在**。\n2.  **谁负责转换高级语言？** 答案是**高级语言层本身**。高级语言层通过编译器或解释器，自己把自己转换成更低层的语言。操作系统层不负责这个转换，它只负责管理资源。\n3.  **操作系统层的作用**：它的核心是**管理硬件资源**和**提供系统调用接口**，而不是执行应用程序或转换代码。执行应用是应用层的事，转换代码是高级语言层的事。\n\n### 五、分步学习建议\n\n为了帮助大家掌握这个知识点，我建议按以下步骤学习：\n\n1.  **第一步：死记硬背**。先把这六层的**名称**和**顺序**牢牢记住（从0到5：微程序、机器语言、操作系统、汇编语言、高级语言、应用）。你可以自己画一个倒金字塔图。\n2.  **第二步：理解功能**。针对每一层，问自己三个问题：它主要由什么组成？它的核心功能是什么？它为上一层提供了什么服务？（比如操作系统层，为上层提供了“系统调用”服务）\n3.  **第三步：掌握转换**。重点理解“编译”和“解释”的区别，以及“汇编”的过程。可以自己动手写一个简单的C程序，然后看看编译生成的汇编代码是什么样的。\n4.  **第四步：联系实际**。想想你平时用的软件、写的代码，分别属于哪一层？当你电脑出故障时，可以尝试从应用层开始，一层一层向下排查问题。\n\n### 六、延伸资源建议\n\n如果学有余力，想深入了解的同学，可以看看：\n\n-   **《计算机组成与设计》（ Patterson & Hennessy）**：经典教材，对指令集和硬件实现讲得非常透彻。\n-   **《深入理解计算机系统》（CS:APP）**：从程序员的视角理解计算机系统，涵盖层次结构、编译、链接等。\n-   **在线课程**：Coursera上Princeton大学的“Computer Architecture”课程。\n\n### 七、小结\n\n好了，同学们，我们来总结一下今天的内容。\n\n我们今天的核心就是理解计算机系统的**六层结构**。从最底层的**微程序**，到最顶层的**应用软件**，每一层都扮演着不可或缺的角色。记住各层的**名称、功能和它们之间的转换机制**，特别是**编译与解释**的区别。\n\n希望大家课后能对照着讲义和练习题，好好消化一下。下次课，我们会深入讲解每一层的具体实现。好，这节课就到这里，谢谢大家！', '你是一位课程助教。请根据以下讲义内容，生成一份\"视频讲解稿\"——模拟老师对着黑板讲课的口语化讲稿，包...', NULL, '2026-06-14 14:49:46');
+INSERT INTO `sp_qa_history` VALUES (2066171250956226562, 3, '主要有哪些课程？数据科学与大数据技术专业', '表情：有趣|动作：右手放身前|回复文本：哇，你问对啦！数据科学与大数据技术专业主要课程包括：Python编程、数据结构与算法、数据库原理、大数据技术基础、机器学习、数据可视化、云计算与大数据平台等等！是不是听起来就很酷呀～需要我帮你打开课程平台看看具体安排吗？|指令：无', '主要有哪些课程？数据科学与大数据技术专业', '6539b444-1520-42e2-aced-cfa75c9acba0', '2026-06-14 14:49:48');
+INSERT INTO `sp_qa_history` VALUES (2066171459245363201, 3, '根据以下课程内容出20道练习题，包含选择题(choice)、判断题(truefalse)、填空题(fill)至少三种。输出纯JSON数组：\n[{\"type\":\"choice\",\"question\":\"题目\",\"options\":[\"A\",\"B\",\"C\",\"D\"],\"answer\":0,\"explanation\":\"解析\"},{\"type\":\"truefalse\",\"question\":\"题目\",\"answer\":0},...]\n判断题answer:0=正确1=错误。填空answer为答案文本。直接输出[]数组。\n\n课程：【2026最新】这绝对是B站最牛的计算机基础课程，一次性全搞懂！全套入门级全套完整课程计算机、操作系统及因特网的基础知识等，编程入门零基础大学生，案例解析！\n内容：# 计算机基础课程讲义\n\n## 第一章：计算机系统概述\n\n### 1.1 计算机的发展历程\n- **第一代计算机（1946-1957）**：电子管时代，如ENIAC，体积庞大，功耗高。\n- **第二代计算机（1958-1964）**：晶体管时代，体积缩小，可靠性提高。\n- **第三代计算机（1965-1971）**：集成电路时代，性能大幅提升。\n- **第四代计算机（1972-至今）**：大规模集成电路时代，微型计算机普及。\n\n### 1.2 计算机系统的组成\n- **硬件系统**：CPU、内存、输入输出设备等。\n- **软件系统**：系统软件（如操作系统）和应用软件。\n\n**重点难点**：\n- 理解冯·诺依曼体系结构：存储程序、程序控制。\n- 区分硬件和软件的关系：硬件是基础，软件是灵魂。\n\n## 第二章：操作系统基础\n\n### 2.1 操作系统的定义与功能\n- **定义**：管理计算机硬件和软件资源的系统软件。\n- **功能**：进程管理、内存管理、文件系统管理、设备管理。\n\n### 2.2 进程与线程\n- **进程**：正在执行的程序，是资源分配的基本单位。\n- **线程**：进程中的执行流，是CPU调度的基本单位。\n\n**重点难点**：\n- 进程状态转换（就绪、运行、阻塞）。\n- 进程同步与互斥（如信号量机制）。\n\n## 第三章：因特网基础\n\n### 3.1 计算机网络概述\n- **定义**：将地理位置不同的计算机互联，实现资源共享。\n- **分类**：局域网、城域网、广域网。\n\n### 3.2 TCP/IP协议栈\n- **应用层**：HTTP、FTP、SMTP等。\n- **传输层**：TCP（可靠传输）、UDP（不可靠传输）。\n- **网络层**：IP协议，负责路由选择。\n- **链路层**：以太网协议，帧的传输。\n\n**重点难点**：\n- TCP的三次握手与四次挥手过程。\n- IP地址与子网掩码的计算。\n\n## 第四章：编程入门基础\n\n### 4.1 程序设计语言概述\n- **机器语言**：二进制代码，直接执行。\n- **汇编语言**：助记符，需汇编器转换。\n- **高级语言**：如Python、Java，易读易写。\n\n### 4.2 基本编程概念\n- **变量与数据类型**：整数、浮点数、字符串等。\n- **控制结构**：顺序、选择（if-else）、循环（for、while）。\n- **函数**：模块化编程，代码复用。\n\n**重点难点**：\n- 理解指针与内存地址的关系（C语言）。\n- 递归函数的调用与栈机制。\n\n## 第五章：案例解析\n\n### 5.1 操作系统案例：Linux文件系统\n- **目录结构**：根目录/，/home、/etc等。\n- **文件权限**：读、写、执行，用chmod修改。\n\n### 5.2 网络案例：网页浏览过程\n- **步骤**：DNS解析 → TCP连接 → HTTP请求 → 服务器响应 → 渲染页面。\n\n### 5.3 编程案例：Python实现简单计算器\n- **代码示例**：\n  ```python\n  def calculator(a, b, op):\n      if op == \'+\':\n          return a + b\n      elif op == \'-\':\n          return a - b\n      elif op == \'*\':\n          return a * b\n      elif op == \'/\':\n          return a / b if b != 0 else \'Error\'\n  ```\n\n**重点难点**：\n- 理解DNS解析的递归与迭代查询。\n- 异常处理（如除零错误）。\n\n## 总结\n本课程覆盖了计算机系统、操作系统、因特网和编程基础，通过案例帮助零基础学生建立完整知识体系。', '```json\n[\n  {\n    \"type\": \"choice\",\n    \"question\": \"ENIAC属于第几代计算机？\",\n    \"options\": [\"第一代\", \"第二代\", \"第三代\", \"第四代\"],\n    \"answer\": 0,\n    \"explanation\": \"ENIAC是电子管计算机，属于第一代计算机（1946-1957）。【参考资料1】\"\n  },\n  {\n    \"type\": \"choice\",\n    \"question\": \"下列哪个是操作系统的基本功能？\",\n    \"options\": [\"进程管理\", \"网页浏览\", \"文件压缩\", \"图形绘制\"],\n    \"answer\": 0,\n    \"explanation\": \"操作系统功能包括进程管理、内存管理、文件系统管理和设备管理。【参考资料2】\"\n  },\n  {\n    \"type\": \"choice\",\n    \"question\": \"在TCP/IP协议栈中，负责可靠传输的协议是？\",\n    \"options\": [\"UDP\", \"TCP\", \"IP\", \"HTTP\"],\n    \"answer\": 1,\n    \"explanation\": \"TCP提供可靠传输，UDP提供不可靠传输。【参考资料3】\"\n  },\n  {\n    \"type\": \"choice\",\n    \"question\": \"以下哪种语言需要汇编器转换？\",\n    \"options\": [\"机器语言\", \"汇编语言\", \"高级语言\", \"Python\"],\n    \"answer\": 1,\n    \"explanation\": \"汇编语言使用助记符，需汇编器转换为机器码。【参考资料4】\"\n  },\n  {\n    \"type\": \"choice\",\n    \"question\": \"Linux中修改文件权限的命令是？\",\n    \"options\": [\"chmod\", \"chown\", \"ls\", \"mkdir\"],\n    \"answer\": 0,\n    \"explanation\": \"chmod用于修改文件读、写、执行权限。【参考资料5】\"\n  },\n  {\n    \"type\": \"choice\",\n    \"question\": \"进程是资源分配的什么单位？\",\n    \"options\": [\"基本单位\", \"最小单位\", \"调度单位\", \"执行单位\"],\n    \"answer\": 0,\n    \"explanation\": \"进程是资源分配的基本单位，线程是CPU调度的基本单位。【参考资料2】\"\n  },\n  {\n    \"type\": \"choice\",\n    \"question\": \"以下哪个是应用层协议？\",\n    \"options\": [\"IP\", \"TCP\", \"HTTP\", \"以太网协议\"],\n    \"answer\": 2,\n    \"explanation\": \"HTTP、FTP、SMTP属于应用层协议。【参考资料3】\"\n  },\n  {\n    \"type\": \"choice\",\n    \"question\": \"冯·诺依曼体系结构的核心思想是？\",\n    \"options\": [\"存储程序\", \"分布式计算\", \"并行处理\", \"虚拟内存\"],\n    \"answer\": 0,\n    \"explanation\": \"冯·诺依曼体系结构强调存储程序、程序控制。【参考资料1】\"\n  },\n  {\n    \"type\": \"truefalse\",\n    \"question\": \"第三代计算机使用晶体管作为主要元件。\",\n    \"answer\": 1,\n    \"explanation\": \"第三代计算机使用集成电路，第二代才使用晶体管。【参考资料1】\"\n  },\n  {\n    \"type\": \"truefalse\",\n    \"question\": \"线程是CPU调度的基本单位。\",\n    \"answer\": 0,\n    \"explanation\": \"线程是进程中的执行流，是CPU调度的基本单位。【参考资料2】\"\n  },\n  {\n    \"type\": \"truefalse\",\n    \"question\": \"UDP提供可靠的面向连接的数据传输。\",\n    \"answer\": 1,\n    \"explanation\": \"UDP提供不可靠的无连接传输，TCP才提供可靠传输。【参考资料3】\"\n  },\n  {\n    \"type\": \"truefalse\",\n    \"question\": \"高级语言编写的程序可以直接由CPU执行。\",\n    \"answer\": 1,\n    \"explanation\": \"高级语言需编译或解释后才能执行，机器语言才能直接执行。【参考资料4】\"\n  },\n  {\n    \"type\": \"truefalse\",\n    \"question\": \"网页浏览过程中，DNS解析发生在TCP连接之前。\",\n    \"answer\": 0,\n    \"explanation\": \"网页浏览步骤为：DNS解析→TCP连接→HTTP请求等。【参考资料5】\"\n  },\n  {\n    \"type\": \"truefalse\",\n    \"question\": \"硬件是计算机的灵魂，软件是基础。\",\n    \"answer\": 1,\n    \"explanation\": \"硬件是基础，软件是灵魂。【参考资料1】\"\n  },\n  {\n    \"type\": \"fill\",\n    \"question\": \"第一代计算机使用的电子元件是________。\",\n    \"answer\": \"电子管\",\n    \"explanation\": \"第一代计算机（1946-1957）使用电子管，如ENIAC。【参考资料1】\"\n  },\n  {\n    \"type\": \"fill\",\n    \"question\": \"操作系统中，进程的三种基本状态是就绪、运行和________。\",\n    \"answer\": \"阻塞\",\n    \"explanation\": \"进程状态包括就绪、运行和阻塞。【参考资料2】\"\n  },\n  {\n    \"type\": \"fill\",\n    \"question\": \"TCP/IP协议栈中，网络层的核心协议是________。\",\n    \"answer\": \"IP\",\n    \"explanation\": \"网络层使用IP协议负责路由选择。【参考资料3】\"\n  },\n  {\n    \"type\": \"fill\",\n    \"question\": \"编程中用于控制循环的结构包括for和________。\",\n    \"answer\": \"while\",\n    \"explanation\": \"控制结构中的循环包括for和while。【参考资料4】\"\n  },\n  {\n    \"type\": \"fill\",\n    \"question\": \"Linux文件系统中，根目录的路径是________。\",\n    \"answer\": \"/\",\n    \"explanation\": \"Linux目录结构以根目录/为起点。【参考资料5】\"\n  },\n  {\n    \"type\": \"fill\",\n    \"question\": \"Python计算器案例中，处理除零错误需要用到________处理。\",\n    \"answer\": \"异常\",\n    \"explanation\": \"案例中通过条件判断处理除零错误，异常处理是重要概念。【参考资料5】\"\n  }\n]\n```', '根据以下课程内容出20道练习题，包含选择题(choice)、判断题(truefalse)、填空题(f...', NULL, '2026-06-14 14:50:38');
 
 -- ----------------------------
 -- Table structure for sp_question_bank
@@ -7330,12 +7544,22 @@ CREATE TABLE `sp_question_bank`  (
   `image_url` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL DEFAULT NULL,
   `created_at` datetime NULL DEFAULT NULL,
   PRIMARY KEY (`id`) USING BTREE,
-  INDEX `idx_question_course`(`course` ASC) USING BTREE
-) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_general_ci ROW_FORMAT = Dynamic;
+  INDEX `idx_question_course`(`course` ASC) USING BTREE,
+  INDEX `idx_qb_creator`(`creator_user_id` ASC) USING BTREE,
+  CONSTRAINT `fk_qb_creator` FOREIGN KEY (`creator_user_id`) REFERENCES `sp_user` (`id`) ON DELETE SET NULL ON UPDATE CASCADE
+) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_general_ci ROW_FORMAT = DYNAMIC;
 
 -- ----------------------------
 -- Records of sp_question_bank
 -- ----------------------------
+INSERT INTO `sp_question_bank` VALUES (1779900016001, 2, '计算机科学', 'C语言中，以下哪个关键字用于定义常量？', '编程基础', 'C语言', '语法', 'single_choice', 'easy', '[\"A. var\",\"B. const\",\"C. let\",\"D. static\"]', 'B', 'const关键字用于定义不可修改的常量。var和let是JavaScript关键字，static在C语言中用于定义静态变量。', NULL, '2026-05-16 10:00:00');
+INSERT INTO `sp_question_bank` VALUES (1779900016002, 2, '计算机科学', '下列排序算法中，平均时间复杂度为O(n log n)的是？', '数据结构与算法', '排序', '复杂度分析', 'multiple_choice', 'medium', '[\"A. 冒泡排序\",\"B. 快速排序\",\"C. 归并排序\",\"D. 插入排序\"]', 'BC', '快速排序和归并排序的平均时间复杂度均为O(n log n)。冒泡排序和插入排序为O(n²)。', NULL, '2026-05-16 10:30:00');
+INSERT INTO `sp_question_bank` VALUES (1779900016003, 2, '计算机科学', '在关系型数据库中，以下哪个操作用于删除表中的所有数据但保留表结构？', '数据库系统', 'SQL', 'DML操作', 'single_choice', 'easy', '[\"A. DELETE FROM table\",\"B. DROP TABLE table\",\"C. TRUNCATE TABLE table\",\"D. REMOVE TABLE table\"]', 'C', 'TRUNCATE删除所有数据但保留表结构，速度比DELETE快。DROP删除整个表（包括结构）。DELETE可带WHERE条件。', NULL, '2026-05-17 09:00:00');
+INSERT INTO `sp_question_bank` VALUES (1779900016004, 2, '计算机科学', '以下关于TCP和UDP的描述，正确的是？', '计算机网络', '传输层', '协议对比', 'multiple_choice', 'medium', '[\"A. TCP是面向连接的\",\"B. UDP提供可靠传输\",\"C. TCP保证数据顺序\",\"D. UDP适合实时应用\"]', 'ACD', 'UDP不提供可靠传输（B错）。TCP面向连接、保证顺序，UDP无连接、不保证可靠性但延迟低，适合视频直播等实时场景。', NULL, '2026-05-17 14:00:00');
+INSERT INTO `sp_question_bank` VALUES (1779900016005, 2, '计算机科学', '请简述死锁产生的四个必要条件。', '操作系统', '进程管理', '死锁', 'short_answer', 'medium', NULL, '互斥条件、请求与保持条件、不可剥夺条件、循环等待条件', '死锁必须同时满足这四个条件，破坏任一条件即可预防死锁。', NULL, '2026-05-18 08:00:00');
+INSERT INTO `sp_question_bank` VALUES (1779900016006, 2, '计算机科学', '在Python中，列表推导式 [x*2 for x in range(5) if x%2==0] 的输出是什么？', '编程基础', 'Python', '列表推导', 'single_choice', 'easy', '[\"A. [0,2,4,6,8]\",\"B. [0,4,8]\",\"C. [2,4,6,8,10]\",\"D. [2,6,10]\"]', 'B', 'range(5)产生0,1,2,3,4，过滤x%2==0保留0,2,4，乘2得0,4,8。', NULL, '2026-05-18 10:00:00');
+INSERT INTO `sp_question_bank` VALUES (1779900016007, 2, '计算机科学', '以下关于HTTP状态码的描述，错误的是？', '计算机网络', '应用层', 'HTTP协议', 'single_choice', 'medium', '[\"A. 200表示请求成功\",\"B. 301表示永久重定向\",\"C. 404表示服务器内部错误\",\"D. 500表示服务器内部错误\"]', 'C', '404表示资源未找到（Not Found），500才是服务器内部错误。', NULL, '2026-05-19 08:00:00');
+INSERT INTO `sp_question_bank` VALUES (1779900016008, 2, '计算机科学', '在机器学习中，交叉验证的主要目的是什么？', '人工智能', '机器学习', '模型评估', 'single_choice', 'medium', '[\"A. 增加训练数据量\",\"B. 评估模型的泛化能力\",\"C. 加快训练速度\",\"D. 减少特征数量\"]', 'B', '交叉验证通过多次划分训练集和验证集，评估模型在未见过数据上的表现，从而衡量泛化能力。', NULL, '2026-05-19 14:00:00');
 
 -- ----------------------------
 -- Table structure for sp_resource_recommendation
@@ -7348,8 +7572,11 @@ CREATE TABLE `sp_resource_recommendation`  (
   `resources_json` longtext CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL,
   `created_at` datetime NULL DEFAULT NULL,
   PRIMARY KEY (`id`) USING BTREE,
-  INDEX `idx_rr_user`(`user_id` ASC) USING BTREE
-) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_general_ci ROW_FORMAT = Dynamic;
+  INDEX `idx_rr_user`(`user_id` ASC) USING BTREE,
+  INDEX `idx_rr_lesson`(`lesson_id` ASC) USING BTREE,
+  CONSTRAINT `fk_rr_lesson` FOREIGN KEY (`lesson_id`) REFERENCES `sp_lesson` (`id`) ON DELETE SET NULL ON UPDATE CASCADE,
+  CONSTRAINT `fk_rr_user` FOREIGN KEY (`user_id`) REFERENCES `sp_user` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
+) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_general_ci ROW_FORMAT = DYNAMIC;
 
 -- ----------------------------
 -- Records of sp_resource_recommendation
@@ -7376,8 +7603,9 @@ CREATE TABLE `sp_student_ability`  (
   `diagnosis` text CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL,
   `evaluated_at` datetime NULL DEFAULT NULL,
   PRIMARY KEY (`id`) USING BTREE,
-  INDEX `idx_sa_user`(`user_id` ASC) USING BTREE
-) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_general_ci ROW_FORMAT = Dynamic;
+  INDEX `idx_sa_user`(`user_id` ASC) USING BTREE,
+  CONSTRAINT `fk_sa_user` FOREIGN KEY (`user_id`) REFERENCES `sp_user` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
+) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_general_ci ROW_FORMAT = DYNAMIC;
 
 -- ----------------------------
 -- Records of sp_student_ability
@@ -7595,6 +7823,48 @@ INSERT INTO `sp_student_ability` VALUES (1779956983435, 3, 0, 100, 39, 11, 45, 2
 INSERT INTO `sp_student_ability` VALUES (1779962424803, 3, 0, 100, 39, 11, 45, 25, NULL, '2026-05-28 18:00:25');
 INSERT INTO `sp_student_ability` VALUES (1779962429600, 3, 0, 100, 39, 11, 45, 25, NULL, '2026-05-28 18:00:30');
 INSERT INTO `sp_student_ability` VALUES (1779962435569, 3, 0, 100, 39, 11, 45, 25, NULL, '2026-05-28 18:00:36');
+INSERT INTO `sp_student_ability` VALUES (1779963609923, 3, 0, 100, 39, 11, 45, 25, '该生知识深度极强，但知识广度为零，导致解题能力与迁移能力受限。建议加强跨学科阅读，拓宽知识面；同时提升学习活跃度与韧性，多参与讨论、坚持错题复盘，以激活深度知识的灵活应用。', '2026-05-28 18:20:10');
+INSERT INTO `sp_student_ability` VALUES (1779963630248, 3, 0, 100, 39, 11, 45, 25, '该生知识深度极强，但知识广度为零，存在严重偏科。解题能力与知识迁移中等，需加强灵活应用。学习活跃度和韧性较低，可能缺乏主动性及抗挫力。建议：拓展跨学科阅读，参与小组讨论以提升广度；设定小目标、记录学习日志来增强活跃度与韧性。', '2026-05-28 18:20:30');
+INSERT INTO `sp_student_ability` VALUES (1779963712617, 3, 0, 100, 39, 11, 45, 25, '该生知识深度极强，但知识广度为零，解题能力与迁移能力中等，学习活跃度和韧性偏低。建议：突破单一学科局限，主动涉猎跨领域知识；增加练习频次以巩固解题技巧；通过小组讨论或挑战性任务提升活跃度与抗挫折能力。', '2026-05-28 18:21:53');
+INSERT INTO `sp_student_ability` VALUES (1779964709544, 3, 0, 100, 39, 11, 45, 25, '根据数据，该生知识深度极佳，但知识广度为零，解题能力与迁移能力中等，活跃度及韧性偏低。建议：在巩固深度基础上，主动拓宽知识面，尝试跨学科联系；增加练习与错题复盘以提升解题效率；制定小目标培养学习节奏，增强韧性。', '2026-05-28 18:38:30');
+INSERT INTO `sp_student_ability` VALUES (1779964855822, 3, 0, 100, 39, 11, 45, 25, '该生知识深度突出，但知识广度为零，解题能力与迁移应用中等偏弱，学习活跃度和韧性较低。建议：加强跨领域阅读，拓展知识面；多参与小组讨论或限时训练，提升解题效率；设定阶段性小目标，增强学习韧性与主动提问习惯。', '2026-05-28 18:40:56');
+INSERT INTO `sp_student_ability` VALUES (1779966203554, 3, 0, 100, 39, 11, 45, 25, '该学生知识深度极强，但知识广度为零，存在严重偏科倾向。解题能力与知识迁移中等，建议加强跨学科阅读，拓展知识面。学习活跃度与韧性偏低，需提升学习积极性与抗挫力。改进方向：每周拓展一个陌生领域，参与小组讨论，设定小目标并坚持完成。', '2026-05-28 19:03:24');
+INSERT INTO `sp_student_ability` VALUES (1779966234041, 3, 0, 100, 39, 11, 45, 25, '该学生知识深度极强，但知识广度为零，解题能力与迁移能力中等偏低，活跃度和韧性不足。建议：拓展跨学科阅读，避免偏科；增加限时训练提升解题效率；制定小目标并坚持打卡，增强学习韧性与活跃度。', '2026-05-28 19:03:54');
+INSERT INTO `sp_student_ability` VALUES (1779966285530, 3, 0, 100, 39, 11, 45, 25, '该生知识深度极强（100分），但知识广度为零，存在严重偏科或知识面狭窄问题。解题能力与迁移能力中等，活跃度和韧性偏低。建议：1）系统拓展跨学科阅读，弥补知识盲区；2）加强变式训练，提升知识迁移应用；3）设定小目标打卡，逐步提高学习活跃度与抗挫折韧性。', '2026-05-28 19:04:46');
+INSERT INTO `sp_student_ability` VALUES (1779967655688, 3, 0, 100, 39, 11, 45, 25, '根据六维数据，该生知识深度极高，但知识广度为零，解题能力与知识迁移中等，活跃度与韧性偏低。建议：优先拓展知识面，避免偏科；加强练习以提升解题技巧；设定短期目标增强学习韧性，参与小组讨论提升活跃度。', '2026-05-28 19:27:36');
+INSERT INTO `sp_student_ability` VALUES (1779969855921, 3, 0, 100, 39, 11, 45, 25, '该生知识深度极强，但知识广度为零，导致解题能力与迁移能力中等偏下。建议：主动跨学科阅读，拓宽知识面；将深度知识迁移至新情境练习，提升解题灵活性。同时，需增加学习活跃度与韧性，通过小目标打卡和错题复盘，保持持续进步。', '2026-05-28 20:04:16');
+INSERT INTO `sp_student_ability` VALUES (1779969901375, 3, 0, 100, 39, 11, 45, 25, '该生属于“深度钻研型”，但知识广度与活跃度极低，导致解题能力受限。建议：1）每周涉猎1-2个新领域，拓宽知识面；2）参与小组讨论或限时练习，提升应用与活跃度；3）针对错题进行变式训练，强化知识迁移能力。保持韧性，平衡深度与广度。', '2026-05-28 20:05:01');
+INSERT INTO `sp_student_ability` VALUES (1779969951442, 3, 0, 100, 39, 11, 45, 25, '该生知识深度突出，但知识广度为零，解题能力与迁移能力中等，学习活跃度及韧性偏低。建议：可尝试拓宽阅读与跨学科联系，避免“钻牛角尖”；同时增加互动练习与错题整理，提升解题效率；设定小目标并记录进步，以增强学习韧性与活跃度。', '2026-05-28 20:05:51');
+INSERT INTO `sp_student_ability` VALUES (1779970064481, 3, 0, 100, 39, 11, 45, 25, '该生知识深度极强，但知识广度为零，导致迁移与解题能力受限，活跃度与韧性偏低。建议：**突破单一领域，主动接触跨学科基础内容**；通过限时练习提升解题效率；设定小目标并记录进步，以增强学习韧性与参与感。', '2026-05-28 20:07:44');
+INSERT INTO `sp_student_ability` VALUES (1779970073576, 3, 0, 100, 39, 11, 45, 25, '该生知识深度突出，但知识广度为零，迁移能力中等，解题能力与学习韧性偏低。建议：1）拓展阅读与跨学科联系，弥补广度短板；2）加强错题复盘与变式训练，提升解题灵活性；3）设定短期目标，增强学习韧性，避免因深度钻研而忽视应用。', '2026-05-28 20:07:54');
+INSERT INTO `sp_student_ability` VALUES (1779970228134, 3, 0, 100, 39, 11, 45, 25, '该生知识深度突出，但知识广度缺失，解题能力与学习韧性中等偏低。建议：在巩固深度的同时，适度拓宽知识面，避免“钻牛角尖”；加强限时训练提升解题效率；通过设定小目标、记录进步，增强学习韧性与活跃度。', '2026-05-28 20:10:28');
+INSERT INTO `sp_student_ability` VALUES (1779970536956, 3, 0, 100, 39, 11, 45, 25, '该生知识深度极强，但知识广度为零，解题能力与迁移能力中等偏低，学习活跃度及韧性不足。建议：优先拓展知识面，通过跨学科阅读或专题学习补全基础；增加练习频率并主动总结错题，以提升解题与迁移能力；设定小目标并坚持打卡，逐步增强学习韧性与活跃度。', '2026-05-28 20:15:37');
+INSERT INTO `sp_student_ability` VALUES (1779970585931, 3, 0, 100, 39, 11, 45, 25, '该生知识深度极强（100），但知识广度为零，解题能力与迁移能力中等偏低，活跃度和韧性不足。建议：优先拓展知识面，通过跨章节或跨学科阅读弥补广度短板；同时增加限时训练与错题反思以提升解题效率；制定小目标打卡，逐步提高学习韧性与活跃度。', '2026-05-28 20:16:26');
+INSERT INTO `sp_student_ability` VALUES (1779970834428, 3, 0, 100, 39, 11, 45, 25, '该生知识深度极强，但知识广度为零，说明专注深入但视野狭窄。解题能力中等，迁移能力尚可，但活跃度与韧性偏低。建议：主动拓展跨学科阅读，参与小组讨论以提升活跃度；面对难题时设定分阶段目标，培养坚持习惯，避免因深度钻研而忽视综合应用。', '2026-05-28 20:20:34');
+INSERT INTO `sp_student_ability` VALUES (1779971125075, 3, 0, 100, 39, 11, 45, 25, '该生知识深度突出，但知识广度为零，说明学习内容过于集中。解题能力中等，学习活跃度低，知识迁移和韧性不足。建议：拓宽学习范围，接触不同领域知识；增加练习与互动频率；通过跨学科题目训练迁移能力；设定小目标提升学习韧性与坚持度。', '2026-05-28 20:25:25');
+INSERT INTO `sp_student_ability` VALUES (1779972343763, 3, 0, 100, 39, 21, 45, 25, '根据数据，该生**知识深度突出（100）**，但**知识广度为零**，存在严重偏科或知识面狭窄问题。**解题能力（39）与迁移能力（45）中等**，需加强题型变式训练。**学习活跃度（21）与韧性（25）偏低**，建议设定小目标提升参与感，并培养面对困难时的坚持习惯。重点：拓宽知识面，强化灵活应用。', '2026-05-28 20:45:44');
+INSERT INTO `sp_student_ability` VALUES (1780036529008, 3, 0, 100, 39, 21, 45, 25, '该生知识深度突出，但知识广度为零，导致迁移能力受限。建议：**拓展阅读范围，从单一深度转向“T型”结构**；同时提升学习活跃度与韧性，可尝试每日记录一道跨学科关联题，并设定小目标（如每周完成2次限时练习），以平衡深度与广度。', '2026-05-29 14:35:29');
+INSERT INTO `sp_student_ability` VALUES (1780039915851, 3, 0, 100, 39, 21, 45, 25, '该生知识深度突出，但知识广度为零，解题能力与迁移能力中等偏低。建议：在巩固深度的同时，适当拓展跨学科阅读，增加题型练习以提升解题熟练度；加强错题归纳与变式训练，促进知识迁移。同时需提高学习活跃度与韧性，建议制定每日小目标，保持持续投入。', '2026-05-29 15:31:56');
+INSERT INTO `sp_student_ability` VALUES (1780042516894, 3, 0, 100, 39, 21, 45, 25, '该生知识深度极强，但知识广度为零，解题能力与迁移能力中等，活跃度与韧性偏低。建议：优先拓展知识面，接触不同题型，避免过度钻研单一难点；同时提升学习互动频率，通过小组讨论或错题复盘增强韧性，逐步将深度优势转化为综合解题能力。', '2026-05-29 16:15:17');
+INSERT INTO `sp_student_ability` VALUES (1780053879838, 3, 0, 100, 39, 21, 45, 25, '该生知识深度极强，但广度缺失，导致解题与应用能力受限。建议：优先补充基础知识框架，通过专题阅读拓宽视野；同时将高深理解转化为通俗讲解，提升迁移能力。保持韧性，每日设定小目标以增强活跃度。', '2026-05-29 19:24:40');
+INSERT INTO `sp_student_ability` VALUES (1780967156543, 3, 0, 100, 39, 20, 45, 25, NULL, '2026-06-09 09:05:57');
+INSERT INTO `sp_student_ability` VALUES (1780967177097, 3, 0, 100, 39, 20, 45, 25, NULL, '2026-06-09 09:06:17');
+INSERT INTO `sp_student_ability` VALUES (1780967249432, 3, 0, 100, 39, 20, 45, 25, '该生知识深度极强，但知识广度为零，导致解题能力受限、迁移不足。建议增加跨学科阅读与题型接触，拓宽视野；同时提升学习活跃度与韧性，避免偏科瓶颈。可设定每日小目标，强化知识联结与灵活应用。', '2026-06-09 09:07:29');
+INSERT INTO `sp_student_ability` VALUES (1780967259583, 3, 0, 100, 39, 20, 45, 25, '该生知识深度突出，但知识广度为零，迁移能力中等，解题与韧性偏低。建议：在巩固深度的同时，适度拓展相关领域基础概念，避免知识结构失衡；通过限时训练提升解题效率，并设定阶梯式小目标增强学习韧性与活跃度。', '2026-06-09 09:07:40');
+INSERT INTO `sp_student_ability` VALUES (1780967261403, 3, 0, 100, 39, 20, 45, 25, '该生知识深度突出但广度为零，建议加强跨学科阅读和基础拓展。解题能力与迁移能力中等，需通过变式训练提升灵活应用。学习活跃度和韧性偏低，应设定短期目标、定期复盘，并尝试小组学习或挑战性任务以增强动力与抗挫力。', '2026-06-09 09:07:41');
+INSERT INTO `sp_student_ability` VALUES (1781352745921, 3, 0, 100, 39, 20, 45, 25, '该生知识深度突出，但知识广度为零，表明存在严重偏科或只钻难题的倾向。建议：适当拓展基础面，避免“只见树木不见森林”。同时解题能力与迁移水平中等，需加强实战训练与变式练习。学习韧性与活跃度偏低，应设定小目标、建立正向反馈机制，提升持续学习动力。', '2026-06-13 20:12:26');
+INSERT INTO `sp_student_ability` VALUES (1781352775367, 3, 0, 100, 39, 20, 45, 25, '该生知识深度突出，但知识广度为零，导致知识体系失衡。建议加强跨领域阅读，拓展知识面。解题能力与迁移能力中等，需通过变式训练和错题复盘提升灵活应用。学习活跃度与韧性偏低，应设定短期目标、建立学习小组，增强主动性与抗挫力。', '2026-06-13 20:12:55');
+INSERT INTO `sp_student_ability` VALUES (1781354322200, 3, 0, 100, 39, 20, 45, 25, '该生知识深度突出，但知识广度为零，可能导致思维局限。解题能力与迁移能力中等，建议加强跨学科阅读与题型变式训练。学习活跃度及韧性偏低，需制定小目标提升参与感，并培养抗挫力，避免遇到难题轻易放弃。', '2026-06-13 20:38:42');
+INSERT INTO `sp_student_ability` VALUES (1781361250357, 3, 0, 100, 39, 20, 45, 25, '该生知识深度突出，但知识广度为零，存在明显偏科或知识面狭窄问题。解题能力与知识迁移处于中下水平，学习活跃度和韧性偏低，缺乏主动探索与坚持。建议：拓展跨学科阅读，参与小组讨论；增加错题反思与变式训练；设定小目标并打卡，提升学习动力与韧性。', '2026-06-13 22:34:10');
+INSERT INTO `sp_student_ability` VALUES (1781447925806, 3, 0, 100, 39, 20, 45, 25, NULL, '2026-06-14 14:38:46');
+INSERT INTO `sp_student_ability` VALUES (1781447981556, 3, 0, 100, 39, 20, 45, 25, NULL, '2026-06-14 14:39:42');
+INSERT INTO `sp_student_ability` VALUES (1781448065543, 3, 0, 100, 39, 20, 45, 25, NULL, '2026-06-14 14:41:06');
+INSERT INTO `sp_student_ability` VALUES (1781448531043, 3, 0, 100, 39, 20, 45, 25, '该生知识深度突出，但广度缺失，易导致思维固化。建议加强跨学科阅读与基础概念拓展，避免“钻牛角尖”。解题能力与迁移能力中等，需通过变式训练提升知识应用灵活性。学习活跃度及韧性偏低，应设定阶段性小目标，结合错题复盘与限时练习，逐步提升抗压与持续学习能力。', '2026-06-14 14:48:51');
+INSERT INTO `sp_student_ability` VALUES (1781448635511, 3, 0, 100, 39, 20, 45, 25, '该生知识深度极强，但知识广度为零，导致解题能力与迁移能力受限。建议在巩固核心知识的基础上，适当拓展相关领域内容，提升知识广度。同时，学习活跃度与韧性偏低，需增加练习频率与错题复盘，培养持续学习的习惯，以平衡深度与广度。', '2026-06-14 14:50:36');
+INSERT INTO `sp_student_ability` VALUES (1781449855221, 3, 0, 100, 39, 20, 45, 25, '该生知识深度突出，但广度缺失，解题能力与迁移水平中等，活跃度及韧性偏低。建议：适度拓展跨学科阅读，避免“偏科式”深耕；强化错题反思与变式训练，提升迁移能力；设定短期目标并记录进步，逐步培养学习韧性与主动参与习惯。', '2026-06-14 23:10:55');
+INSERT INTO `sp_student_ability` VALUES (1781451788174, 3, 0, 100, 39, 20, 45, 25, '该生知识深度极强，但知识广度为零，说明存在严重偏科或知识面狭窄问题。解题能力与迁移能力中等偏低，活跃度与韧性不足。建议：在保持深度优势的基础上，每周拓展1-2个新领域的基础知识；增加练习量并尝试跨题型训练以提升迁移能力；设定小目标打卡，增强学习韧性与活跃度。', '2026-06-14 23:43:08');
+INSERT INTO `sp_student_ability` VALUES (1781451917535, 3, 0, 100, 39, 20, 45, 25, '该生知识深度突出，但知识广度为零，表明存在严重偏科或知识面狭窄问题。解题能力中等，学习活跃度与韧性偏低，知识迁移能力尚可。建议：优先拓展跨学科基础阅读，弥补知识广度短板；制定每日小目标提升学习活跃度；通过错题反思训练强化解题韧性。', '2026-06-14 23:45:18');
+INSERT INTO `sp_student_ability` VALUES (1781452059332, 3, 0, 100, 39, 20, 45, 25, '该生知识深度突出，但知识广度、学习活跃度和韧性明显不足。建议：增加跨领域阅读与拓展练习，避免过度聚焦单一知识点；制定每日学习计划，参与小组讨论提升活跃度；面对难题时尝试分步解决，培养抗挫力，以平衡能力结构。', '2026-06-14 23:47:39');
 
 -- ----------------------------
 -- Table structure for sp_student_profile
@@ -7614,13 +7884,14 @@ CREATE TABLE `sp_student_profile`  (
   `profile_json` text CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL,
   `updated_at` datetime NULL DEFAULT NULL,
   PRIMARY KEY (`id`) USING BTREE,
-  INDEX `idx_profile_user`(`user_id` ASC) USING BTREE
-) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_general_ci ROW_FORMAT = Dynamic;
+  INDEX `idx_profile_user`(`user_id` ASC) USING BTREE,
+  CONSTRAINT `fk_sp_user` FOREIGN KEY (`user_id`) REFERENCES `sp_user` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
+) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_general_ci ROW_FORMAT = DYNAMIC;
 
 -- ----------------------------
 -- Records of sp_student_profile
 -- ----------------------------
-INSERT INTO `sp_student_profile` VALUES (2055602784513806337, 3, '数据科学与大数据技术', NULL, NULL, NULL, NULL, NULL, NULL, NULL, '{\"major\":\"数据科学与大数据技术\",\"course\":\"-\",\"knowledgeBase\":\"-\",\"cognitiveStyle\":\"-\",\"weakPoints\":\"-\",\"interestPreference\":\"-\",\"pacePreference\":\"-\",\"examGoal\":\"-\"}', '2026-05-16 18:54:30');
+INSERT INTO `sp_student_profile` VALUES (2055602784513806337, 3, '人工智能', '人工智能导论', '中等', '图文结合', '模型评估与知识迁移', '理论精讲', '每周3次', '80分以上', '{\"major\":\"人工智能\",\"course\":\"人工智能导论\",\"knowledgeBase\":\"中等\",\"cognitiveStyle\":\"图文结合\",\"weakPoints\":\"模型评估与知识迁移\",\"interestPreference\":\"理论精讲\",\"pacePreference\":\"每周3次\",\"examGoal\":\"80分以上\"}', '2026-05-29 14:30:40');
 INSERT INTO `sp_student_profile` VALUES (2055687771342737410, 2055687643366133761, '数据科学与大数据技术', NULL, NULL, NULL, NULL, NULL, NULL, NULL, '{\"major\":\"数据科学与大数据技术\",\"course\":\"-\",\"knowledgeBase\":\"-\",\"cognitiveStyle\":\"-\",\"weakPoints\":\"-\",\"interestPreference\":\"-\",\"pacePreference\":\"-\",\"examGoal\":\"-\"}', '2026-05-17 00:32:12');
 
 -- ----------------------------
@@ -7633,8 +7904,13 @@ CREATE TABLE `sp_study_duration`  (
   `lesson_id` bigint NULL DEFAULT NULL,
   `study_date` date NULL DEFAULT NULL,
   `duration_seconds` int NULL DEFAULT 0,
-  PRIMARY KEY (`id`) USING BTREE
-) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_general_ci ROW_FORMAT = Dynamic;
+  PRIMARY KEY (`id`) USING BTREE,
+  INDEX `idx_sd_user`(`user_id` ASC) USING BTREE,
+  INDEX `idx_sd_lesson`(`lesson_id` ASC) USING BTREE,
+  INDEX `idx_sd_date`(`study_date` ASC) USING BTREE,
+  CONSTRAINT `fk_sd_lesson` FOREIGN KEY (`lesson_id`) REFERENCES `sp_lesson` (`id`) ON DELETE SET NULL ON UPDATE CASCADE,
+  CONSTRAINT `fk_sd_user` FOREIGN KEY (`user_id`) REFERENCES `sp_user` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
+) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_general_ci ROW_FORMAT = DYNAMIC;
 
 -- ----------------------------
 -- Records of sp_study_duration
@@ -8080,6 +8356,8 @@ INSERT INTO `sp_study_duration` VALUES (1779850677847, 3, 1779182707164, '2026-0
 INSERT INTO `sp_study_duration` VALUES (1779850771060, 3, 1779850731622, '2026-05-27', 480);
 INSERT INTO `sp_study_duration` VALUES (1779851352126, 3, 1778941932298, '2026-05-27', 810);
 INSERT INTO `sp_study_duration` VALUES (1779852185918, 3, 1779850762314, '2026-05-27', 780);
+INSERT INTO `sp_study_duration` VALUES (1779969992305, 3, 1779850762314, '2026-05-28', 90);
+INSERT INTO `sp_study_duration` VALUES (1779970114837, 3, 1779188471228, '2026-05-28', 30);
 
 -- ----------------------------
 -- Table structure for sp_study_path
@@ -8093,12 +8371,17 @@ CREATE TABLE `sp_study_path`  (
   `push_json` text CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL,
   `created_at` datetime NULL DEFAULT NULL,
   PRIMARY KEY (`id`) USING BTREE,
-  INDEX `idx_path_user`(`user_id` ASC) USING BTREE
-) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_general_ci ROW_FORMAT = Dynamic;
+  INDEX `idx_path_user`(`user_id` ASC) USING BTREE,
+  CONSTRAINT `fk_study_path_user` FOREIGN KEY (`user_id`) REFERENCES `sp_user` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
+) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_general_ci ROW_FORMAT = DYNAMIC;
 
 -- ----------------------------
 -- Records of sp_study_path
 -- ----------------------------
+INSERT INTO `sp_study_path` VALUES (1779900017001, 3, '编程入门学习路径', '{\"steps\":[{\"order\":1,\"name\":\"认识编程\",\"kps\":[\"什么是程序\",\"编程语言概述\"],\"status\":\"completed\"},{\"order\":2,\"name\":\"开发环境搭建\",\"kps\":[\"安装IDE\",\"第一个程序\"],\"status\":\"completed\"},{\"order\":3,\"name\":\"变量与数据类型\",\"kps\":[\"基本数据类型\",\"变量声明\",\"类型转换\"],\"status\":\"in_progress\"},{\"order\":4,\"name\":\"流程控制\",\"kps\":[\"条件判断\",\"循环结构\"],\"status\":\"pending\"},{\"order\":5,\"name\":\"函数\",\"kps\":[\"函数定义\",\"参数传递\",\"作用域\"],\"status\":\"pending\"}]}', '{\"讲义精读包\":[{\"title\":\"编程入门PPT课件\",\"url\":\"/resources/slides/ch01-intro.pdf\"}],\"分层练习题\":[{\"title\":\"C语言基础练习集\",\"url\":\"/practice/c-basics\"}],\"知识脉络图\":[{\"title\":\"编程基础知识图谱\",\"url\":\"/mindmap/programming-basics\"}]}', '2026-05-20 08:00:00');
+INSERT INTO `sp_study_path` VALUES (1779900017002, 4, 'Web开发学习路径', '{\"steps\":[{\"order\":1,\"name\":\"HTML基础\",\"kps\":[\"HTML标签\",\"语义化\",\"表单\"],\"status\":\"completed\"},{\"order\":2,\"name\":\"CSS样式\",\"kps\":[\"选择器\",\"盒模型\",\"Flexbox\",\"Grid\"],\"status\":\"in_progress\"},{\"order\":3,\"name\":\"JavaScript入门\",\"kps\":[\"变量\",\"函数\",\"DOM操作\"],\"status\":\"pending\"},{\"order\":4,\"name\":\"响应式设计\",\"kps\":[\"媒体查询\",\"移动端适配\"],\"status\":\"pending\"},{\"order\":5,\"name\":\"前端框架\",\"kps\":[\"Vue基础\",\"组件化\"],\"status\":\"pending\"}]}', '{\"讲义精读包\":[{\"title\":\"HTML/CSS基础讲义\",\"url\":\"/resources/slides/html-css-basics.pdf\"}],\"视频脚本\":[{\"title\":\"Flexbox布局详解\",\"url\":\"/video/flexbox-tutorial\"}]}', '2026-05-22 10:00:00');
+INSERT INTO `sp_study_path` VALUES (1779900017003, 5, '数据结构学习路径', '{\"steps\":[{\"order\":1,\"name\":\"线性结构\",\"kps\":[\"数组\",\"链表\",\"栈\",\"队列\"],\"status\":\"in_progress\"},{\"order\":2,\"name\":\"树结构\",\"kps\":[\"二叉树\",\"BST\",\"堆\"],\"status\":\"pending\"},{\"order\":3,\"name\":\"图结构\",\"kps\":[\"图的表示\",\"DFS\",\"BFS\",\"最短路径\"],\"status\":\"pending\"},{\"order\":4,\"name\":\"排序算法\",\"kps\":[\"冒泡\",\"快排\",\"归并排序\"],\"status\":\"pending\"},{\"order\":5,\"name\":\"搜索与查找\",\"kps\":[\"二分查找\",\"哈希表\"],\"status\":\"pending\"}]}', '{\"讲义精读包\":[{\"title\":\"数据结构基础讲义\",\"url\":\"/resources/slides/ds-basics.pdf\"}],\"代码实操\":[{\"title\":\"二叉搜索树实现\",\"url\":\"/resources/code/bst-demo.zip\"}]}', '2026-05-25 14:00:00');
+INSERT INTO `sp_study_path` VALUES (1779900017004, 3, '机器学习进阶路径', '{\"steps\":[{\"order\":1,\"name\":\"数学基础\",\"kps\":[\"线性代数\",\"概率论\",\"微积分\"],\"status\":\"completed\"},{\"order\":2,\"name\":\"监督学习\",\"kps\":[\"线性回归\",\"逻辑回归\",\"SVM\",\"决策树\"],\"status\":\"in_progress\"},{\"order\":3,\"name\":\"神经网络\",\"kps\":[\"感知机\",\"多层网络\",\"激活函数\"],\"status\":\"pending\"},{\"order\":4,\"name\":\"深度学习\",\"kps\":[\"CNN\",\"RNN\",\"Transformer\"],\"status\":\"pending\"},{\"order\":5,\"name\":\"模型部署\",\"kps\":[\"模型优化\",\"ONNX\",\"TensorRT\"],\"status\":\"pending\"}]}', '{\"讲义精读包\":[{\"title\":\"机器学习入门指南\",\"url\":\"https://www.coursera.org/learn/machine-learning\"}],\"分层练习题\":[{\"title\":\"监督学习算法练习\",\"url\":\"/practice/supervised-learning\"}]}', '2026-05-27 09:00:00');
 
 -- ----------------------------
 -- Table structure for sp_sub_chapter
@@ -8118,8 +8401,14 @@ CREATE TABLE `sp_sub_chapter`  (
   `cover_url` varchar(512) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL DEFAULT NULL,
   `status` varchar(32) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL DEFAULT 'published',
   `user_id` bigint NULL DEFAULT NULL,
-  PRIMARY KEY (`id`) USING BTREE
-) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_general_ci ROW_FORMAT = Dynamic;
+  PRIMARY KEY (`id`) USING BTREE,
+  INDEX `idx_sc_chapter`(`chapter_id` ASC) USING BTREE,
+  INDEX `idx_sc_course`(`course_id` ASC) USING BTREE,
+  INDEX `idx_sc_user`(`user_id` ASC) USING BTREE,
+  CONSTRAINT `fk_sub_chapter_chapter` FOREIGN KEY (`chapter_id`) REFERENCES `sp_chapter` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
+  CONSTRAINT `fk_sub_chapter_course` FOREIGN KEY (`course_id`) REFERENCES `sp_course` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
+  CONSTRAINT `fk_sub_chapter_user` FOREIGN KEY (`user_id`) REFERENCES `sp_user` (`id`) ON DELETE SET NULL ON UPDATE CASCADE
+) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_general_ci ROW_FORMAT = DYNAMIC;
 
 -- ----------------------------
 -- Records of sp_sub_chapter
@@ -8885,7 +9174,7 @@ CREATE TABLE `sp_subject`  (
   `description` text CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL,
   `sort_order` int NULL DEFAULT 0,
   PRIMARY KEY (`id`) USING BTREE
-) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_general_ci ROW_FORMAT = Dynamic;
+) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_general_ci ROW_FORMAT = DYNAMIC;
 
 -- ----------------------------
 -- Records of sp_subject
@@ -8915,7 +9204,8 @@ CREATE TABLE `sp_task_completion`  (
   `created_at` datetime NULL DEFAULT NULL,
   `updated_at` datetime NULL DEFAULT NULL,
   PRIMARY KEY (`id`) USING BTREE,
-  INDEX `idx_task_user_week`(`user_id` ASC, `week_start_date` ASC) USING BTREE
+  INDEX `idx_task_user_week`(`user_id` ASC, `week_start_date` ASC) USING BTREE,
+  CONSTRAINT `fk_tc_user` FOREIGN KEY (`user_id`) REFERENCES `sp_user` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
 ) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_general_ci ROW_FORMAT = DYNAMIC;
 
 -- ----------------------------
@@ -8939,8 +9229,10 @@ CREATE TABLE `sp_unit`  (
   `description` text CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL,
   `sort_order` int NULL DEFAULT 0,
   `prerequisite_unit_id` bigint NULL DEFAULT NULL,
-  PRIMARY KEY (`id`) USING BTREE
-) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_general_ci ROW_FORMAT = Dynamic;
+  PRIMARY KEY (`id`) USING BTREE,
+  INDEX `idx_unit_subject`(`subject_id` ASC) USING BTREE,
+  CONSTRAINT `fk_unit_subject` FOREIGN KEY (`subject_id`) REFERENCES `sp_subject` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
+) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_general_ci ROW_FORMAT = DYNAMIC;
 
 -- ----------------------------
 -- Records of sp_unit
@@ -8985,7 +9277,7 @@ CREATE TABLE `sp_user`  (
   `avatar_url` varchar(512) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL DEFAULT NULL,
   PRIMARY KEY (`id`) USING BTREE,
   UNIQUE INDEX `username`(`username` ASC) USING BTREE
-) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_general_ci ROW_FORMAT = Dynamic;
+) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_general_ci ROW_FORMAT = DYNAMIC;
 
 -- ----------------------------
 -- Records of sp_user
@@ -8996,6 +9288,7 @@ INSERT INTO `sp_user` VALUES (3, 'student', '8d969eef6ecad3c29a3a629280e686cf0c3
 INSERT INTO `sp_user` VALUES (4, 'student02', '8d969eef6ecad3c29a3a629280e686cf0c3f5d5a86aff3ca12020c923adc6c92', 'student', '李同学', NULL);
 INSERT INTO `sp_user` VALUES (5, 'student03', '8d969eef6ecad3c29a3a629280e686cf0c3f5d5a86aff3ca12020c923adc6c92', 'student', '陈同学', NULL);
 INSERT INTO `sp_user` VALUES (2055687643366133761, '15823188146', '8d969eef6ecad3c29a3a629280e686cf0c3f5d5a86aff3ca12020c923adc6c92', 'student', '15823188146', NULL);
+INSERT INTO `sp_user` VALUES (2066164562829561857, 'student21', '8d969eef6ecad3c29a3a629280e686cf0c3f5d5a86aff3ca12020c923adc6c92', 'student', 'student21', NULL);
 
 -- ----------------------------
 -- Table structure for sp_user_badge
@@ -9007,8 +9300,11 @@ CREATE TABLE `sp_user_badge`  (
   `badge_id` bigint NOT NULL,
   `unlocked_at` datetime NULL DEFAULT NULL COMMENT '解锁时间',
   PRIMARY KEY (`id`) USING BTREE,
-  INDEX `idx_ub_user`(`user_id` ASC) USING BTREE
-) ENGINE = InnoDB AUTO_INCREMENT = 9 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_general_ci ROW_FORMAT = Dynamic;
+  INDEX `idx_ub_user`(`user_id` ASC) USING BTREE,
+  INDEX `idx_ub_badge`(`badge_id` ASC) USING BTREE,
+  CONSTRAINT `fk_ub_badge` FOREIGN KEY (`badge_id`) REFERENCES `sp_badge_def` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
+  CONSTRAINT `fk_ub_user` FOREIGN KEY (`user_id`) REFERENCES `sp_user` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
+) ENGINE = InnoDB AUTO_INCREMENT = 9 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_general_ci ROW_FORMAT = DYNAMIC;
 
 -- ----------------------------
 -- Records of sp_user_badge
@@ -9035,8 +9331,11 @@ CREATE TABLE `sp_user_kp_mastery`  (
   `correct_count` int NULL DEFAULT 0,
   `last_practice_at` datetime NULL DEFAULT NULL,
   PRIMARY KEY (`id`) USING BTREE,
-  UNIQUE INDEX `uk_user_kp`(`user_id` ASC, `knowledge_point_id` ASC) USING BTREE
-) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_general_ci ROW_FORMAT = Dynamic;
+  UNIQUE INDEX `uk_user_kp`(`user_id` ASC, `knowledge_point_id` ASC) USING BTREE,
+  INDEX `idx_ukm_kp`(`knowledge_point_id` ASC) USING BTREE,
+  CONSTRAINT `fk_ukm_kp` FOREIGN KEY (`knowledge_point_id`) REFERENCES `sp_knowledge_point` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
+  CONSTRAINT `fk_ukm_user` FOREIGN KEY (`user_id`) REFERENCES `sp_user` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
+) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_general_ci ROW_FORMAT = DYNAMIC;
 
 -- ----------------------------
 -- Records of sp_user_kp_mastery
@@ -9061,13 +9360,14 @@ CREATE TABLE `sp_user_streak`  (
   `total_checkins` int NULL DEFAULT 0 COMMENT '总签到次数',
   `updated_at` datetime NULL DEFAULT NULL,
   PRIMARY KEY (`id`) USING BTREE,
-  UNIQUE INDEX `uk_streak_user`(`user_id` ASC) USING BTREE
-) ENGINE = InnoDB AUTO_INCREMENT = 2 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_general_ci ROW_FORMAT = Dynamic;
+  UNIQUE INDEX `uk_streak_user`(`user_id` ASC) USING BTREE,
+  CONSTRAINT `fk_us_user` FOREIGN KEY (`user_id`) REFERENCES `sp_user` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
+) ENGINE = InnoDB AUTO_INCREMENT = 2 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_general_ci ROW_FORMAT = DYNAMIC;
 
 -- ----------------------------
 -- Records of sp_user_streak
 -- ----------------------------
-INSERT INTO `sp_user_streak` VALUES (1, 3, 1, 14, '2026-05-27', 30, '2026-05-27 10:56:23');
+INSERT INTO `sp_user_streak` VALUES (1, 3, 2, 14, '2026-05-28', 31, '2026-05-28 20:45:05');
 
 -- ----------------------------
 -- Table structure for sp_user_xp
@@ -9082,13 +9382,14 @@ CREATE TABLE `sp_user_xp`  (
   `created_at` datetime NULL DEFAULT NULL,
   `updated_at` datetime NULL DEFAULT NULL,
   PRIMARY KEY (`id`) USING BTREE,
-  UNIQUE INDEX `uk_xp_user`(`user_id` ASC) USING BTREE
-) ENGINE = InnoDB AUTO_INCREMENT = 2 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_general_ci ROW_FORMAT = Dynamic;
+  UNIQUE INDEX `uk_xp_user`(`user_id` ASC) USING BTREE,
+  CONSTRAINT `fk_uxp_user` FOREIGN KEY (`user_id`) REFERENCES `sp_user` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
+) ENGINE = InnoDB AUTO_INCREMENT = 2 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_general_ci ROW_FORMAT = DYNAMIC;
 
 -- ----------------------------
 -- Records of sp_user_xp
 -- ----------------------------
-INSERT INTO `sp_user_xp` VALUES (1, 3, 8675, 19, '终极学者', '2026-05-16 04:33:31', '2026-05-27 10:56:23');
+INSERT INTO `sp_user_xp` VALUES (1, 3, 8680, 19, '终极学者', '2026-05-16 04:33:31', '2026-05-28 20:45:05');
 
 -- ----------------------------
 -- Table structure for sp_wrong_question
@@ -9106,191 +9407,3229 @@ CREATE TABLE `sp_wrong_question`  (
   `created_at` datetime NULL DEFAULT NULL,
   PRIMARY KEY (`id`) USING BTREE,
   INDEX `idx_wrong_user`(`user_id` ASC) USING BTREE,
-  INDEX `idx_wrong_record`(`exam_record_id` ASC) USING BTREE
-) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_general_ci ROW_FORMAT = Dynamic;
+  INDEX `idx_wrong_record`(`exam_record_id` ASC) USING BTREE,
+  INDEX `fk_wq_question`(`exam_question_id` ASC) USING BTREE,
+  CONSTRAINT `fk_wq_question` FOREIGN KEY (`exam_question_id`) REFERENCES `sp_exam_question` (`id`) ON DELETE SET NULL ON UPDATE CASCADE,
+  CONSTRAINT `fk_wq_record` FOREIGN KEY (`exam_record_id`) REFERENCES `sp_exam_record` (`id`) ON DELETE SET NULL ON UPDATE CASCADE,
+  CONSTRAINT `fk_wq_user` FOREIGN KEY (`user_id`) REFERENCES `sp_user` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
+) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_general_ci ROW_FORMAT = DYNAMIC;
 
 -- ----------------------------
 -- Records of sp_wrong_question
 -- ----------------------------
-
--- ============================================================
--- Seed data for empty tables (generated 2026-05-28)
--- ============================================================
-
--- sp_assignment
-INSERT INTO `sp_assignment` VALUES
-(1779900001001, 1778903957642, '第一章课后作业', '[1778945292204,1778945309169]', '完成第一章的编程练习，提交源代码和运行截图', '2026-06-15 23:59:59', '2026-05-20 08:00:00'),
-(1779900001002, 1778903957642, '第二章综合练习', '[1778945335548,1778945352317]', '完成变量与数据类型章节的综合练习', '2026-06-22 23:59:59', '2026-05-22 08:00:00'),
-(1779900001003, 1778903957642, '条件判断与循环作业', '[1778945372976,1778945390332]', '完成条件判断和循环结构的编程题目', '2026-06-30 23:59:59', '2026-05-25 08:00:00'),
-(1779900001004, 1778903957642, '函数模块实践', '[1778945406858]', '编写至少3个自定义函数并完成单元测试', '2026-07-07 23:59:59', '2026-05-28 08:00:00'),
-(1779900001005, 1778903957642, '数据结构基础练习', '[1778941914331]', '完成线性结构相关习题，含代码实现', '2026-07-15 23:59:59', '2026-06-01 08:00:00'),
-(1779900001006, 1778903957642, '算法思维训练', '[1778941945222]', '完成5道算法设计题目并分析时间复杂度', '2026-07-22 23:59:59', '2026-06-05 08:00:00'),
-(1779900001007, 1778903957642, '期中项目：简易计算器', '[1778945324508]', '使用Qt开发一个带GUI的科学计算器', '2026-08-01 23:59:59', '2026-06-10 08:00:00');
-
--- sp_assignment_submission
-INSERT INTO `sp_assignment_submission` VALUES
-(1779900002001, 1779900001001, 3, 'submitted', 92, '代码规范，注释清晰，运行结果正确', '2026-06-14 21:30:00'),
-(1779900002002, 1779900001001, 4, 'submitted', 85, '功能实现正常，部分变量命名可优化', '2026-06-14 22:15:00'),
-(1779900002003, 1779900001001, 5, 'submitted', 78, '基本功能完成，缺少异常处理', '2026-06-15 20:45:00'),
-(1779900002004, 1779900001002, 3, 'submitted', 95, '完成质量高，逻辑清晰', '2026-06-21 19:30:00'),
-(1779900002005, 1779900001002, 4, 'pending', NULL, NULL, '2026-06-22 10:00:00'),
-(1779900002006, 1779900001003, 3, 'submitted', 88, '循环逻辑正确，边界条件处理得当', '2026-06-28 21:00:00'),
-(1779900002007, 1779900001003, 5, 'submitted', 72, '部分循环条件有误，需加强练习', '2026-06-29 22:30:00'),
-(1779900002008, 1779900001004, 3, 'submitted', 90, '函数设计合理，测试覆盖全面', '2026-07-05 20:00:00');
-
--- sp_chapter_resource
-INSERT INTO `sp_chapter_resource` VALUES
-(1779900003001, 1779182227741, 2001, 'pdf', '编程入门PPT课件', '第一章的完整课件，包含基本概念讲解', '/resources/slides/ch01-intro.pdf', '2.4MB', '2026-05-16 10:00:00', '2026-05-16 10:00:00'),
-(1779900003002, 1779182227741, 2001, 'doc', '编程语言对比表', '常见编程语言特性对比（Python/Java/C++）', '/resources/docs/lang-comparison.md', '156KB', '2026-05-16 10:30:00', '2026-05-16 10:30:00'),
-(1779900003003, 1779182227741, 2004, 'pdf', '变量与数据类型详解', '数据类型转换规则与内存模型图解', '/resources/slides/ch04-datatypes.pdf', '3.1MB', '2026-05-18 14:00:00', '2026-05-18 14:00:00'),
-(1779900003004, 8004, 1401, 'link', '机器学习入门指南', '吴恩达机器学习课程学习路径', 'https://www.coursera.org/learn/machine-learning', NULL, '2026-05-20 09:00:00', '2026-05-20 09:00:00'),
-(1779900003005, 8004, 1401, 'pdf', '监督学习算法综述', '线性回归、逻辑回归、SVM、决策树对比', '/resources/slides/supervised-learning.pdf', '4.2MB', '2026-05-20 09:30:00', '2026-05-20 09:30:00'),
-(1779900003006, 8004, 1402, 'video', '神经网络可视化演示', '交互式神经网络前向传播演示', 'https://playground.tensorflow.org', NULL, '2026-05-22 11:00:00', '2026-05-22 11:00:00'),
-(1779900003007, 1779184286152, 1201, 'pdf', '数组与链表讲解', '线性结构核心知识点梳理', '/resources/slides/linear-structures.pdf', '2.8MB', '2026-05-25 08:00:00', '2026-05-25 08:00:00'),
-(1779900003008, 1779184286152, 1202, 'code', '二叉树实现代码', 'BST的插入、删除、遍历Java实现', '/resources/code/bst-demo.zip', '45KB', '2026-05-25 09:00:00', '2026-05-25 09:00:00');
-
--- sp_class_member
-INSERT INTO `sp_class_member` VALUES
-(1779900004001, 1778903957642, 3, '2026-05-16 12:00:00'),
-(1779900004002, 1778903957642, 4, '2026-05-17 09:30:00'),
-(1779900004003, 1778903957642, 5, '2026-05-18 14:20:00'),
-(1779900004004, 1778903957642, 2055687643366133761, '2026-05-20 10:15:00');
-
--- sp_course_announcement
-INSERT INTO `sp_course_announcement` VALUES
-(1779900005001, 1779182227741, '课程通知', '第一周学习任务发布', '请各位同学完成"什么是编程"和"开发环境搭建"两个课时的学习内容，并在讨论区提交学习笔记。', '2026-05-16 08:30:00', '2026-05-16 08:30:00'),
-(1779900005002, 1779182227741, '作业提醒', '第一次作业截止提醒', '第一章课后作业将于6月15日截止，请还未提交的同学尽快完成。', '2026-06-13 10:00:00', '2026-06-13 10:00:00'),
-(1779900005003, 1779182227741, '重要通知', '期中考试安排', '期中考试定于7月5日，考试范围：第1-5章，考试时长120分钟。', '2026-06-25 14:00:00', '2026-06-25 14:00:00'),
-(1779900005004, 8004, '课程通知', '机器学习课程开课须知', '请提前安装Python 3.10+和Jupyter Notebook环境，课程中会使用scikit-learn库。', '2026-05-16 09:00:00', '2026-05-16 09:00:00'),
-(1779900005005, 8004, '资源推荐', '推荐阅读材料', '推荐《统计学习方法》（李航著）作为本课程的辅助教材，特别是第2-6章。', '2026-05-20 11:00:00', '2026-05-20 11:00:00'),
-(1779900005006, 1779184286152, '课程通知', '实验环境配置', '请安装JDK 17+和IntelliJ IDEA Community版，后续实验将使用Java实现数据结构。', '2026-05-18 08:00:00', '2026-05-18 08:00:00'),
-(1779900005007, 1001, '欢迎公告', '欢迎加入编程入门课程', '本课程从零开始教授编程基础知识，配套有丰富的练习题和实践项目，祝学习愉快！', '2026-05-16 04:35:00', '2026-05-16 04:35:00');
-
--- sp_course_question
-INSERT INTO `sp_course_question` VALUES
-(1779900006001, 1779182227741, 3, '关于变量作用域的问题', '在C语言中，全局变量和局部变量同名时，函数内部访问的是哪个变量？能否给出示例代码说明？', '2026-05-20 15:30:00', '2026-05-20 15:30:00'),
-(1779900006002, 1779182227741, 4, 'for循环嵌套的疑问', '双重for循环中，break语句只能跳出内层循环吗？如果想跳出外层循环应该怎么实现？', '2026-05-22 10:45:00', '2026-05-22 10:45:00'),
-(1779900006003, 1779182227741, 5, '指针和数组的关系', 'C语言中数组名和指针有什么区别？为什么说数组名是常量指针？', '2026-05-25 16:20:00', '2026-05-25 16:20:00'),
-(1779900006004, 8004, 3, '过拟合和欠拟合如何判断', '在训练机器学习模型时，通过什么指标可以判断是过拟合还是欠拟合？训练集准确率95%但测试集只有70%，这说明什么问题？', '2026-05-23 14:00:00', '2026-05-23 14:00:00'),
-(1779900006005, 8004, 4, '学习率的选择策略', '学习率设置过大或过小会有什么影响？有没有自适应调整学习率的方法推荐？', '2026-05-26 11:30:00', '2026-05-26 11:30:00'),
-(1779900006006, 1779184286152, 3, '链表反转的递归思路', '用递归实现单链表反转时，递归函数的返回值和参数应该如何设计？', '2026-05-28 09:15:00', '2026-05-28 09:15:00'),
-(1779900006007, 1779184286152, 5, '二叉搜索树的删除操作', 'BST删除一个有两个子节点的节点时，用前驱还是后继替代比较好？', '2026-05-28 16:00:00', '2026-05-28 16:00:00');
-
--- sp_course_answer
-INSERT INTO `sp_course_answer` VALUES
-(1779900007001, 1779900006001, 2, '在C语言中，当全局变量和局部变量同名时，函数内部访问的是局部变量（就近原则）。示例：\n```c\nint x = 10; // 全局变量\nvoid test() {\n    int x = 20; // 局部变量\n    printf("%d", x); // 输出20，访问局部变量\n}\n```\n如果确实需要访问全局变量，可以使用extern声明或在没有同名局部变量的作用域中访问。', 0, '2026-05-20 16:30:00', '2026-05-20 16:30:00'),
-(1779900007002, 1779900006001, NULL, '补充说明：局部变量会"遮蔽"（shadowing）同名的全局变量。编译器会优先在当前作用域查找变量，找到即停止，不会继续向外层查找。这是一种语言设计上的保护机制，避免内部代码意外修改全局状态。', 0, '2026-05-20 17:00:00', '2026-05-20 17:00:00'),
-(1779900007003, 1779900006002, 2, '是的，break默认只跳出最内层循环。要跳出外层循环有几种方法：\n1. 使用goto语句（最简单直接）\n2. 设置标志变量，在外层循环条件中判断\n3. 将嵌套循环封装成函数，使用return退出\n\n推荐使用方法2或3，因为goto会降低代码可读性。', 0, '2026-05-22 14:00:00', '2026-05-22 14:00:00'),
-(1779900007004, 1779900006004, NULL, '训练集准确率95%而测试集只有70%，这是典型的过拟合（Overfitting）现象。判断标准：\n- 过拟合：训练集误差低、测试集误差高（泛化能力差）\n- 欠拟合：训练集和测试集误差都高\n\n解决方法：增加正则化（L1/L2）、使用Dropout、数据增强、早停法、减少模型复杂度。', 1, '2026-05-23 14:05:00', '2026-05-23 14:05:00'),
-(1779900007005, 1779900006005, NULL, '学习率影响：\n- 过大：损失函数震荡甚至发散，无法收敛\n- 过小：收敛速度慢，可能陷入局部最优\n\n自适应方法推荐：Adam（最常用）、RMSprop、Adagrad。Adam结合了动量和自适应学习率，通常是最佳默认选择。', 1, '2026-05-26 11:35:00', '2026-05-26 11:35:00'),
-(1779900007006, 1779900006006, 2, '递归反转单链表的思路：\n1. 递归终止条件：当前节点为空或只有一个节点\n2. 递归反转后续链表\n3. 将当前节点的下一个节点的next指向当前节点\n4. 将当前节点的next置为NULL\n\n```c\nNode* reverse(Node* head) {\n    if (head == NULL || head->next == NULL) return head;\n    Node* newHead = reverse(head->next);\n    head->next->next = head;\n    head->next = NULL;\n    return newHead;\n}\n```', 0, '2026-05-28 10:00:00', '2026-05-28 10:00:00'),
-(1779900007007, 1779900006007, 2, '使用后继（successor）或前驱（predecessor）替换都可以，结果都是合法的BST。通常选择后继（右子树的最小节点），因为实现更直观。如果树比较平衡，两者效率相同；如果树偏向一侧，选择较少节点的那一侧更高效。', 0, '2026-05-28 17:30:00', '2026-05-28 17:30:00');
-
--- sp_exam
-INSERT INTO `sp_exam` VALUES
-(1779900008001, 2, '编程入门期中考试', '计算机科学', 120, '变量、数据类型、流程控制、函数', '已发布', 25, '2026-06-01 10:00:00'),
-(1779900008002, 2, '编程入门期末考试', '计算机科学', 150, '全部课程内容', '草稿', 40, '2026-06-15 10:00:00'),
-(1779900008003, 2, '数据结构单元测验一', '数据结构与算法', 60, '线性结构与树结构', '已发布', 15, '2026-05-25 08:00:00'),
-(1779900008004, 2, '数据结构单元测验二', '数据结构与算法', 60, '图结构与排序算法', '已发布', 15, '2026-06-10 08:00:00'),
-(1779900008005, 2, '机器学习阶段测试', '人工智能', 90, '监督学习与神经网络基础', '已发布', 20, '2026-06-05 14:00:00'),
-(1779900008006, 2, '数据库SQL综合测试', '数据库系统', 90, 'SQL查询、索引、事务', '已发布', 20, '2026-06-20 09:00:00');
-
--- sp_exam_assignment
-INSERT INTO `sp_exam_assignment` VALUES
-(1779900009001, 1779900008001, 3, '2026-06-01 10:00:00'),
-(1779900009002, 1779900008001, 4, '2026-06-01 10:00:00'),
-(1779900009003, 1779900008001, 5, '2026-06-01 10:00:00'),
-(1779900009004, 1779900008003, 3, '2026-05-25 08:00:00'),
-(1779900009005, 1779900008003, 4, '2026-05-25 08:00:00'),
-(1779900009006, 1779900008003, 5, '2026-05-25 08:00:00'),
-(1779900009007, 1779900008005, 3, '2026-06-05 14:00:00'),
-(1779900009008, 1779900008005, 4, '2026-06-05 14:00:00');
-
--- sp_exam_question
-INSERT INTO `sp_exam_question` VALUES
-(1779900010001, 1779900008001, 1, 'single_choice', '以下哪种数据类型占用的内存最大？', 4, 'D'),
-(1779900010002, 1779900008001, 2, 'single_choice', '在C语言中，for循环的初始化语句在什么时候执行？', 4, 'A'),
-(1779900010003, 1779900008001, 3, 'single_choice', '以下哪个是合法的C语言变量名？', 4, 'C'),
-(1779900010004, 1779900008001, 4, 'multiple_choice', '以下关于函数的描述，哪些是正确的？', 6, 'ABD'),
-(1779900010005, 1779900008001, 5, 'short_answer', '请用C语言编写一个函数，实现计算1+2+...+n的功能，并分析其时间复杂度。', 10, 'int sum(int n) { int s=0; for(int i=1;i<=n;i++) s+=i; return s; } 时间复杂度O(n)'),
-(1779900010006, 1779900008003, 1, 'single_choice', '数组和链表的主要区别是什么？', 4, 'B'),
-(1779900010007, 1779900008003, 2, 'single_choice', '栈的特点是？', 4, 'C'),
-(1779900010008, 1779900008003, 3, 'single_choice', '二叉搜索树的中序遍历结果是？', 4, 'A'),
-(1779900010009, 1779900008003, 4, 'short_answer', '请描述快速排序的基本思想，并给出其平均时间复杂度。', 8, '分治法：选基准，分区，递归。平均O(n log n)'),
-(1779900010010, 1779900008005, 1, 'single_choice', '以下哪个不是监督学习算法？', 4, 'D');
-
--- sp_exam_record
-INSERT INTO `sp_exam_record` VALUES
-(1779900011001, 1779900008001, 3, 88, '基础扎实，函数题回答完整，选择题偶有失误', '[{"qid":1779900010001,"answer":"D"},{"qid":1779900010002,"answer":"A"},{"qid":1779900010003,"answer":"B"},{"qid":1779900010004,"answer":"ABD"},{"qid":1779900010005,"answer":"正确"}]', '2026-06-01 11:50:00'),
-(1779900011002, 1779900008001, 4, 76, '选择题表现好，函数题部分失分，需加强编程练习', '[{"qid":1779900010001,"answer":"D"},{"qid":1779900010002,"answer":"A"},{"qid":1779900010003,"answer":"C"},{"qid":1779900010004,"answer":"AB"},{"qid":1779900010005,"answer":"部分正确"}]', '2026-06-01 11:55:00'),
-(1779900011003, 1779900008001, 5, 68, '基础知识掌握不够牢固，建议重新复习前五章', '[{"qid":1779900010001,"answer":"C"},{"qid":1779900010002,"answer":"B"},{"qid":1779900010003,"answer":"C"},{"qid":1779900010004,"answer":"AD"},{"qid":1779900010005,"answer":"有错误"}]', '2026-06-01 12:00:00'),
-(1779900011004, 1779900008003, 3, 92, '数据结构基础扎实，算法分析能力优秀', '[{"qid":1779900010006,"answer":"B"},{"qid":1779900010007,"answer":"C"},{"qid":1779900010008,"answer":"A"},{"qid":1779900010009,"answer":"正确"}]', '2026-05-25 08:55:00'),
-(1779900011005, 1779900008003, 4, 80, '链表和树结构掌握较好，建议再复习图相关章节', '[{"qid":1779900010006,"answer":"B"},{"qid":1779900010007,"answer":"C"},{"qid":1779900010008,"answer":"B"},{"qid":1779900010009,"answer":"基本正确"}]', '2026-05-25 08:50:00'),
-(1779900011006, 1779900008005, 3, 85, '监督学习概念清晰，神经网络部分表现良好', '[{"qid":1779900010010,"answer":"D"}]', '2026-06-05 15:20:00');
-
--- sp_learning_assessment
-INSERT INTO `sp_learning_assessment` VALUES
-(1779900012001, 3, '{"accuracy_score":85,"activity_score":78,"completion_score":82,"resource_score":75,"stability_score":80}', '学习表现整体良好。准确率和课程完成度较高，说明知识掌握扎实。资源使用度稍低，建议多利用系统推荐的学习资料丰富知识面。', '建议增加每日学习时长至1.5小时以上，每周至少完成2次练习题。重点关注数据结构与算法模块的薄弱环节。', '2026-05-28 10:00:00'),
-(1779900012002, 4, '{"accuracy_score":72,"activity_score":85,"completion_score":70,"resource_score":82,"stability_score":68}', '学习积极性高，活跃度好。但知识掌握的稳定性不足，准确率波动较大。资源使用情况良好，能够主动查阅学习资料。', '建议在完成练习题后认真阅读解析，建立错题本。每周回顾本周所学内容，加强知识巩固。', '2026-05-28 10:05:00'),
-(1779900012003, 5, '{"accuracy_score":65,"activity_score":60,"completion_score":55,"resource_score":45,"stability_score":58}', '学习进度偏慢，各项指标均处于中下水平。课程完成度和资源使用度较低，需要加强学习投入。', '建议制定每周学习计划，确保每天至少1小时学习时间。从基础章节开始重新梳理，打好基础再推进。', '2026-05-28 10:10:00'),
-(1779900012004, 3, '{"accuracy_score":88,"activity_score":82,"completion_score":85,"resource_score":80,"stability_score":86}', '近期学习表现优秀，各项指标稳步提升。准确率和稳定性均达到良好水平，学习习惯和方法值得肯定。', '可尝试挑战更高难度的练习题目，参加编程竞赛提升实战能力。建议开始学习更深入的算法知识。', '2026-06-15 10:00:00'),
-(1779900012005, 4, '{"accuracy_score":76,"activity_score":90,"completion_score":75,"resource_score":88,"stability_score":72}', '学习热情高涨，活跃度显著提升。资源使用能力强，善于查找学习资料。准确性还需进一步提高。', '在保持学习热情的同时，注重学习质量。每道错题都要深入理解原因，避免重复犯错。', '2026-06-15 10:05:00');
-
--- sp_learning_resource
-INSERT INTO `sp_learning_resource` VALUES
-(1779900013001, 3, 'syllabus', '编程入门 - 个性化学习讲义', '## 第一章：认识编程\n\n### 什么是程序\n程序（Program）是计算机能够理解和执行的一组有序指令。它告诉计算机做什么以及怎么做。\n\n程序 = 数据结构 + 算法\n- 数据结构：组织数据的方式（数组、链表、树等）\n- 算法：解决问题的步骤\n\n### 三种基本结构\n1. 顺序结构：按书写顺序依次执行\n2. 选择结构：if-else分支\n3. 循环结构：for/while重复执行\n\n### 重点提示\n理解程序的本质是解决问题的过程，代码只是工具。', '["https://www.runoob.com/cprogramming/c-tutorial.html","https://leetcode.cn/problemset/all/"]', 92, '2026-05-20 14:00:00'),
-(1779900013002, 3, 'mind_map', '数据结构知识图谱', '# 数据结构知识体系\n\n## 线性结构\n- 数组 → 连续存储 → O(1)随机访问\n- 链表 → 离散存储 → O(1)插入删除\n- 栈 → LIFO → 函数调用、括号匹配\n- 队列 → FIFO → BFS、任务调度\n\n## 树形结构\n- 二叉树 → 遍历（前中后序）\n- 二叉搜索树 → 查找O(log n)\n- 堆 → 优先队列\n- 哈夫曼树 → 数据压缩\n\n## 图形结构\n- 邻接矩阵 vs 邻接表\n- DFS（深度优先）vs BFS（广度优先）\n- 最短路径：Dijkstra、Floyd\n\n## 排序算法\n| 算法 | 平均时间 | 空间 |\n|------|---------|------|\n| 冒泡 | O(n²) | O(1) |\n| 快排 | O(n log n) | O(log n) |\n| 归并 | O(n log n) | O(n) |', NULL, 88, '2026-05-22 15:00:00'),
-(1779900013003, 3, 'practice', '机器学习 - 分层练习题', '## 基础题\n1. 以下哪种方法用于处理缺失值？\n   A. 删除缺失行  B. 均值填充  C. 插值法  D. 以上都是\n\n2. 在逻辑回归中，Sigmoid函数的输出范围是？\n\n## 进阶题\n3. 请简述SVM中核函数的作用，并列举两种常用核函数。\n4. 决策树分裂时，信息增益和基尼系数分别如何计算？\n\n## 挑战题\n5. 某数据集的训练准确率为99%，测试准确率为78%，请分析原因并给出3种优化方案。', NULL, 85, '2026-05-25 16:00:00'),
-(1779900013004, 3, 'video_script', '排序算法可视化讲解 - 视频脚本', '# 排序算法可视化讲解\n\n## 开场（30秒）\n画面：展示乱序的柱状图\n解说："面对一堆杂乱的数据，如何让它们变得有序？今天我们来了解三种经典排序算法。"\n\n## 冒泡排序（2分钟）\n画面：动画展示相邻元素比较和交换过程\n解说："冒泡排序像水中的气泡，较小的值像气泡一样向上浮..."\n\n## 快速排序（2.5分钟）\n画面：展示分区过程，枢轴元素归位\n解说："快速排序采用分治思想，选择一个基准值..."\n\n## 对比总结（1分钟）\n画面：三列并排对比动画\n解说："冒泡简单但慢，快速高效但不稳定..."', NULL, 90, '2026-05-26 10:00:00'),
-(1779900013005, 3, 'code_lab', 'Python数据分析实战项目', '# 实战项目：学生成绩分析\n\n## 项目目标\n使用Pandas和Matplotlib分析学生成绩数据\n\n```python\nimport pandas as pd\nimport matplotlib.pyplot as plt\n\n# 1. 数据加载\ndf = pd.read_csv("student_scores.csv")\nprint(df.describe())\n\n# 2. 数据清洗\ndf = df.dropna()\ndf["avg_score"] = df[["math","english","cs"]].mean(axis=1)\n\n# 3. 成绩分布可视化\nplt.hist(df["avg_score"], bins=20)\nplt.xlabel("Average Score")\nplt.ylabel("Count")\nplt.title("Student Score Distribution")\nplt.show()\n\n# 4. 找出需要关注的学生\nlow_performers = df[df["avg_score"] < 60]\nprint(f"需要关注的学生人数：{len(low_performers)}")\n```', NULL, 87, '2026-05-27 09:00:00'),
-(1779900013006, 4, 'syllabus', 'Web开发入门 - 学习讲义', '## HTML/CSS基础\n\n### HTML5语义化\n使用语义化标签提升页面可访问性和SEO。\n\n### CSS布局\n- Flexbox：一维布局利器\n- Grid：二维布局最佳选择\n\n### 实践建议\n多动手，从仿写页面开始。', NULL, 80, '2026-05-23 11:00:00'),
-(1779900013007, 5, 'practice', 'C语言基础练习集', '## 练习题\n1. 写出程序输出：int a=5; printf("%d", ++a + a++);\n2. 用指针实现两个变量值的交换函数\n3. 判断一个字符串是否为回文', NULL, 75, '2026-05-24 14:00:00');
-
--- sp_ppt_template
-INSERT INTO `sp_ppt_template` VALUES
-(1779900014001, '科技蓝风格', 'tech-blue', '/templates/tech-blue-cover.png', '课程讲解', '适合计算机类课程的课件模板，蓝色科技风格', '{"slides":["封面","目录","章节页","内容页","代码展示页","总结页"]}', '#2563eb', '2026-05-16 00:00:00'),
-(1779900014002, '学术简约', 'academic-clean', '/templates/academic-cover.png', '学术报告', '简洁大方的学术报告模板，适合高等数学、物理等理科课程', '{"slides":["封面","目录","概念页","公式推演","案例页","参考文献"]}', '#1e293b', '2026-05-16 00:00:00'),
-(1779900014003, '暖色教育', 'warm-edu', '/templates/warm-cover.png', '通识课程', '温暖亲和的教育风格，适合人文社科类通识课程', '{"slides":["封面","导入页","知识点","讨论页","案例页","总结"]}', '#ea580c', '2026-05-16 00:00:00'),
-(1779900014004, '数据可视化', 'data-viz', '/templates/dataviz-cover.png', '数据分析', '包含多种图表的模板，适合数据分析和统计类课程', '{"slides":["封面","数据展示","柱状图","折线图","饼图","结论"]}', '#7c3aed', '2026-05-16 00:00:00'),
-(1779900014005, 'AI未来风', 'ai-future', '/templates/ai-cover.png', 'AI课程', '深色背景搭配霓虹色调，适合人工智能与前沿科技类课程', '{"slides":["封面","背景介绍","技术原理","应用场景","未来展望","Q&A"]}', '#06b6d4', '2026-05-16 00:00:00'),
-(1779900014006, '代码学院', 'code-academy', '/templates/code-cover.png', '编程教学', '代码高亮友好的模板，适合编程语言教学', '{"slides":["封面","理论讲解","代码演示","动手实践","常见错误","练习"]}', '#0891b2', '2026-05-16 00:00:00'),
-(1779900014007, '商务演示', 'business-pro', '/templates/biz-cover.png', '项目管理', '专业的商务演示模板，适合项目汇报和答辩场景', '{"slides":["封面","议程","进度汇报","数据分析","风险与对策","下一步计划"]}', '#0f172a', '2026-05-16 00:00:00');
-
--- sp_qa_history
-INSERT INTO `sp_qa_history` VALUES
-(1779900015001, 3, '什么是递归？能给我一个简单的例子吗？', '递归（Recursion）是一种编程技巧，指函数直接或间接调用自身。递归包含两个关键部分：\n\n1. **基线条件**：终止递归的条件\n2. **递归条件**：函数调用自身的条件\n\n最简单的例子——计算阶乘：\n```c\nint factorial(int n) {\n    if (n <= 1) return 1;  // 基线条件\n    return n * factorial(n - 1);  // 递归条件\n}\n```\n\n递归的优点是代码简洁优雅，缺点是可能导致栈溢出，效率通常不如迭代。适用于树遍历、分治算法、动态规划等场景。', '递归的定义与阶乘示例', 'sess_20260520_001', '2026-05-20 15:00:00'),
-(1779900015002, 3, '二叉树的先序遍历和中序遍历有什么区别？', '二叉树的三种遍历方式：\n\n**先序遍历（Pre-order）**：根 → 左 → 右\n- 先访问根节点，再遍历左子树，最后遍历右子树\n- 示例：A, B, D, E, C, F\n\n**中序遍历（In-order）**：左 → 根 → 右\n- 先遍历左子树，再访问根节点，最后遍历右子树\n- 示例：D, B, E, A, C, F\n- **重要特性**：BST的中序遍历结果是有序的\n\n**后序遍历（Post-order）**：左 → 右 → 根\n- 示例：D, E, B, F, C, A\n- 应用：计算目录大小、表达式树求值\n\n记忆技巧：前中后指的是"访问根节点"的时机。', '二叉树三种遍历方式的区别', 'sess_20260522_001', '2026-05-22 16:30:00'),
-(1779900015003, 3, '过拟合和欠拟合有什么区别？怎么解决？', '## 过拟合 vs 欠拟合\n\n| 特征 | 欠拟合 | 刚好 | 过拟合 |\n|------|--------|------|--------|\n| 训练误差 | 高 | 低 | 很低 |\n| 测试误差 | 高 | 低 | 高 |\n| 表现 | 学得太少 | 恰到好处 | 学得太多 |\n\n**欠拟合原因**：模型太简单、特征太少、训练不足\n**过拟合原因**：模型太复杂、数据太少、噪声被学习\n\n**解决方案**：\n- 欠拟合：增加特征、增加模型复杂度、更长时间训练\n- 过拟合：正则化（L1/L2）、Dropout、数据增强、早停法、交叉验证', '机器学习中过拟合与欠拟合的辨析', 'sess_20260525_001', '2026-05-25 10:00:00'),
-(1779900015004, 4, '数组和链表哪个查找更快？', '**数组**查找更快。\n\n原因：\n- 数组支持随机访问，通过索引O(1)直接定位元素\n- 链表只能顺序访问，需要从头遍历，O(n)时间\n\n但是注意：\n- 如果是有序数组，还可以用二分查找达到O(log n)\n- 链表的优势在于插入和删除（O(1)，前提是已知位置）\n\n结论：查找多用数组，频繁增删多用链表。', '数组vs链表的查找效率对比', 'sess_20260523_001', '2026-05-23 09:30:00'),
-(1779900015005, 4, 'CSS中flex和grid有什么区别？什么时候用哪个？', '## Flexbox vs Grid\n\n**Flexbox**：一维布局（行或列）\n- 适用：导航栏、按钮组、卡片横向排列\n- 特点：内容驱动，弹性伸缩\n\n**Grid**：二维布局（行和列）\n- 适用：页面整体布局、仪表盘、图片画廊\n- 特点：布局驱动，精确控制\n\n**选择建议**：\n- 单行/单列排列 → Flex\n- 多行多列网格 → Grid\n- 可以混用：外层Grid定布局，内层Flex排组件', 'CSS Flexbox与Grid布局的区别与选择', 'sess_20260524_001', '2026-05-24 11:00:00'),
-(1779900015006, 5, '栈和队列的区别是什么？各有什么应用场景？', '## 栈 vs 队列\n\n| 特性 | 栈 Stack | 队列 Queue |\n|------|----------|------------|\n| 数据进出 | LIFO（后进先出） | FIFO（先进先出） |\n| 操作端 | 一端（栈顶） | 两端（队头出，队尾入） |\n\n**栈的应用**：\n- 函数调用栈\n- 括号匹配检查\n- 浏览器后退按钮\n- 撤销操作（Ctrl+Z）\n\n**队列的应用**：\n- 任务调度（先来先服务）\n- BFS图遍历\n- 打印队列\n- 消息队列', '栈与队列的区别和应用场景', 'sess_20260526_001', '2026-05-26 14:00:00'),
-(1779900015007, 3, '请解释动态规划的核心思想', '## 动态规划核心思想\n\n**本质**：将大问题分解为小问题，记住小问题的解，避免重复计算。\n\n**两个关键要素**：\n1. **最优子结构**：问题的最优解包含子问题的最优解\n2. **重叠子问题**：子问题被重复计算多次\n\n**经典示例——斐波那契**：\n```python\n# 原始递归（重复计算多）\ndef fib(n):\n    if n <= 1: return n\n    return fib(n-1) + fib(n-2)  # O(2^n)\n\n# 动态规划（记忆化）\ndef fib_dp(n):\n    dp = [0] * (n+1)\n    dp[1] = 1\n    for i in range(2, n+1):\n        dp[i] = dp[i-1] + dp[i-2]  # O(n)\n    return dp[n]\n```\n\n**经典问题**：背包问题、最长公共子序列、编辑距离。', '动态规划的核心思想与斐波那契示例', 'sess_20260527_001', '2026-05-27 15:30:00');
-
--- sp_question_bank
-INSERT INTO `sp_question_bank` VALUES
-(1779900016001, 2, '计算机科学', 'C语言中，以下哪个关键字用于定义常量？', '编程基础', 'C语言', '语法', 'single_choice', 'easy', '["A. var","B. const","C. let","D. static"]', 'B', 'const关键字用于定义不可修改的常量。var和let是JavaScript关键字，static在C语言中用于定义静态变量。', NULL, '2026-05-16 10:00:00'),
-(1779900016002, 2, '计算机科学', '下列排序算法中，平均时间复杂度为O(n log n)的是？', '数据结构与算法', '排序', '复杂度分析', 'multiple_choice', 'medium', '["A. 冒泡排序","B. 快速排序","C. 归并排序","D. 插入排序"]', 'BC', '快速排序和归并排序的平均时间复杂度均为O(n log n)。冒泡排序和插入排序为O(n²)。', NULL, '2026-05-16 10:30:00'),
-(1779900016003, 2, '计算机科学', '在关系型数据库中，以下哪个操作用于删除表中的所有数据但保留表结构？', '数据库系统', 'SQL', 'DML操作', 'single_choice', 'easy', '["A. DELETE FROM table","B. DROP TABLE table","C. TRUNCATE TABLE table","D. REMOVE TABLE table"]', 'C', 'TRUNCATE删除所有数据但保留表结构，速度比DELETE快。DROP删除整个表（包括结构）。DELETE可带WHERE条件。', NULL, '2026-05-17 09:00:00'),
-(1779900016004, 2, '计算机科学', '以下关于TCP和UDP的描述，正确的是？', '计算机网络', '传输层', '协议对比', 'multiple_choice', 'medium', '["A. TCP是面向连接的","B. UDP提供可靠传输","C. TCP保证数据顺序","D. UDP适合实时应用"]', 'ACD', 'UDP不提供可靠传输（B错）。TCP面向连接、保证顺序，UDP无连接、不保证可靠性但延迟低，适合视频直播等实时场景。', NULL, '2026-05-17 14:00:00'),
-(1779900016005, 2, '计算机科学', '请简述死锁产生的四个必要条件。', '操作系统', '进程管理', '死锁', 'short_answer', 'medium', NULL, '互斥条件、请求与保持条件、不可剥夺条件、循环等待条件', '死锁必须同时满足这四个条件，破坏任一条件即可预防死锁。', NULL, '2026-05-18 08:00:00'),
-(1779900016006, 2, '计算机科学', '在Python中，列表推导式 [x*2 for x in range(5) if x%2==0] 的输出是什么？', '编程基础', 'Python', '列表推导', 'single_choice', 'easy', '["A. [0,2,4,6,8]","B. [0,4,8]","C. [2,4,6,8,10]","D. [2,6,10]"]', 'B', 'range(5)产生0,1,2,3,4，过滤x%2==0保留0,2,4，乘2得0,4,8。', NULL, '2026-05-18 10:00:00'),
-(1779900016007, 2, '计算机科学', '以下关于HTTP状态码的描述，错误的是？', '计算机网络', '应用层', 'HTTP协议', 'single_choice', 'medium', '["A. 200表示请求成功","B. 301表示永久重定向","C. 404表示服务器内部错误","D. 500表示服务器内部错误"]', 'C', '404表示资源未找到（Not Found），500才是服务器内部错误。', NULL, '2026-05-19 08:00:00'),
-(1779900016008, 2, '计算机科学', '在机器学习中，交叉验证的主要目的是什么？', '人工智能', '机器学习', '模型评估', 'single_choice', 'medium', '["A. 增加训练数据量","B. 评估模型的泛化能力","C. 加快训练速度","D. 减少特征数量"]', 'B', '交叉验证通过多次划分训练集和验证集，评估模型在未见过数据上的表现，从而衡量泛化能力。', NULL, '2026-05-19 14:00:00');
-
--- sp_study_path
-INSERT INTO `sp_study_path` VALUES
-(1779900017001, 3, '编程入门学习路径', '{"steps":[{"order":1,"name":"认识编程","kps":["什么是程序","编程语言概述"],"status":"completed"},{"order":2,"name":"开发环境搭建","kps":["安装IDE","第一个程序"],"status":"completed"},{"order":3,"name":"变量与数据类型","kps":["基本数据类型","变量声明","类型转换"],"status":"in_progress"},{"order":4,"name":"流程控制","kps":["条件判断","循环结构"],"status":"pending"},{"order":5,"name":"函数","kps":["函数定义","参数传递","作用域"],"status":"pending"}]}', '{"讲义精读包":[{"title":"编程入门PPT课件","url":"/resources/slides/ch01-intro.pdf"}],"分层练习题":[{"title":"C语言基础练习集","url":"/practice/c-basics"}],"知识脉络图":[{"title":"编程基础知识图谱","url":"/mindmap/programming-basics"}]}', '2026-05-20 08:00:00'),
-(1779900017002, 4, 'Web开发学习路径', '{"steps":[{"order":1,"name":"HTML基础","kps":["HTML标签","语义化","表单"],"status":"completed"},{"order":2,"name":"CSS样式","kps":["选择器","盒模型","Flexbox","Grid"],"status":"in_progress"},{"order":3,"name":"JavaScript入门","kps":["变量","函数","DOM操作"],"status":"pending"},{"order":4,"name":"响应式设计","kps":["媒体查询","移动端适配"],"status":"pending"},{"order":5,"name":"前端框架","kps":["Vue基础","组件化"],"status":"pending"}]}', '{"讲义精读包":[{"title":"HTML/CSS基础讲义","url":"/resources/slides/html-css-basics.pdf"}],"视频脚本":[{"title":"Flexbox布局详解","url":"/video/flexbox-tutorial"}]}', '2026-05-22 10:00:00'),
-(1779900017003, 5, '数据结构学习路径', '{"steps":[{"order":1,"name":"线性结构","kps":["数组","链表","栈","队列"],"status":"in_progress"},{"order":2,"name":"树结构","kps":["二叉树","BST","堆"],"status":"pending"},{"order":3,"name":"图结构","kps":["图的表示","DFS","BFS","最短路径"],"status":"pending"},{"order":4,"name":"排序算法","kps":["冒泡","快排","归并排序"],"status":"pending"},{"order":5,"name":"搜索与查找","kps":["二分查找","哈希表"],"status":"pending"}]}', '{"讲义精读包":[{"title":"数据结构基础讲义","url":"/resources/slides/ds-basics.pdf"}],"代码实操":[{"title":"二叉搜索树实现","url":"/resources/code/bst-demo.zip"}]}', '2026-05-25 14:00:00'),
-(1779900017004, 3, '机器学习进阶路径', '{"steps":[{"order":1,"name":"数学基础","kps":["线性代数","概率论","微积分"],"status":"completed"},{"order":2,"name":"监督学习","kps":["线性回归","逻辑回归","SVM","决策树"],"status":"in_progress"},{"order":3,"name":"神经网络","kps":["感知机","多层网络","激活函数"],"status":"pending"},{"order":4,"name":"深度学习","kps":["CNN","RNN","Transformer"],"status":"pending"},{"order":5,"name":"模型部署","kps":["模型优化","ONNX","TensorRT"],"status":"pending"}]}', '{"讲义精读包":[{"title":"机器学习入门指南","url":"https://www.coursera.org/learn/machine-learning"}],"分层练习题":[{"title":"监督学习算法练习","url":"/practice/supervised-learning"}]}', '2026-05-27 09:00:00');
-
--- sp_wrong_question
-INSERT INTO `sp_wrong_question` VALUES
-(1779900018001, 3, 1779900011001, 1779900010003, '以下哪个是合法的C语言变量名？', 'B', 'C', 'C语言变量名只能由字母、数字和下划线组成，且不能以数字开头。选项B可能以数字开头，因此不合法。', '2026-06-01 11:50:00'),
-(1779900018002, 4, 1779900011002, 1779900010004, '以下关于函数的描述，哪些是正确的？', 'AB', 'ABD', '函数可以没有返回值（void），可以有多个参数，支持递归调用。选项D描述的函数必须嵌套定义是错误的，C语言不支持函数嵌套定义。', '2026-06-01 11:55:00'),
-(1779900018003, 5, 1779900011003, 1779900010001, '以下哪种数据类型占用的内存最大？', 'C', 'D', 'double类型通常占用8字节，是选项中最大的。int和float通常占4字节，char占1字节。需要注意这取决于具体的编译器和平台。', '2026-06-01 12:00:00'),
-(1779900018004, 5, 1779900011003, 1779900010002, '在C语言中，for循环的初始化语句在什么时候执行？', 'B', 'A', 'for循环的初始化语句仅在循环开始前执行一次。之后每次迭代前检查条件，每次迭代后执行增量语句。', '2026-06-01 12:00:00'),
-(1779900018005, 4, 1779900011005, 1779900010008, '二叉搜索树的中序遍历结果是？', 'B', 'A', '二叉搜索树的中序遍历（左→根→右）会按节点值的升序输出结果。这是BST最重要的性质之一。', '2026-05-25 08:50:00'),
-(1779900018006, 3, 1779900011001, 1779900010003, '以下哪个是合法的C语言变量名？', 'B', 'C', '参见解析：合法变量名只能以字母或下划线开头，由字母、数字、下划线组成。', '2026-06-01 11:50:00');
+INSERT INTO `sp_wrong_question` VALUES (1779900018001, 3, 1779900011001, 1779900010003, '以下哪个是合法的C语言变量名？', 'B', 'C', 'C语言变量名只能由字母、数字和下划线组成，且不能以数字开头。选项B可能以数字开头，因此不合法。', '2026-06-01 11:50:00');
+INSERT INTO `sp_wrong_question` VALUES (1779900018002, 4, 1779900011002, 1779900010004, '以下关于函数的描述，哪些是正确的？', 'AB', 'ABD', '函数可以没有返回值（void），可以有多个参数，支持递归调用。选项D描述的函数必须嵌套定义是错误的，C语言不支持函数嵌套定义。', '2026-06-01 11:55:00');
+INSERT INTO `sp_wrong_question` VALUES (1779900018003, 5, 1779900011003, 1779900010001, '以下哪种数据类型占用的内存最大？', 'C', 'D', 'double类型通常占用8字节，是选项中最大的。int和float通常占4字节，char占1字节。需要注意这取决于具体的编译器和平台。', '2026-06-01 12:00:00');
+INSERT INTO `sp_wrong_question` VALUES (1779900018004, 5, 1779900011003, 1779900010002, '在C语言中，for循环的初始化语句在什么时候执行？', 'B', 'A', 'for循环的初始化语句仅在循环开始前执行一次。之后每次迭代前检查条件，每次迭代后执行增量语句。', '2026-06-01 12:00:00');
+INSERT INTO `sp_wrong_question` VALUES (1779900018005, 4, 1779900011005, 1779900010008, '二叉搜索树的中序遍历结果是？', 'B', 'A', '二叉搜索树的中序遍历（左→根→右）会按节点值的升序输出结果。这是BST最重要的性质之一。', '2026-05-25 08:50:00');
+INSERT INTO `sp_wrong_question` VALUES (1779900018006, 3, 1779900011001, 1779900010003, '以下哪个是合法的C语言变量名？', 'B', 'C', '参见解析：合法变量名只能以字母或下划线开头，由字母、数字、下划线组成。', '2026-06-01 11:50:00');
 
 SET FOREIGN_KEY_CHECKS = 1;
+
+-- =========================================
+-- 新增 20 个学生用户 (测试数据)
+-- =========================================
+
+INSERT INTO `sp_user` VALUES (17814526375438419, 'stu10', '8d969eef6ecad3c29a3a629280e686cf0c3f5d5a86aff3ca12020c923adc6c92', 'student', '孙斌宇', NULL);
+INSERT INTO `sp_user` VALUES (17814526375447915, 'stu11', '8d969eef6ecad3c29a3a629280e686cf0c3f5d5a86aff3ca12020c923adc6c92', 'student', '王强', NULL);
+INSERT INTO `sp_user` VALUES (17814526375442956, 'stu12', '8d969eef6ecad3c29a3a629280e686cf0c3f5d5a86aff3ca12020c923adc6c92', 'student', '孙然静', NULL);
+INSERT INTO `sp_user` VALUES (17814526375441770, 'stu13', '8d969eef6ecad3c29a3a629280e686cf0c3f5d5a86aff3ca12020c923adc6c92', 'student', '吴然', NULL);
+INSERT INTO `sp_user` VALUES (17814526375446401, 'stu14', '8d969eef6ecad3c29a3a629280e686cf0c3f5d5a86aff3ca12020c923adc6c92', 'student', '朱博然', NULL);
+INSERT INTO `sp_user` VALUES (17814526375442593, 'stu15', '8d969eef6ecad3c29a3a629280e686cf0c3f5d5a86aff3ca12020c923adc6c92', 'student', '褚涛', NULL);
+INSERT INTO `sp_user` VALUES (17814526375445022, 'stu16', '8d969eef6ecad3c29a3a629280e686cf0c3f5d5a86aff3ca12020c923adc6c92', 'student', '韩然', NULL);
+INSERT INTO `sp_user` VALUES (17814526375442364, 'stu17', '8d969eef6ecad3c29a3a629280e686cf0c3f5d5a86aff3ca12020c923adc6c92', 'student', '郑伟明', NULL);
+INSERT INTO `sp_user` VALUES (17814526375447326, 'stu18', '8d969eef6ecad3c29a3a629280e686cf0c3f5d5a86aff3ca12020c923adc6c92', 'student', '郑伟伟', NULL);
+INSERT INTO `sp_user` VALUES (17814526375441082, 'stu19', '8d969eef6ecad3c29a3a629280e686cf0c3f5d5a86aff3ca12020c923adc6c92', 'student', '许博敏', NULL);
+INSERT INTO `sp_user` VALUES (17814526375444185, 'stu20', '8d969eef6ecad3c29a3a629280e686cf0c3f5d5a86aff3ca12020c923adc6c92', 'student', '陈涵涛', NULL);
+INSERT INTO `sp_user` VALUES (17814526375443087, 'stu21', '8d969eef6ecad3c29a3a629280e686cf0c3f5d5a86aff3ca12020c923adc6c92', 'student', '吴浩涛', NULL);
+INSERT INTO `sp_user` VALUES (17814526375448690, 'stu22', '8d969eef6ecad3c29a3a629280e686cf0c3f5d5a86aff3ca12020c923adc6c92', 'student', '尤华伟', NULL);
+INSERT INTO `sp_user` VALUES (17814526375445312, 'stu23', '8d969eef6ecad3c29a3a629280e686cf0c3f5d5a86aff3ca12020c923adc6c92', 'student', '卫洋强', NULL);
+INSERT INTO `sp_user` VALUES (17814526375441816, 'stu24', '8d969eef6ecad3c29a3a629280e686cf0c3f5d5a86aff3ca12020c923adc6c92', 'student', '周博', NULL);
+INSERT INTO `sp_user` VALUES (17814526375447814, 'stu25', '8d969eef6ecad3c29a3a629280e686cf0c3f5d5a86aff3ca12020c923adc6c92', 'student', '孙丽', NULL);
+INSERT INTO `sp_user` VALUES (17814526375443349, 'stu26', '8d969eef6ecad3c29a3a629280e686cf0c3f5d5a86aff3ca12020c923adc6c92', 'student', '朱浩伟', NULL);
+INSERT INTO `sp_user` VALUES (17814526375443628, 'stu27', '8d969eef6ecad3c29a3a629280e686cf0c3f5d5a86aff3ca12020c923adc6c92', 'student', '吴华', NULL);
+INSERT INTO `sp_user` VALUES (17814526375449793, 'stu28', '8d969eef6ecad3c29a3a629280e686cf0c3f5d5a86aff3ca12020c923adc6c92', 'student', '周斌', NULL);
+INSERT INTO `sp_user` VALUES (17814526375444621, 'stu29', '8d969eef6ecad3c29a3a629280e686cf0c3f5d5a86aff3ca12020c923adc6c92', 'student', '冯洋丽', NULL);
+
+-- =========================================
+-- 新增 20 个学生画像 (测试数据)
+-- =========================================
+
+INSERT INTO `sp_student_profile` VALUES (17814526375445646, 3, '电子信息工程', '深度学习', '中等', '动手实践', '图论算法、代码调试、动态规划、指针与内存管理', '视频教程', '碎片时间', '70分以上', '{"major":"电子信息工程","course":"深度学习","knowledgeBase":"中等","cognitiveStyle":"动手实践","weakPoints":"图论算法、代码调试、动态规划、指针与内存管理","interestPreference":"视频教程","pacePreference":"碎片时间","examGoal":"70分以上"}', '2026-04-03 09:42:10');
+INSERT INTO `sp_student_profile` VALUES (17814526375449984, 4, '电子信息工程', '深度学习', '进阶', '动手实践', '动态规划、多线程编程、网络协议栈、内存泄漏排查', '视频教程', '周末集中', '70分以上', '{"major":"电子信息工程","course":"深度学习","knowledgeBase":"进阶","cognitiveStyle":"动手实践","weakPoints":"动态规划、多线程编程、网络协议栈、内存泄漏排查","interestPreference":"视频教程","pacePreference":"周末集中","examGoal":"70分以上"}', '2026-06-06 08:42:54');
+INSERT INTO `sp_student_profile` VALUES (17814526375449969, 5, '网络工程', '线性代数', '入门', '图文结合', '正则表达式、多线程编程', '视频教程', '周末集中', '95分以上', '{"major":"网络工程","course":"线性代数","knowledgeBase":"入门","cognitiveStyle":"图文结合","weakPoints":"正则表达式、多线程编程","interestPreference":"视频教程","pacePreference":"周末集中","examGoal":"95分以上"}', '2026-04-16 00:31:09');
+INSERT INTO `sp_student_profile` VALUES (17814526375446870, 17814526375438419, '软件工程', '数据库系统概论', '入门', '动手实践', '多线程编程、图论算法', '刷题练习', '碎片时间', '通过即可', '{"major":"软件工程","course":"数据库系统概论","knowledgeBase":"入门","cognitiveStyle":"动手实践","weakPoints":"多线程编程、图论算法","interestPreference":"刷题练习","pacePreference":"碎片时间","examGoal":"通过即可"}', '2026-05-25 16:59:42');
+INSERT INTO `sp_student_profile` VALUES (17814526375444860, 17814526375447915, '软件工程', '操作系统原理', '进阶', '项目实战', '算法复杂度分析、指针与内存管理', '刷题练习', '周末集中', '90分以上', '{"major":"软件工程","course":"操作系统原理","knowledgeBase":"进阶","cognitiveStyle":"项目实战","weakPoints":"算法复杂度分析、指针与内存管理","interestPreference":"刷题练习","pacePreference":"周末集中","examGoal":"90分以上"}', '2026-08-04 01:12:53');
+INSERT INTO `sp_student_profile` VALUES (17814526375446755, 17814526375442956, '计算机科学与技术', '数据库系统概论', '基础', '项目实战', '图论算法、数学建模、代码调试、内存泄漏排查', '小组讨论', '每周5次', '80分以上', '{"major":"计算机科学与技术","course":"数据库系统概论","knowledgeBase":"基础","cognitiveStyle":"项目实战","weakPoints":"图论算法、数学建模、代码调试、内存泄漏排查","interestPreference":"小组讨论","pacePreference":"每周5次","examGoal":"80分以上"}', '2026-06-13 08:03:42');
+INSERT INTO `sp_student_profile` VALUES (17814526375442361, 17814526375441770, '信息安全', '编译原理', '进阶', '视频学习', '多线程编程、并发编程、图论算法', '开源贡献', '每天2小时', '90分以上', '{"major":"信息安全","course":"编译原理","knowledgeBase":"进阶","cognitiveStyle":"视频学习","weakPoints":"多线程编程、并发编程、图论算法","interestPreference":"开源贡献","pacePreference":"每天2小时","examGoal":"90分以上"}', '2026-05-20 09:01:54');
+INSERT INTO `sp_student_profile` VALUES (17814526375445648, 17814526375446401, '数学与应用数学', '计算机网络', '熟练', '视频学习', '动态规划、数学建模', '读书笔记', '每天30分钟', '80分以上', '{"major":"数学与应用数学","course":"计算机网络","knowledgeBase":"熟练","cognitiveStyle":"视频学习","weakPoints":"动态规划、数学建模","interestPreference":"读书笔记","pacePreference":"每天30分钟","examGoal":"80分以上"}', '2026-05-10 03:16:47');
+INSERT INTO `sp_student_profile` VALUES (17814526375444424, 17814526375442593, '电子信息工程', '机器学习', '进阶', '动手实践', '图论算法、并发编程、动态规划、指针与内存管理', '实战项目', '周末集中', '70分以上', '{"major":"电子信息工程","course":"机器学习","knowledgeBase":"进阶","cognitiveStyle":"动手实践","weakPoints":"图论算法、并发编程、动态规划、指针与内存管理","interestPreference":"实战项目","pacePreference":"周末集中","examGoal":"70分以上"}', '2026-07-03 08:10:16');
+INSERT INTO `sp_student_profile` VALUES (17814526375444988, 17814526375445022, '数据科学与大数据技术', 'Java程序设计', '基础', '案例驱动', '算法复杂度分析、递归思想', '科研论文', '每天1小时', '95分以上', '{"major":"数据科学与大数据技术","course":"Java程序设计","knowledgeBase":"基础","cognitiveStyle":"案例驱动","weakPoints":"算法复杂度分析、递归思想","interestPreference":"科研论文","pacePreference":"每天1小时","examGoal":"95分以上"}', '2026-03-24 08:14:48');
+INSERT INTO `sp_student_profile` VALUES (17814526375445383, 17814526375442364, '计算机科学与技术', '深度学习', '入门', '动手实践', '数学建模、正则表达式', '科研论文', '每天2小时', '90分以上', '{"major":"计算机科学与技术","course":"深度学习","knowledgeBase":"入门","cognitiveStyle":"动手实践","weakPoints":"数学建模、正则表达式","interestPreference":"科研论文","pacePreference":"每天2小时","examGoal":"90分以上"}', '2026-08-28 10:54:51');
+INSERT INTO `sp_student_profile` VALUES (17814526375444778, 17814526375447326, '信息安全', '线性代数', '进阶', '图文结合', '算法复杂度分析、指针与内存管理', '读书笔记', '周末集中', '70分以上', '{"major":"信息安全","course":"线性代数","knowledgeBase":"进阶","cognitiveStyle":"图文结合","weakPoints":"算法复杂度分析、指针与内存管理","interestPreference":"读书笔记","pacePreference":"周末集中","examGoal":"70分以上"}', '2026-04-16 12:54:06');
+INSERT INTO `sp_student_profile` VALUES (17814526375446488, 17814526375441082, '电子信息工程', '深度学习', '进阶', '项目实战', '网络协议栈、动态规划', '视频教程', '周末集中', '85分以上', '{"major":"电子信息工程","course":"深度学习","knowledgeBase":"进阶","cognitiveStyle":"项目实战","weakPoints":"网络协议栈、动态规划","interestPreference":"视频教程","pacePreference":"周末集中","examGoal":"85分以上"}', '2026-03-21 01:40:30');
+INSERT INTO `sp_student_profile` VALUES (17814526375453886, 17814526375444185, '物联网工程', '软件工程导论', '入门', '图文结合', '数学建模、算法复杂度分析', '实战项目', '周末集中', '85分以上', '{"major":"物联网工程","course":"软件工程导论","knowledgeBase":"入门","cognitiveStyle":"图文结合","weakPoints":"数学建模、算法复杂度分析","interestPreference":"实战项目","pacePreference":"周末集中","examGoal":"85分以上"}', '2026-06-25 14:52:09');
+INSERT INTO `sp_student_profile` VALUES (17814526375455206, 17814526375443087, '网络工程', '软件工程导论', '入门', '理论精讲', '网络协议栈、数据库优化', '科研论文', '每天2小时', '70分以上', '{"major":"网络工程","course":"软件工程导论","knowledgeBase":"入门","cognitiveStyle":"理论精讲","weakPoints":"网络协议栈、数据库优化","interestPreference":"科研论文","pacePreference":"每天2小时","examGoal":"70分以上"}', '2026-08-08 13:22:17');
+INSERT INTO `sp_student_profile` VALUES (17814526375452171, 17814526375448690, '数学与应用数学', '深度学习', '入门', '图文结合', '多线程编程、网络协议栈', '理论精讲', '每周3次', '满分', '{"major":"数学与应用数学","course":"深度学习","knowledgeBase":"入门","cognitiveStyle":"图文结合","weakPoints":"多线程编程、网络协议栈","interestPreference":"理论精讲","pacePreference":"每周3次","examGoal":"满分"}', '2026-03-27 13:19:42');
+INSERT INTO `sp_student_profile` VALUES (17814526375456976, 17814526375445312, '物联网工程', '计算机网络', '入门', '项目实战', '算法复杂度分析、数据库优化、面向对象设计', '算法竞赛', '每周3次', '60分以上', '{"major":"物联网工程","course":"计算机网络","knowledgeBase":"入门","cognitiveStyle":"项目实战","weakPoints":"算法复杂度分析、数据库优化、面向对象设计","interestPreference":"算法竞赛","pacePreference":"每周3次","examGoal":"60分以上"}', '2026-06-16 20:05:23');
+INSERT INTO `sp_student_profile` VALUES (17814526375452320, 17814526375441816, '人工智能', '计算机网络', '中等', '项目实战', '网络协议栈、面向对象设计、代码调试、图论算法', '理论精讲', '每周3次', '60分以上', '{"major":"人工智能","course":"计算机网络","knowledgeBase":"中等","cognitiveStyle":"项目实战","weakPoints":"网络协议栈、面向对象设计、代码调试、图论算法","interestPreference":"理论精讲","pacePreference":"每周3次","examGoal":"60分以上"}', '2026-07-28 09:56:30');
+INSERT INTO `sp_student_profile` VALUES (17814526375455836, 17814526375447814, '数学与应用数学', 'Web全栈开发', '进阶', '案例驱动', '图论算法、数据库优化', '视频教程', '周末集中', '80分以上', '{"major":"数学与应用数学","course":"Web全栈开发","knowledgeBase":"进阶","cognitiveStyle":"案例驱动","weakPoints":"图论算法、数据库优化","interestPreference":"视频教程","pacePreference":"周末集中","examGoal":"80分以上"}', '2026-07-16 23:27:34');
+INSERT INTO `sp_student_profile` VALUES (17814526375451702, 17814526375443349, '电子信息工程', '数据结构与算法', '基础', '案例驱动', '动态规划、正则表达式', '算法竞赛', '每周2次', '90分以上', '{"major":"电子信息工程","course":"数据结构与算法","knowledgeBase":"基础","cognitiveStyle":"案例驱动","weakPoints":"动态规划、正则表达式","interestPreference":"算法竞赛","pacePreference":"每周2次","examGoal":"90分以上"}', '2026-04-23 13:33:46');
+INSERT INTO `sp_student_profile` VALUES (17814526375458964, 17814526375443628, '计算机科学与技术', '操作系统原理', '入门', '理论精讲', '动态规划、递归思想、数据库优化', '视频教程', '碎片时间', '60分以上', '{"major":"计算机科学与技术","course":"操作系统原理","knowledgeBase":"入门","cognitiveStyle":"理论精讲","weakPoints":"动态规划、递归思想、数据库优化","interestPreference":"视频教程","pacePreference":"碎片时间","examGoal":"60分以上"}', '2026-05-02 15:16:30');
+INSERT INTO `sp_student_profile` VALUES (17814526375456190, 17814526375449793, '数学与应用数学', '深度学习', '进阶', '视频学习', '代码调试、数据库优化', '实战项目', '每周2次', '60分以上', '{"major":"数学与应用数学","course":"深度学习","knowledgeBase":"进阶","cognitiveStyle":"视频学习","weakPoints":"代码调试、数据库优化","interestPreference":"实战项目","pacePreference":"每周2次","examGoal":"60分以上"}', '2026-08-27 00:10:43');
+INSERT INTO `sp_student_profile` VALUES (17814526375458108, 17814526375444621, '软件工程', '机器学习', '进阶', '理论精讲', '动态规划、代码调试、数学建模', '读书笔记', '每天30分钟', '满分', '{"major":"软件工程","course":"机器学习","knowledgeBase":"进阶","cognitiveStyle":"理论精讲","weakPoints":"动态规划、代码调试、数学建模","interestPreference":"读书笔记","pacePreference":"每天30分钟","examGoal":"满分"}', '2026-07-14 23:47:58');
+
+-- =========================================
+-- 新增 100+ 学习资源 (测试数据)
+-- =========================================
+
+INSERT INTO `sp_learning_resource` VALUES (17814526375451802, 3, 'video_script', '线段树 可视化讲解 - 视频脚本', '# 🎬 线段树 视频脚本
+
+## 开场 (30秒)
+画面：动态标题 + 问题引入
+"你是否曾经好奇线段树是如何工作的？今天我们用5分钟彻底搞懂它。"
+
+## 核心讲解 (3分钟)
+### 第一部分：概念可视化
+使用动画演示线段树的核心流程
+
+### 第二部分：代码演示
+一边写代码一边讲解关键步骤
+
+### 第三部分：对比分析
+与其他方案的对比，突出线段树的优势
+
+## 总结 (1分钟)
+回顾关键点 + 下期预告
+
+## 配套资源
+- 源码地址
+- 练习题目
+- 延伸阅读', '["https://developer.mozilla.org/","https://zhuanlan.zhihu.com/"]', 77, '2026-08-09 17:47:09');
+INSERT INTO `sp_learning_resource` VALUES (17814526375455758, 3, 'code_lab', '锁机制 编程实战项目', '# 项目：锁机制 实战
+
+## 技术栈
+- Python / Java
+- Spring Boot / Flask
+- MySQL + Redis
+
+## 实现步骤
+
+### Step 1: 环境搭建
+配置开发环境，安装依赖
+
+### Step 2: 核心逻辑
+实现 锁机制 的核心算法，注意边界条件和异常处理
+
+### Step 3: 测试验证
+编写单元测试和集成测试
+
+## 性能基准
+| 数据规模 | 耗时 | 内存 |
+|---------|------|------|
+| 1000 | 0.1s | 10MB |
+| 10000 | 1.2s | 50MB |
+| 100000 | 15s | 200MB |
+
+## 扩展思考
+如何将 锁机制 应用到分布式系统中？', '["https://github.com/topics/","https://developer.mozilla.org/","https://spring.io/docs"]', 75, '2026-07-03 09:58:10');
+INSERT INTO `sp_learning_resource` VALUES (17814526375454051, 3, 'code_lab', '回溯法 编程实战项目', '# 项目：回溯法 实战
+
+## 技术栈
+- Python / Java
+- Spring Boot / Flask
+- MySQL + Redis
+
+## 实现步骤
+
+### Step 1: 环境搭建
+配置开发环境，安装依赖
+
+### Step 2: 核心逻辑
+实现 回溯法 的核心算法，注意边界条件和异常处理
+
+### Step 3: 测试验证
+编写单元测试和集成测试
+
+## 性能基准
+| 数据规模 | 耗时 | 内存 |
+|---------|------|------|
+| 1000 | 0.1s | 10MB |
+| 10000 | 1.2s | 50MB |
+| 100000 | 15s | 200MB |
+
+## 扩展思考
+如何将 回溯法 应用到分布式系统中？', '["https://www.bilibili.com/video/"]', 89, '2026-09-14 05:32:22');
+INSERT INTO `sp_learning_resource` VALUES (17814526375454943, 3, 'code_lab', '响应式编程 编程实战项目', '# 项目：响应式编程 实战
+
+## 技术栈
+- Python / Java
+- Spring Boot / Flask
+- MySQL + Redis
+
+## 实现步骤
+
+### Step 1: 环境搭建
+配置开发环境，安装依赖
+
+### Step 2: 核心逻辑
+实现 响应式编程 的核心算法，注意边界条件和异常处理
+
+### Step 3: 测试验证
+编写单元测试和集成测试
+
+## 性能基准
+| 数据规模 | 耗时 | 内存 |
+|---------|------|------|
+| 1000 | 0.1s | 10MB |
+| 10000 | 1.2s | 50MB |
+| 100000 | 15s | 200MB |
+
+## 扩展思考
+如何将 响应式编程 应用到分布式系统中？', '["https://stackoverflow.com/questions/","https://www.runoob.com/"]', 77, '2026-05-11 18:22:52');
+INSERT INTO `sp_learning_resource` VALUES (17814526375455817, 3, 'mind_map', 'HTTPS原理 知识体系思维导图', '# HTTPS原理 知识体系
+
+## 基础层
+- 概念定义
+- 术语解释
+- 发展历程
+
+## 核心层
+- 算法原理 → 时间复杂度 → 空间复杂度
+- 数据结构 → 数组/链表/树/图
+- 设计模式 → 创建型/结构型/行为型
+
+## 应用层
+- 实际案例
+- 最佳实践
+- 常见陷阱
+
+## 进阶层
+- 性能优化
+- 源码分析
+- 架构演进', '["https://developer.mozilla.org/"]', 77, '2026-09-23 09:11:34');
+INSERT INTO `sp_learning_resource` VALUES (17814526375456739, 4, 'code_lab', '消息队列 编程实战项目', '# 项目：消息队列 实战
+
+## 技术栈
+- Python / Java
+- Spring Boot / Flask
+- MySQL + Redis
+
+## 实现步骤
+
+### Step 1: 环境搭建
+配置开发环境，安装依赖
+
+### Step 2: 核心逻辑
+实现 消息队列 的核心算法，注意边界条件和异常处理
+
+### Step 3: 测试验证
+编写单元测试和集成测试
+
+## 性能基准
+| 数据规模 | 耗时 | 内存 |
+|---------|------|------|
+| 1000 | 0.1s | 10MB |
+| 10000 | 1.2s | 50MB |
+| 100000 | 15s | 200MB |
+
+## 扩展思考
+如何将 消息队列 应用到分布式系统中？', '["https://github.com/topics/","https://leetcode.cn/problemset/all/"]', 83, '2026-09-22 06:33:00');
+INSERT INTO `sp_learning_resource` VALUES (17814526375451777, 4, 'practice', '推荐系统 - 分层练习题库', '# 推荐系统 实战题库
+
+## 选择题 (20题)
+1. 在推荐系统中，时间复杂度最优的算法是？
+2. 推荐系统与${pick(courses)}的主要区别是？
+
+## 编程题 (10题)
+3. 【简单】实现推荐系统的基本版本
+4. 【中等】优化推荐系统至O(n log n)
+5. 【困难】分布式推荐系统系统设计
+
+## 综合应用题 (5题)
+6. 结合${pick(courses)}知识，解决实际问题
+
+## 详细解析
+每题包含：解题思路、代码示例、复杂度分析、易错点', '["https://leetcode.cn/problemset/all/"]', 94, '2026-06-24 02:24:27');
+INSERT INTO `sp_learning_resource` VALUES (17814526375452224, 4, 'mind_map', '神经网络基础 知识体系思维导图', '# 神经网络基础 知识图谱
+
+## 🏗️ 基础知识
+```
+概念理解 → 原理掌握 → 动手实现
+```
+
+## 🔗 关联知识
+- 前置依赖：${pick(courses)}
+- 后续延伸：${pick(courses)}
+- 横向对比：${pick(courses)}
+
+## 📊 掌握度自评
+| 维度 | 掌握程度 | 下一步 |
+|------|---------|--------|
+| 概念 | ★★★★☆ | 阅读进阶文献 |
+| 实现 | ★★★☆☆ | 完成3个练习 |
+| 优化 | ★★☆☆☆ | 学习性能分析 |', '["https://www.bilibili.com/video/"]', 88, '2026-09-18 16:16:15');
+INSERT INTO `sp_learning_resource` VALUES (17814526375458110, 4, 'syllabus', 'Transformer架构 - 系统化学习讲义', '## Transformer架构核心概念
+
+### 1. 基础理论
+Transformer架构是数学与应用数学领域的基础，理解其核心原理对后续学习至关重要。
+
+### 2. 关键知识点
+- 定义与分类
+- 核心算法/方法
+- 应用场景分析
+- 常见误区
+
+### 3. 学习路径
+1. 先掌握基本概念
+2. 通过实例加深理解
+3. 完成配套练习
+4. 阅读进阶文献
+
+### 4. 推荐阅读
+- 《Transformer架构实战》
+- 官方文档
+- 相关论文', '["https://leetcode.cn/problemset/all/","https://www.runoob.com/","https://docs.python.org/"]', 82, '2026-07-27 23:21:41');
+INSERT INTO `sp_learning_resource` VALUES (17814526375455738, 4, 'syllabus', 'JWT令牌 - 系统化学习讲义', '# JWT令牌 学习指南
+
+## 为什么学习JWT令牌
+JWT令牌在当前技术栈中占据重要位置，掌握它能让你的技能体系更加完整。
+
+## 知识地图
+```
+基础概念 → 核心原理 → 实战应用 → 性能优化 → 架构设计
+```
+
+## 每阶段目标
+- 第1周：理解概念，完成Hello World
+- 第2周：掌握核心API/方法
+- 第3周：独立完成小项目
+- 第4周：优化与扩展
+
+## 常见问题
+1. Q: 如何开始学习？ A: 从官方文档和简单示例入手
+2. Q: 需要什么前置知识？ A: 基本的软件工程概念', '["https://stackoverflow.com/questions/"]', 94, '2026-09-19 00:30:03');
+INSERT INTO `sp_learning_resource` VALUES (17814526375455235, 5, 'code_lab', '设计模式 编程实战项目', '# 项目：设计模式 实战
+
+## 技术栈
+- Python / Java
+- Spring Boot / Flask
+- MySQL + Redis
+
+## 实现步骤
+
+### Step 1: 环境搭建
+配置开发环境，安装依赖
+
+### Step 2: 核心逻辑
+实现 设计模式 的核心算法，注意边界条件和异常处理
+
+### Step 3: 测试验证
+编写单元测试和集成测试
+
+## 性能基准
+| 数据规模 | 耗时 | 内存 |
+|---------|------|------|
+| 1000 | 0.1s | 10MB |
+| 10000 | 1.2s | 50MB |
+| 100000 | 15s | 200MB |
+
+## 扩展思考
+如何将 设计模式 应用到分布式系统中？', '["https://developer.mozilla.org/"]', 79, '2026-05-28 03:01:17');
+INSERT INTO `sp_learning_resource` VALUES (17814526375452581, 5, 'practice', '神经网络基础 - 分层练习题库', '## 📝 神经网络基础 分层练习
+
+### 🟢 基础题 (10题)
+1. 神经网络基础的核心特性有哪些？
+2. 简述神经网络基础的基本工作流程。
+3. 以下哪个不属于神经网络基础的应用场景？
+   A. Web开发 B. 数据分析 C. 文字处理 D. 机器学习
+
+### 🟡 进阶题 (5题)
+4. 请实现一个简单的神经网络基础示例，要求包含错误处理。
+5. 分析神经网络基础在大规模数据下的性能瓶颈。
+
+### 🔴 挑战题 (3题)
+6. 设计一个基于神经网络基础的分布式系统，画架构图并说明。
+7. 优化给定代码的性能，从O(n²)降到O(n log n)。
+
+### ✅ 答案与解析
+（每题附详细解答）', '["https://leetcode.cn/problemset/all/","https://www.runoob.com/","https://zhuanlan.zhihu.com/"]', 80, '2026-09-16 08:43:43');
+INSERT INTO `sp_learning_resource` VALUES (17814526375457982, 5, 'syllabus', 'Vue 3 Composition API - 系统化学习讲义', '## Vue 3 Composition API核心概念
+
+### 1. 基础理论
+Vue 3 Composition API是物联网工程领域的基础，理解其核心原理对后续学习至关重要。
+
+### 2. 关键知识点
+- 定义与分类
+- 核心算法/方法
+- 应用场景分析
+- 常见误区
+
+### 3. 学习路径
+1. 先掌握基本概念
+2. 通过实例加深理解
+3. 完成配套练习
+4. 阅读进阶文献
+
+### 4. 推荐阅读
+- 《Vue 3 Composition API实战》
+- 官方文档
+- 相关论文', '["https://developer.mozilla.org/"]', 80, '2026-06-03 15:36:14');
+INSERT INTO `sp_learning_resource` VALUES (17814526375459153, 5, 'syllabus', 'MySQL索引优化 - 系统化学习讲义', '# MySQL索引优化 学习指南
+
+## 为什么学习MySQL索引优化
+MySQL索引优化在当前技术栈中占据重要位置，掌握它能让你的技能体系更加完整。
+
+## 知识地图
+```
+基础概念 → 核心原理 → 实战应用 → 性能优化 → 架构设计
+```
+
+## 每阶段目标
+- 第1周：理解概念，完成Hello World
+- 第2周：掌握核心API/方法
+- 第3周：独立完成小项目
+- 第4周：优化与扩展
+
+## 常见问题
+1. Q: 如何开始学习？ A: 从官方文档和简单示例入手
+2. Q: 需要什么前置知识？ A: 基本的软件工程概念', '["https://www.bilibili.com/video/","https://leetcode.cn/problemset/all/"]', 95, '2026-08-03 04:34:32');
+INSERT INTO `sp_learning_resource` VALUES (17814526375454644, 5, 'practice', 'Redis缓存策略 - 分层练习题库', '## 📝 Redis缓存策略 分层练习
+
+### 🟢 基础题 (10题)
+1. Redis缓存策略的核心特性有哪些？
+2. 简述Redis缓存策略的基本工作流程。
+3. 以下哪个不属于Redis缓存策略的应用场景？
+   A. Web开发 B. 数据分析 C. 文字处理 D. 机器学习
+
+### 🟡 进阶题 (5题)
+4. 请实现一个简单的Redis缓存策略示例，要求包含错误处理。
+5. 分析Redis缓存策略在大规模数据下的性能瓶颈。
+
+### 🔴 挑战题 (3题)
+6. 设计一个基于Redis缓存策略的分布式系统，画架构图并说明。
+7. 优化给定代码的性能，从O(n²)降到O(n log n)。
+
+### ✅ 答案与解析
+（每题附详细解答）', '["https://developer.mozilla.org/","https://github.com/topics/","https://spring.io/docs"]', 84, '2026-05-12 14:54:03');
+INSERT INTO `sp_learning_resource` VALUES (17814526375454656, 5, 'code_lab', '神经网络基础 编程实战项目', '# 项目：神经网络基础 实战
+
+## 技术栈
+- Python / Java
+- Spring Boot / Flask
+- MySQL + Redis
+
+## 实现步骤
+
+### Step 1: 环境搭建
+配置开发环境，安装依赖
+
+### Step 2: 核心逻辑
+实现 神经网络基础 的核心算法，注意边界条件和异常处理
+
+### Step 3: 测试验证
+编写单元测试和集成测试
+
+## 性能基准
+| 数据规模 | 耗时 | 内存 |
+|---------|------|------|
+| 1000 | 0.1s | 10MB |
+| 10000 | 1.2s | 50MB |
+| 100000 | 15s | 200MB |
+
+## 扩展思考
+如何将 神经网络基础 应用到分布式系统中？', '["https://zhuanlan.zhihu.com/","https://docs.python.org/"]', 80, '2026-07-19 16:19:45');
+INSERT INTO `sp_learning_resource` VALUES (17814526375452233, 5, 'code_lab', '神经网络基础 编程实战项目', '# 项目：神经网络基础 实战
+
+## 技术栈
+- Python / Java
+- Spring Boot / Flask
+- MySQL + Redis
+
+## 实现步骤
+
+### Step 1: 环境搭建
+配置开发环境，安装依赖
+
+### Step 2: 核心逻辑
+实现 神经网络基础 的核心算法，注意边界条件和异常处理
+
+### Step 3: 测试验证
+编写单元测试和集成测试
+
+## 性能基准
+| 数据规模 | 耗时 | 内存 |
+|---------|------|------|
+| 1000 | 0.1s | 10MB |
+| 10000 | 1.2s | 50MB |
+| 100000 | 15s | 200MB |
+
+## 扩展思考
+如何将 神经网络基础 应用到分布式系统中？', '["https://leetcode.cn/problemset/all/","https://github.com/topics/"]', 92, '2026-06-04 23:49:31');
+INSERT INTO `sp_learning_resource` VALUES (17814526375457588, 5, 'syllabus', 'HTTPS原理 - 系统化学习讲义', '# HTTPS原理 学习指南
+
+## 为什么学习HTTPS原理
+HTTPS原理在当前技术栈中占据重要位置，掌握它能让你的技能体系更加完整。
+
+## 知识地图
+```
+基础概念 → 核心原理 → 实战应用 → 性能优化 → 架构设计
+```
+
+## 每阶段目标
+- 第1周：理解概念，完成Hello World
+- 第2周：掌握核心API/方法
+- 第3周：独立完成小项目
+- 第4周：优化与扩展
+
+## 常见问题
+1. Q: 如何开始学习？ A: 从官方文档和简单示例入手
+2. Q: 需要什么前置知识？ A: 基本的计算机科学与技术概念', '["https://stackoverflow.com/questions/","https://zhuanlan.zhihu.com/","https://leetcode.cn/problemset/all/"]', 91, '2026-06-11 06:18:55');
+INSERT INTO `sp_learning_resource` VALUES (17814526375453396, 17814526375438419, 'code_lab', '分治策略 编程实战项目', '# 项目：分治策略 实战
+
+## 技术栈
+- Python / Java
+- Spring Boot / Flask
+- MySQL + Redis
+
+## 实现步骤
+
+### Step 1: 环境搭建
+配置开发环境，安装依赖
+
+### Step 2: 核心逻辑
+实现 分治策略 的核心算法，注意边界条件和异常处理
+
+### Step 3: 测试验证
+编写单元测试和集成测试
+
+## 性能基准
+| 数据规模 | 耗时 | 内存 |
+|---------|------|------|
+| 1000 | 0.1s | 10MB |
+| 10000 | 1.2s | 50MB |
+| 100000 | 15s | 200MB |
+
+## 扩展思考
+如何将 分治策略 应用到分布式系统中？', '["https://stackoverflow.com/questions/"]', 91, '2026-06-04 10:09:39');
+INSERT INTO `sp_learning_resource` VALUES (17814526375457292, 17814526375438419, 'code_lab', '特征工程 编程实战项目', '# 项目：特征工程 实战
+
+## 技术栈
+- Python / Java
+- Spring Boot / Flask
+- MySQL + Redis
+
+## 实现步骤
+
+### Step 1: 环境搭建
+配置开发环境，安装依赖
+
+### Step 2: 核心逻辑
+实现 特征工程 的核心算法，注意边界条件和异常处理
+
+### Step 3: 测试验证
+编写单元测试和集成测试
+
+## 性能基准
+| 数据规模 | 耗时 | 内存 |
+|---------|------|------|
+| 1000 | 0.1s | 10MB |
+| 10000 | 1.2s | 50MB |
+| 100000 | 15s | 200MB |
+
+## 扩展思考
+如何将 特征工程 应用到分布式系统中？', '["https://docs.python.org/","https://zhuanlan.zhihu.com/"]', 89, '2026-06-03 12:37:05');
+INSERT INTO `sp_learning_resource` VALUES (17814526375453800, 17814526375438419, 'mind_map', 'Transformer架构 知识体系思维导图', '# Transformer架构 知识体系
+
+## 基础层
+- 概念定义
+- 术语解释
+- 发展历程
+
+## 核心层
+- 算法原理 → 时间复杂度 → 空间复杂度
+- 数据结构 → 数组/链表/树/图
+- 设计模式 → 创建型/结构型/行为型
+
+## 应用层
+- 实际案例
+- 最佳实践
+- 常见陷阱
+
+## 进阶层
+- 性能优化
+- 源码分析
+- 架构演进', '["https://docs.python.org/","https://www.bilibili.com/video/","https://leetcode.cn/problemset/all/"]', 82, '2026-08-07 22:33:25');
+INSERT INTO `sp_learning_resource` VALUES (17814526375459053, 17814526375438419, 'practice', 'RESTful API - 分层练习题库', '# RESTful API 实战题库
+
+## 选择题 (20题)
+1. 在RESTful API中，时间复杂度最优的算法是？
+2. RESTful API与${pick(courses)}的主要区别是？
+
+## 编程题 (10题)
+3. 【简单】实现RESTful API的基本版本
+4. 【中等】优化RESTful API至O(n log n)
+5. 【困难】分布式RESTful API系统设计
+
+## 综合应用题 (5题)
+6. 结合${pick(courses)}知识，解决实际问题
+
+## 详细解析
+每题包含：解题思路、代码示例、复杂度分析、易错点', '["https://developer.mozilla.org/","https://github.com/topics/","https://www.bilibili.com/video/"]', 87, '2026-03-22 10:15:39');
+INSERT INTO `sp_learning_resource` VALUES (17814526375452458, 17814526375438419, 'video_script', '哈希表 可视化讲解 - 视频脚本', '# 🎬 哈希表 视频脚本
+
+## 开场 (30秒)
+画面：动态标题 + 问题引入
+"你是否曾经好奇哈希表是如何工作的？今天我们用5分钟彻底搞懂它。"
+
+## 核心讲解 (3分钟)
+### 第一部分：概念可视化
+使用动画演示哈希表的核心流程
+
+### 第二部分：代码演示
+一边写代码一边讲解关键步骤
+
+### 第三部分：对比分析
+与其他方案的对比，突出哈希表的优势
+
+## 总结 (1分钟)
+回顾关键点 + 下期预告
+
+## 配套资源
+- 源码地址
+- 练习题目
+- 延伸阅读', '["https://www.runoob.com/"]', 96, '2026-05-26 00:37:06');
+INSERT INTO `sp_learning_resource` VALUES (17814526375459160, 17814526375438419, 'video_script', '并查集 可视化讲解 - 视频脚本', '# 🎬 并查集 视频脚本
+
+## 开场 (30秒)
+画面：动态标题 + 问题引入
+"你是否曾经好奇并查集是如何工作的？今天我们用5分钟彻底搞懂它。"
+
+## 核心讲解 (3分钟)
+### 第一部分：概念可视化
+使用动画演示并查集的核心流程
+
+### 第二部分：代码演示
+一边写代码一边讲解关键步骤
+
+### 第三部分：对比分析
+与其他方案的对比，突出并查集的优势
+
+## 总结 (1分钟)
+回顾关键点 + 下期预告
+
+## 配套资源
+- 源码地址
+- 练习题目
+- 延伸阅读', '["https://leetcode.cn/problemset/all/"]', 78, '2026-08-04 05:03:53');
+INSERT INTO `sp_learning_resource` VALUES (17814526375458327, 17814526375438419, 'video_script', '并发编程 可视化讲解 - 视频脚本', '# 🎬 并发编程 视频脚本
+
+## 开场 (30秒)
+画面：动态标题 + 问题引入
+"你是否曾经好奇并发编程是如何工作的？今天我们用5分钟彻底搞懂它。"
+
+## 核心讲解 (3分钟)
+### 第一部分：概念可视化
+使用动画演示并发编程的核心流程
+
+### 第二部分：代码演示
+一边写代码一边讲解关键步骤
+
+### 第三部分：对比分析
+与其他方案的对比，突出并发编程的优势
+
+## 总结 (1分钟)
+回顾关键点 + 下期预告
+
+## 配套资源
+- 源码地址
+- 练习题目
+- 延伸阅读', '["https://spring.io/docs","https://www.runoob.com/"]', 85, '2026-06-19 03:10:42');
+INSERT INTO `sp_learning_resource` VALUES (17814526375458969, 17814526375447915, 'syllabus', 'Vue 3 Composition API - 系统化学习讲义', '## Vue 3 Composition API核心概念
+
+### 1. 基础理论
+Vue 3 Composition API是计算机科学与技术领域的基础，理解其核心原理对后续学习至关重要。
+
+### 2. 关键知识点
+- 定义与分类
+- 核心算法/方法
+- 应用场景分析
+- 常见误区
+
+### 3. 学习路径
+1. 先掌握基本概念
+2. 通过实例加深理解
+3. 完成配套练习
+4. 阅读进阶文献
+
+### 4. 推荐阅读
+- 《Vue 3 Composition API实战》
+- 官方文档
+- 相关论文', '["https://www.runoob.com/","https://www.bilibili.com/video/"]', 96, '2026-09-20 22:19:25');
+INSERT INTO `sp_learning_resource` VALUES (17814526375458353, 17814526375447915, 'mind_map', '计算机视觉 知识体系思维导图', '# 计算机视觉 知识体系
+
+## 基础层
+- 概念定义
+- 术语解释
+- 发展历程
+
+## 核心层
+- 算法原理 → 时间复杂度 → 空间复杂度
+- 数据结构 → 数组/链表/树/图
+- 设计模式 → 创建型/结构型/行为型
+
+## 应用层
+- 实际案例
+- 最佳实践
+- 常见陷阱
+
+## 进阶层
+- 性能优化
+- 源码分析
+- 架构演进', '["https://leetcode.cn/problemset/all/","https://docs.python.org/"]', 85, '2026-04-09 20:32:47');
+INSERT INTO `sp_learning_resource` VALUES (17814526375456726, 17814526375447915, 'syllabus', '搜索算法 - 系统化学习讲义', '## 搜索算法核心概念
+
+### 1. 基础理论
+搜索算法是网络工程领域的基础，理解其核心原理对后续学习至关重要。
+
+### 2. 关键知识点
+- 定义与分类
+- 核心算法/方法
+- 应用场景分析
+- 常见误区
+
+### 3. 学习路径
+1. 先掌握基本概念
+2. 通过实例加深理解
+3. 完成配套练习
+4. 阅读进阶文献
+
+### 4. 推荐阅读
+- 《搜索算法实战》
+- 官方文档
+- 相关论文', '["https://developer.mozilla.org/","https://www.runoob.com/","https://docs.python.org/"]', 92, '2026-06-13 08:01:29');
+INSERT INTO `sp_learning_resource` VALUES (17814526375456405, 17814526375447915, 'practice', 'JWT令牌 - 分层练习题库', '# JWT令牌 实战题库
+
+## 选择题 (20题)
+1. 在JWT令牌中，时间复杂度最优的算法是？
+2. JWT令牌与${pick(courses)}的主要区别是？
+
+## 编程题 (10题)
+3. 【简单】实现JWT令牌的基本版本
+4. 【中等】优化JWT令牌至O(n log n)
+5. 【困难】分布式JWT令牌系统设计
+
+## 综合应用题 (5题)
+6. 结合${pick(courses)}知识，解决实际问题
+
+## 详细解析
+每题包含：解题思路、代码示例、复杂度分析、易错点', '["https://docs.python.org/"]', 82, '2026-08-08 22:26:55');
+INSERT INTO `sp_learning_resource` VALUES (17814526375457225, 17814526375447915, 'video_script', '哈希表 可视化讲解 - 视频脚本', '# 🎬 哈希表 视频脚本
+
+## 开场 (30秒)
+画面：动态标题 + 问题引入
+"你是否曾经好奇哈希表是如何工作的？今天我们用5分钟彻底搞懂它。"
+
+## 核心讲解 (3分钟)
+### 第一部分：概念可视化
+使用动画演示哈希表的核心流程
+
+### 第二部分：代码演示
+一边写代码一边讲解关键步骤
+
+### 第三部分：对比分析
+与其他方案的对比，突出哈希表的优势
+
+## 总结 (1分钟)
+回顾关键点 + 下期预告
+
+## 配套资源
+- 源码地址
+- 练习题目
+- 延伸阅读', '["https://spring.io/docs"]', 89, '2026-08-20 10:21:56');
+INSERT INTO `sp_learning_resource` VALUES (17814526375455816, 17814526375447915, 'syllabus', 'WebSocket实时通信 - 系统化学习讲义', '# WebSocket实时通信 学习指南
+
+## 为什么学习WebSocket实时通信
+WebSocket实时通信在当前技术栈中占据重要位置，掌握它能让你的技能体系更加完整。
+
+## 知识地图
+```
+基础概念 → 核心原理 → 实战应用 → 性能优化 → 架构设计
+```
+
+## 每阶段目标
+- 第1周：理解概念，完成Hello World
+- 第2周：掌握核心API/方法
+- 第3周：独立完成小项目
+- 第4周：优化与扩展
+
+## 常见问题
+1. Q: 如何开始学习？ A: 从官方文档和简单示例入手
+2. Q: 需要什么前置知识？ A: 基本的人工智能概念', '["https://www.bilibili.com/video/","https://docs.python.org/","https://zhuanlan.zhihu.com/"]', 79, '2026-03-16 04:41:17');
+INSERT INTO `sp_learning_resource` VALUES (17814526375452496, 17814526375447915, 'video_script', '负载均衡 可视化讲解 - 视频脚本', '# 🎬 负载均衡 视频脚本
+
+## 开场 (30秒)
+画面：动态标题 + 问题引入
+"你是否曾经好奇负载均衡是如何工作的？今天我们用5分钟彻底搞懂它。"
+
+## 核心讲解 (3分钟)
+### 第一部分：概念可视化
+使用动画演示负载均衡的核心流程
+
+### 第二部分：代码演示
+一边写代码一边讲解关键步骤
+
+### 第三部分：对比分析
+与其他方案的对比，突出负载均衡的优势
+
+## 总结 (1分钟)
+回顾关键点 + 下期预告
+
+## 配套资源
+- 源码地址
+- 练习题目
+- 延伸阅读', '["https://github.com/topics/","https://developer.mozilla.org/","https://zhuanlan.zhihu.com/"]', 84, '2026-07-17 10:13:18');
+INSERT INTO `sp_learning_resource` VALUES (17814526375451540, 17814526375447915, 'mind_map', '图的遍历 知识体系思维导图', '# 图的遍历 知识图谱
+
+## 🏗️ 基础知识
+```
+概念理解 → 原理掌握 → 动手实现
+```
+
+## 🔗 关联知识
+- 前置依赖：${pick(courses)}
+- 后续延伸：${pick(courses)}
+- 横向对比：${pick(courses)}
+
+## 📊 掌握度自评
+| 维度 | 掌握程度 | 下一步 |
+|------|---------|--------|
+| 概念 | ★★★★☆ | 阅读进阶文献 |
+| 实现 | ★★★☆☆ | 完成3个练习 |
+| 优化 | ★★☆☆☆ | 学习性能分析 |', '["https://github.com/topics/","https://leetcode.cn/problemset/all/"]', 77, '2026-04-03 19:45:45');
+INSERT INTO `sp_learning_resource` VALUES (17814526375459729, 17814526375442956, 'syllabus', '函数式编程 - 系统化学习讲义', '## 函数式编程核心概念
+
+### 1. 基础理论
+函数式编程是软件工程领域的基础，理解其核心原理对后续学习至关重要。
+
+### 2. 关键知识点
+- 定义与分类
+- 核心算法/方法
+- 应用场景分析
+- 常见误区
+
+### 3. 学习路径
+1. 先掌握基本概念
+2. 通过实例加深理解
+3. 完成配套练习
+4. 阅读进阶文献
+
+### 4. 推荐阅读
+- 《函数式编程实战》
+- 官方文档
+- 相关论文', '["https://github.com/topics/"]', 79, '2026-08-29 10:16:47');
+INSERT INTO `sp_learning_resource` VALUES (17814526375457618, 17814526375442956, 'code_lab', 'React Hooks 编程实战项目', '# 项目：React Hooks 实战
+
+## 技术栈
+- Python / Java
+- Spring Boot / Flask
+- MySQL + Redis
+
+## 实现步骤
+
+### Step 1: 环境搭建
+配置开发环境，安装依赖
+
+### Step 2: 核心逻辑
+实现 React Hooks 的核心算法，注意边界条件和异常处理
+
+### Step 3: 测试验证
+编写单元测试和集成测试
+
+## 性能基准
+| 数据规模 | 耗时 | 内存 |
+|---------|------|------|
+| 1000 | 0.1s | 10MB |
+| 10000 | 1.2s | 50MB |
+| 100000 | 15s | 200MB |
+
+## 扩展思考
+如何将 React Hooks 应用到分布式系统中？', '["https://docs.python.org/","https://zhuanlan.zhihu.com/","https://github.com/topics/"]', 86, '2026-09-19 10:33:36');
+INSERT INTO `sp_learning_resource` VALUES (17814526375458951, 17814526375442956, 'mind_map', 'WebSocket实时通信 知识体系思维导图', '# WebSocket实时通信 知识体系
+
+## 基础层
+- 概念定义
+- 术语解释
+- 发展历程
+
+## 核心层
+- 算法原理 → 时间复杂度 → 空间复杂度
+- 数据结构 → 数组/链表/树/图
+- 设计模式 → 创建型/结构型/行为型
+
+## 应用层
+- 实际案例
+- 最佳实践
+- 常见陷阱
+
+## 进阶层
+- 性能优化
+- 源码分析
+- 架构演进', '["https://leetcode.cn/problemset/all/"]', 80, '2026-05-27 03:47:33');
+INSERT INTO `sp_learning_resource` VALUES (17814526375455271, 17814526375442956, 'syllabus', '分治策略 - 系统化学习讲义', '# 分治策略 学习指南
+
+## 为什么学习分治策略
+分治策略在当前技术栈中占据重要位置，掌握它能让你的技能体系更加完整。
+
+## 知识地图
+```
+基础概念 → 核心原理 → 实战应用 → 性能优化 → 架构设计
+```
+
+## 每阶段目标
+- 第1周：理解概念，完成Hello World
+- 第2周：掌握核心API/方法
+- 第3周：独立完成小项目
+- 第4周：优化与扩展
+
+## 常见问题
+1. Q: 如何开始学习？ A: 从官方文档和简单示例入手
+2. Q: 需要什么前置知识？ A: 基本的电子信息工程概念', '["https://zhuanlan.zhihu.com/","https://stackoverflow.com/questions/"]', 81, '2026-05-21 03:15:53');
+INSERT INTO `sp_learning_resource` VALUES (17814526375456458, 17814526375442956, 'video_script', '搜索算法 可视化讲解 - 视频脚本', '# 🎬 搜索算法 视频脚本
+
+## 开场 (30秒)
+画面：动态标题 + 问题引入
+"你是否曾经好奇搜索算法是如何工作的？今天我们用5分钟彻底搞懂它。"
+
+## 核心讲解 (3分钟)
+### 第一部分：概念可视化
+使用动画演示搜索算法的核心流程
+
+### 第二部分：代码演示
+一边写代码一边讲解关键步骤
+
+### 第三部分：对比分析
+与其他方案的对比，突出搜索算法的优势
+
+## 总结 (1分钟)
+回顾关键点 + 下期预告
+
+## 配套资源
+- 源码地址
+- 练习题目
+- 延伸阅读', '["https://www.bilibili.com/video/"]', 91, '2026-08-24 19:19:03');
+INSERT INTO `sp_learning_resource` VALUES (17814526375456495, 17814526375442956, 'syllabus', '布隆过滤器 - 系统化学习讲义', '## 布隆过滤器核心概念
+
+### 1. 基础理论
+布隆过滤器是人工智能领域的基础，理解其核心原理对后续学习至关重要。
+
+### 2. 关键知识点
+- 定义与分类
+- 核心算法/方法
+- 应用场景分析
+- 常见误区
+
+### 3. 学习路径
+1. 先掌握基本概念
+2. 通过实例加深理解
+3. 完成配套练习
+4. 阅读进阶文献
+
+### 4. 推荐阅读
+- 《布隆过滤器实战》
+- 官方文档
+- 相关论文', '["https://github.com/topics/","https://docs.python.org/","https://stackoverflow.com/questions/"]', 91, '2026-07-28 16:26:05');
+INSERT INTO `sp_learning_resource` VALUES (17814526375452595, 17814526375441770, 'mind_map', '并发编程 知识体系思维导图', '# 并发编程 知识体系
+
+## 基础层
+- 概念定义
+- 术语解释
+- 发展历程
+
+## 核心层
+- 算法原理 → 时间复杂度 → 空间复杂度
+- 数据结构 → 数组/链表/树/图
+- 设计模式 → 创建型/结构型/行为型
+
+## 应用层
+- 实际案例
+- 最佳实践
+- 常见陷阱
+
+## 进阶层
+- 性能优化
+- 源码分析
+- 架构演进', '["https://zhuanlan.zhihu.com/","https://github.com/topics/"]', 95, '2026-08-30 01:28:58');
+INSERT INTO `sp_learning_resource` VALUES (17814526375451112, 17814526375441770, 'mind_map', '异步IO 知识体系思维导图', '# 异步IO 知识体系
+
+## 基础层
+- 概念定义
+- 术语解释
+- 发展历程
+
+## 核心层
+- 算法原理 → 时间复杂度 → 空间复杂度
+- 数据结构 → 数组/链表/树/图
+- 设计模式 → 创建型/结构型/行为型
+
+## 应用层
+- 实际案例
+- 最佳实践
+- 常见陷阱
+
+## 进阶层
+- 性能优化
+- 源码分析
+- 架构演进', '["https://stackoverflow.com/questions/"]', 92, '2026-09-27 04:16:40');
+INSERT INTO `sp_learning_resource` VALUES (17814526375455698, 17814526375441770, 'mind_map', '模型部署 知识体系思维导图', '# 模型部署 知识图谱
+
+## 🏗️ 基础知识
+```
+概念理解 → 原理掌握 → 动手实现
+```
+
+## 🔗 关联知识
+- 前置依赖：${pick(courses)}
+- 后续延伸：${pick(courses)}
+- 横向对比：${pick(courses)}
+
+## 📊 掌握度自评
+| 维度 | 掌握程度 | 下一步 |
+|------|---------|--------|
+| 概念 | ★★★★☆ | 阅读进阶文献 |
+| 实现 | ★★★☆☆ | 完成3个练习 |
+| 优化 | ★★☆☆☆ | 学习性能分析 |', '["https://leetcode.cn/problemset/all/","https://zhuanlan.zhihu.com/","https://spring.io/docs"]', 94, '2026-05-19 13:47:56');
+INSERT INTO `sp_learning_resource` VALUES (17814526375458109, 17814526375441770, 'code_lab', '回溯法 编程实战项目', '# 项目：回溯法 实战
+
+## 技术栈
+- Python / Java
+- Spring Boot / Flask
+- MySQL + Redis
+
+## 实现步骤
+
+### Step 1: 环境搭建
+配置开发环境，安装依赖
+
+### Step 2: 核心逻辑
+实现 回溯法 的核心算法，注意边界条件和异常处理
+
+### Step 3: 测试验证
+编写单元测试和集成测试
+
+## 性能基准
+| 数据规模 | 耗时 | 内存 |
+|---------|------|------|
+| 1000 | 0.1s | 10MB |
+| 10000 | 1.2s | 50MB |
+| 100000 | 15s | 200MB |
+
+## 扩展思考
+如何将 回溯法 应用到分布式系统中？', '["https://www.runoob.com/","https://docs.python.org/","https://www.bilibili.com/video/"]', 80, '2026-08-23 03:26:58');
+INSERT INTO `sp_learning_resource` VALUES (17814526375458531, 17814526375441770, 'video_script', 'CI/CD流水线 可视化讲解 - 视频脚本', '# 🎬 CI/CD流水线 视频脚本
+
+## 开场 (30秒)
+画面：动态标题 + 问题引入
+"你是否曾经好奇CI/CD流水线是如何工作的？今天我们用5分钟彻底搞懂它。"
+
+## 核心讲解 (3分钟)
+### 第一部分：概念可视化
+使用动画演示CI/CD流水线的核心流程
+
+### 第二部分：代码演示
+一边写代码一边讲解关键步骤
+
+### 第三部分：对比分析
+与其他方案的对比，突出CI/CD流水线的优势
+
+## 总结 (1分钟)
+回顾关键点 + 下期预告
+
+## 配套资源
+- 源码地址
+- 练习题目
+- 延伸阅读', '["https://docs.python.org/","https://leetcode.cn/problemset/all/","https://stackoverflow.com/questions/"]', 86, '2026-06-29 03:20:02');
+INSERT INTO `sp_learning_resource` VALUES (17814526375451721, 17814526375441770, 'syllabus', 'MySQL索引优化 - 系统化学习讲义', '# MySQL索引优化 学习指南
+
+## 为什么学习MySQL索引优化
+MySQL索引优化在当前技术栈中占据重要位置，掌握它能让你的技能体系更加完整。
+
+## 知识地图
+```
+基础概念 → 核心原理 → 实战应用 → 性能优化 → 架构设计
+```
+
+## 每阶段目标
+- 第1周：理解概念，完成Hello World
+- 第2周：掌握核心API/方法
+- 第3周：独立完成小项目
+- 第4周：优化与扩展
+
+## 常见问题
+1. Q: 如何开始学习？ A: 从官方文档和简单示例入手
+2. Q: 需要什么前置知识？ A: 基本的信息安全概念', '["https://stackoverflow.com/questions/"]', 96, '2026-09-12 22:06:25');
+INSERT INTO `sp_learning_resource` VALUES (17814526375452546, 17814526375441770, 'mind_map', '并查集 知识体系思维导图', '# 并查集 知识图谱
+
+## 🏗️ 基础知识
+```
+概念理解 → 原理掌握 → 动手实现
+```
+
+## 🔗 关联知识
+- 前置依赖：${pick(courses)}
+- 后续延伸：${pick(courses)}
+- 横向对比：${pick(courses)}
+
+## 📊 掌握度自评
+| 维度 | 掌握程度 | 下一步 |
+|------|---------|--------|
+| 概念 | ★★★★☆ | 阅读进阶文献 |
+| 实现 | ★★★☆☆ | 完成3个练习 |
+| 优化 | ★★☆☆☆ | 学习性能分析 |', '["https://leetcode.cn/problemset/all/","https://www.bilibili.com/video/"]', 93, '2026-04-10 11:55:35');
+INSERT INTO `sp_learning_resource` VALUES (17814526375455766, 17814526375446401, 'video_script', 'Kubernetes编排 可视化讲解 - 视频脚本', '# 🎬 Kubernetes编排 视频脚本
+
+## 开场 (30秒)
+画面：动态标题 + 问题引入
+"你是否曾经好奇Kubernetes编排是如何工作的？今天我们用5分钟彻底搞懂它。"
+
+## 核心讲解 (3分钟)
+### 第一部分：概念可视化
+使用动画演示Kubernetes编排的核心流程
+
+### 第二部分：代码演示
+一边写代码一边讲解关键步骤
+
+### 第三部分：对比分析
+与其他方案的对比，突出Kubernetes编排的优势
+
+## 总结 (1分钟)
+回顾关键点 + 下期预告
+
+## 配套资源
+- 源码地址
+- 练习题目
+- 延伸阅读', '["https://docs.python.org/","https://github.com/topics/"]', 96, '2026-08-26 22:31:33');
+INSERT INTO `sp_learning_resource` VALUES (17814526375451162, 17814526375446401, 'code_lab', '并发编程 编程实战项目', '# 项目：并发编程 实战
+
+## 技术栈
+- Python / Java
+- Spring Boot / Flask
+- MySQL + Redis
+
+## 实现步骤
+
+### Step 1: 环境搭建
+配置开发环境，安装依赖
+
+### Step 2: 核心逻辑
+实现 并发编程 的核心算法，注意边界条件和异常处理
+
+### Step 3: 测试验证
+编写单元测试和集成测试
+
+## 性能基准
+| 数据规模 | 耗时 | 内存 |
+|---------|------|------|
+| 1000 | 0.1s | 10MB |
+| 10000 | 1.2s | 50MB |
+| 100000 | 15s | 200MB |
+
+## 扩展思考
+如何将 并发编程 应用到分布式系统中？', '["https://github.com/topics/","https://www.runoob.com/","https://docs.python.org/"]', 97, '2026-06-24 19:40:20');
+INSERT INTO `sp_learning_resource` VALUES (17814526375457538, 17814526375446401, 'practice', 'React Hooks - 分层练习题库', '# React Hooks 实战题库
+
+## 选择题 (20题)
+1. 在React Hooks中，时间复杂度最优的算法是？
+2. React Hooks与${pick(courses)}的主要区别是？
+
+## 编程题 (10题)
+3. 【简单】实现React Hooks的基本版本
+4. 【中等】优化React Hooks至O(n log n)
+5. 【困难】分布式React Hooks系统设计
+
+## 综合应用题 (5题)
+6. 结合${pick(courses)}知识，解决实际问题
+
+## 详细解析
+每题包含：解题思路、代码示例、复杂度分析、易错点', '["https://www.bilibili.com/video/"]', 86, '2026-07-29 01:38:51');
+INSERT INTO `sp_learning_resource` VALUES (17814526375459795, 17814526375446401, 'video_script', '卷积神经网络 可视化讲解 - 视频脚本', '# 🎬 卷积神经网络 视频脚本
+
+## 开场 (30秒)
+画面：动态标题 + 问题引入
+"你是否曾经好奇卷积神经网络是如何工作的？今天我们用5分钟彻底搞懂它。"
+
+## 核心讲解 (3分钟)
+### 第一部分：概念可视化
+使用动画演示卷积神经网络的核心流程
+
+### 第二部分：代码演示
+一边写代码一边讲解关键步骤
+
+### 第三部分：对比分析
+与其他方案的对比，突出卷积神经网络的优势
+
+## 总结 (1分钟)
+回顾关键点 + 下期预告
+
+## 配套资源
+- 源码地址
+- 练习题目
+- 延伸阅读', '["https://docs.python.org/"]', 76, '2026-05-25 15:10:48');
+INSERT INTO `sp_learning_resource` VALUES (17814526375456689, 17814526375446401, 'syllabus', '拓扑排序 - 系统化学习讲义', '# 拓扑排序 学习指南
+
+## 为什么学习拓扑排序
+拓扑排序在当前技术栈中占据重要位置，掌握它能让你的技能体系更加完整。
+
+## 知识地图
+```
+基础概念 → 核心原理 → 实战应用 → 性能优化 → 架构设计
+```
+
+## 每阶段目标
+- 第1周：理解概念，完成Hello World
+- 第2周：掌握核心API/方法
+- 第3周：独立完成小项目
+- 第4周：优化与扩展
+
+## 常见问题
+1. Q: 如何开始学习？ A: 从官方文档和简单示例入手
+2. Q: 需要什么前置知识？ A: 基本的信息与计算科学概念', '["https://www.bilibili.com/video/","https://zhuanlan.zhihu.com/"]', 98, '2026-08-16 22:57:48');
+INSERT INTO `sp_learning_resource` VALUES (17814526375456292, 17814526375446401, 'video_script', '模型部署 可视化讲解 - 视频脚本', '# 🎬 模型部署 视频脚本
+
+## 开场 (30秒)
+画面：动态标题 + 问题引入
+"你是否曾经好奇模型部署是如何工作的？今天我们用5分钟彻底搞懂它。"
+
+## 核心讲解 (3分钟)
+### 第一部分：概念可视化
+使用动画演示模型部署的核心流程
+
+### 第二部分：代码演示
+一边写代码一边讲解关键步骤
+
+### 第三部分：对比分析
+与其他方案的对比，突出模型部署的优势
+
+## 总结 (1分钟)
+回顾关键点 + 下期预告
+
+## 配套资源
+- 源码地址
+- 练习题目
+- 延伸阅读', '["https://docs.python.org/","https://stackoverflow.com/questions/"]', 76, '2026-04-19 13:23:24');
+INSERT INTO `sp_learning_resource` VALUES (17814526375458928, 17814526375446401, 'mind_map', '微服务架构 知识体系思维导图', '# 微服务架构 知识体系
+
+## 基础层
+- 概念定义
+- 术语解释
+- 发展历程
+
+## 核心层
+- 算法原理 → 时间复杂度 → 空间复杂度
+- 数据结构 → 数组/链表/树/图
+- 设计模式 → 创建型/结构型/行为型
+
+## 应用层
+- 实际案例
+- 最佳实践
+- 常见陷阱
+
+## 进阶层
+- 性能优化
+- 源码分析
+- 架构演进', '["https://stackoverflow.com/questions/"]', 82, '2026-03-16 04:29:03');
+INSERT INTO `sp_learning_resource` VALUES (17814526375459912, 17814526375442593, 'mind_map', '异常检测 知识体系思维导图', '# 异常检测 知识体系
+
+## 基础层
+- 概念定义
+- 术语解释
+- 发展历程
+
+## 核心层
+- 算法原理 → 时间复杂度 → 空间复杂度
+- 数据结构 → 数组/链表/树/图
+- 设计模式 → 创建型/结构型/行为型
+
+## 应用层
+- 实际案例
+- 最佳实践
+- 常见陷阱
+
+## 进阶层
+- 性能优化
+- 源码分析
+- 架构演进', '["https://leetcode.cn/problemset/all/"]', 92, '2026-08-03 17:06:29');
+INSERT INTO `sp_learning_resource` VALUES (17814526375458523, 17814526375442593, 'video_script', '模型部署 可视化讲解 - 视频脚本', '# 🎬 模型部署 视频脚本
+
+## 开场 (30秒)
+画面：动态标题 + 问题引入
+"你是否曾经好奇模型部署是如何工作的？今天我们用5分钟彻底搞懂它。"
+
+## 核心讲解 (3分钟)
+### 第一部分：概念可视化
+使用动画演示模型部署的核心流程
+
+### 第二部分：代码演示
+一边写代码一边讲解关键步骤
+
+### 第三部分：对比分析
+与其他方案的对比，突出模型部署的优势
+
+## 总结 (1分钟)
+回顾关键点 + 下期预告
+
+## 配套资源
+- 源码地址
+- 练习题目
+- 延伸阅读', '["https://developer.mozilla.org/","https://github.com/topics/","https://leetcode.cn/problemset/all/"]', 77, '2026-08-05 16:09:23');
+INSERT INTO `sp_learning_resource` VALUES (17814526375452359, 17814526375442593, 'mind_map', 'A/B测试 知识体系思维导图', '# A/B测试 知识图谱
+
+## 🏗️ 基础知识
+```
+概念理解 → 原理掌握 → 动手实现
+```
+
+## 🔗 关联知识
+- 前置依赖：${pick(courses)}
+- 后续延伸：${pick(courses)}
+- 横向对比：${pick(courses)}
+
+## 📊 掌握度自评
+| 维度 | 掌握程度 | 下一步 |
+|------|---------|--------|
+| 概念 | ★★★★☆ | 阅读进阶文献 |
+| 实现 | ★★★☆☆ | 完成3个练习 |
+| 优化 | ★★☆☆☆ | 学习性能分析 |', '["https://docs.python.org/"]', 94, '2026-05-15 05:01:42');
+INSERT INTO `sp_learning_resource` VALUES (17814526375455041, 17814526375442593, 'code_lab', '自然语言处理 编程实战项目', '# 项目：自然语言处理 实战
+
+## 技术栈
+- Python / Java
+- Spring Boot / Flask
+- MySQL + Redis
+
+## 实现步骤
+
+### Step 1: 环境搭建
+配置开发环境，安装依赖
+
+### Step 2: 核心逻辑
+实现 自然语言处理 的核心算法，注意边界条件和异常处理
+
+### Step 3: 测试验证
+编写单元测试和集成测试
+
+## 性能基准
+| 数据规模 | 耗时 | 内存 |
+|---------|------|------|
+| 1000 | 0.1s | 10MB |
+| 10000 | 1.2s | 50MB |
+| 100000 | 15s | 200MB |
+
+## 扩展思考
+如何将 自然语言处理 应用到分布式系统中？', '["https://stackoverflow.com/questions/","https://docs.python.org/"]', 90, '2026-09-20 15:47:19');
+INSERT INTO `sp_learning_resource` VALUES (17814526375454639, 17814526375442593, 'practice', 'MySQL索引优化 - 分层练习题库', '# MySQL索引优化 实战题库
+
+## 选择题 (20题)
+1. 在MySQL索引优化中，时间复杂度最优的算法是？
+2. MySQL索引优化与${pick(courses)}的主要区别是？
+
+## 编程题 (10题)
+3. 【简单】实现MySQL索引优化的基本版本
+4. 【中等】优化MySQL索引优化至O(n log n)
+5. 【困难】分布式MySQL索引优化系统设计
+
+## 综合应用题 (5题)
+6. 结合${pick(courses)}知识，解决实际问题
+
+## 详细解析
+每题包含：解题思路、代码示例、复杂度分析、易错点', '["https://www.bilibili.com/video/","https://docs.python.org/","https://leetcode.cn/problemset/all/"]', 90, '2026-07-01 14:39:15');
+INSERT INTO `sp_learning_resource` VALUES (17814526375453439, 17814526375445022, 'code_lab', '强化学习 编程实战项目', '# 项目：强化学习 实战
+
+## 技术栈
+- Python / Java
+- Spring Boot / Flask
+- MySQL + Redis
+
+## 实现步骤
+
+### Step 1: 环境搭建
+配置开发环境，安装依赖
+
+### Step 2: 核心逻辑
+实现 强化学习 的核心算法，注意边界条件和异常处理
+
+### Step 3: 测试验证
+编写单元测试和集成测试
+
+## 性能基准
+| 数据规模 | 耗时 | 内存 |
+|---------|------|------|
+| 1000 | 0.1s | 10MB |
+| 10000 | 1.2s | 50MB |
+| 100000 | 15s | 200MB |
+
+## 扩展思考
+如何将 强化学习 应用到分布式系统中？', '["https://github.com/topics/","https://leetcode.cn/problemset/all/","https://zhuanlan.zhihu.com/"]', 75, '2026-06-15 09:38:52');
+INSERT INTO `sp_learning_resource` VALUES (17814526375459245, 17814526375445022, 'practice', '计算机视觉 - 分层练习题库', '# 计算机视觉 实战题库
+
+## 选择题 (20题)
+1. 在计算机视觉中，时间复杂度最优的算法是？
+2. 计算机视觉与${pick(courses)}的主要区别是？
+
+## 编程题 (10题)
+3. 【简单】实现计算机视觉的基本版本
+4. 【中等】优化计算机视觉至O(n log n)
+5. 【困难】分布式计算机视觉系统设计
+
+## 综合应用题 (5题)
+6. 结合${pick(courses)}知识，解决实际问题
+
+## 详细解析
+每题包含：解题思路、代码示例、复杂度分析、易错点', '["https://docs.python.org/","https://www.runoob.com/"]', 82, '2026-09-13 04:42:37');
+INSERT INTO `sp_learning_resource` VALUES (17814526375452493, 17814526375445022, 'mind_map', 'Redis缓存策略 知识体系思维导图', '# Redis缓存策略 知识图谱
+
+## 🏗️ 基础知识
+```
+概念理解 → 原理掌握 → 动手实现
+```
+
+## 🔗 关联知识
+- 前置依赖：${pick(courses)}
+- 后续延伸：${pick(courses)}
+- 横向对比：${pick(courses)}
+
+## 📊 掌握度自评
+| 维度 | 掌握程度 | 下一步 |
+|------|---------|--------|
+| 概念 | ★★★★☆ | 阅读进阶文献 |
+| 实现 | ★★★☆☆ | 完成3个练习 |
+| 优化 | ★★☆☆☆ | 学习性能分析 |', '["https://docs.python.org/"]', 85, '2026-07-01 20:39:36');
+INSERT INTO `sp_learning_resource` VALUES (17814526375456898, 17814526375445022, 'code_lab', '设计模式 编程实战项目', '# 项目：设计模式 实战
+
+## 技术栈
+- Python / Java
+- Spring Boot / Flask
+- MySQL + Redis
+
+## 实现步骤
+
+### Step 1: 环境搭建
+配置开发环境，安装依赖
+
+### Step 2: 核心逻辑
+实现 设计模式 的核心算法，注意边界条件和异常处理
+
+### Step 3: 测试验证
+编写单元测试和集成测试
+
+## 性能基准
+| 数据规模 | 耗时 | 内存 |
+|---------|------|------|
+| 1000 | 0.1s | 10MB |
+| 10000 | 1.2s | 50MB |
+| 100000 | 15s | 200MB |
+
+## 扩展思考
+如何将 设计模式 应用到分布式系统中？', '["https://leetcode.cn/problemset/all/","https://github.com/topics/","https://spring.io/docs"]', 84, '2026-06-10 17:15:01');
+INSERT INTO `sp_learning_resource` VALUES (17814526375459010, 17814526375445022, 'mind_map', '哈希表 知识体系思维导图', '# 哈希表 知识图谱
+
+## 🏗️ 基础知识
+```
+概念理解 → 原理掌握 → 动手实现
+```
+
+## 🔗 关联知识
+- 前置依赖：${pick(courses)}
+- 后续延伸：${pick(courses)}
+- 横向对比：${pick(courses)}
+
+## 📊 掌握度自评
+| 维度 | 掌握程度 | 下一步 |
+|------|---------|--------|
+| 概念 | ★★★★☆ | 阅读进阶文献 |
+| 实现 | ★★★☆☆ | 完成3个练习 |
+| 优化 | ★★☆☆☆ | 学习性能分析 |', '["https://www.runoob.com/","https://developer.mozilla.org/","https://www.bilibili.com/video/"]', 79, '2026-05-26 21:57:12');
+INSERT INTO `sp_learning_resource` VALUES (17814526375458069, 17814526375445022, 'video_script', 'Kubernetes编排 可视化讲解 - 视频脚本', '# 🎬 Kubernetes编排 视频脚本
+
+## 开场 (30秒)
+画面：动态标题 + 问题引入
+"你是否曾经好奇Kubernetes编排是如何工作的？今天我们用5分钟彻底搞懂它。"
+
+## 核心讲解 (3分钟)
+### 第一部分：概念可视化
+使用动画演示Kubernetes编排的核心流程
+
+### 第二部分：代码演示
+一边写代码一边讲解关键步骤
+
+### 第三部分：对比分析
+与其他方案的对比，突出Kubernetes编排的优势
+
+## 总结 (1分钟)
+回顾关键点 + 下期预告
+
+## 配套资源
+- 源码地址
+- 练习题目
+- 延伸阅读', '["https://leetcode.cn/problemset/all/"]', 91, '2026-08-18 23:51:39');
+INSERT INTO `sp_learning_resource` VALUES (17814526375453920, 17814526375445022, 'code_lab', 'RESTful API 编程实战项目', '# 项目：RESTful API 实战
+
+## 技术栈
+- Python / Java
+- Spring Boot / Flask
+- MySQL + Redis
+
+## 实现步骤
+
+### Step 1: 环境搭建
+配置开发环境，安装依赖
+
+### Step 2: 核心逻辑
+实现 RESTful API 的核心算法，注意边界条件和异常处理
+
+### Step 3: 测试验证
+编写单元测试和集成测试
+
+## 性能基准
+| 数据规模 | 耗时 | 内存 |
+|---------|------|------|
+| 1000 | 0.1s | 10MB |
+| 10000 | 1.2s | 50MB |
+| 100000 | 15s | 200MB |
+
+## 扩展思考
+如何将 RESTful API 应用到分布式系统中？', '["https://www.runoob.com/","https://docs.python.org/"]', 91, '2026-08-16 23:35:19');
+INSERT INTO `sp_learning_resource` VALUES (17814526375451125, 17814526375442364, 'practice', '设计模式 - 分层练习题库', '## 📝 设计模式 分层练习
+
+### 🟢 基础题 (10题)
+1. 设计模式的核心特性有哪些？
+2. 简述设计模式的基本工作流程。
+3. 以下哪个不属于设计模式的应用场景？
+   A. Web开发 B. 数据分析 C. 文字处理 D. 机器学习
+
+### 🟡 进阶题 (5题)
+4. 请实现一个简单的设计模式示例，要求包含错误处理。
+5. 分析设计模式在大规模数据下的性能瓶颈。
+
+### 🔴 挑战题 (3题)
+6. 设计一个基于设计模式的分布式系统，画架构图并说明。
+7. 优化给定代码的性能，从O(n²)降到O(n log n)。
+
+### ✅ 答案与解析
+（每题附详细解答）', '["https://spring.io/docs","https://github.com/topics/"]', 89, '2026-03-18 22:27:18');
+INSERT INTO `sp_learning_resource` VALUES (17814526375457028, 17814526375442364, 'syllabus', '图的遍历 - 系统化学习讲义', '## 图的遍历核心概念
+
+### 1. 基础理论
+图的遍历是网络工程领域的基础，理解其核心原理对后续学习至关重要。
+
+### 2. 关键知识点
+- 定义与分类
+- 核心算法/方法
+- 应用场景分析
+- 常见误区
+
+### 3. 学习路径
+1. 先掌握基本概念
+2. 通过实例加深理解
+3. 完成配套练习
+4. 阅读进阶文献
+
+### 4. 推荐阅读
+- 《图的遍历实战》
+- 官方文档
+- 相关论文', '["https://leetcode.cn/problemset/all/","https://docs.python.org/"]', 76, '2026-07-25 13:52:02');
+INSERT INTO `sp_learning_resource` VALUES (17814526375457359, 17814526375442364, 'syllabus', 'JWT令牌 - 系统化学习讲义', '## JWT令牌核心概念
+
+### 1. 基础理论
+JWT令牌是信息安全领域的基础，理解其核心原理对后续学习至关重要。
+
+### 2. 关键知识点
+- 定义与分类
+- 核心算法/方法
+- 应用场景分析
+- 常见误区
+
+### 3. 学习路径
+1. 先掌握基本概念
+2. 通过实例加深理解
+3. 完成配套练习
+4. 阅读进阶文献
+
+### 4. 推荐阅读
+- 《JWT令牌实战》
+- 官方文档
+- 相关论文', '["https://docs.python.org/","https://github.com/topics/","https://www.runoob.com/"]', 87, '2026-06-09 11:00:17');
+INSERT INTO `sp_learning_resource` VALUES (17814526375457989, 17814526375442364, 'code_lab', '数据库事务 编程实战项目', '# 项目：数据库事务 实战
+
+## 技术栈
+- Python / Java
+- Spring Boot / Flask
+- MySQL + Redis
+
+## 实现步骤
+
+### Step 1: 环境搭建
+配置开发环境，安装依赖
+
+### Step 2: 核心逻辑
+实现 数据库事务 的核心算法，注意边界条件和异常处理
+
+### Step 3: 测试验证
+编写单元测试和集成测试
+
+## 性能基准
+| 数据规模 | 耗时 | 内存 |
+|---------|------|------|
+| 1000 | 0.1s | 10MB |
+| 10000 | 1.2s | 50MB |
+| 100000 | 15s | 200MB |
+
+## 扩展思考
+如何将 数据库事务 应用到分布式系统中？', '["https://www.runoob.com/","https://stackoverflow.com/questions/","https://spring.io/docs"]', 97, '2026-07-09 05:19:51');
+INSERT INTO `sp_learning_resource` VALUES (17814526375454583, 17814526375442364, 'code_lab', '并发编程 编程实战项目', '# 项目：并发编程 实战
+
+## 技术栈
+- Python / Java
+- Spring Boot / Flask
+- MySQL + Redis
+
+## 实现步骤
+
+### Step 1: 环境搭建
+配置开发环境，安装依赖
+
+### Step 2: 核心逻辑
+实现 并发编程 的核心算法，注意边界条件和异常处理
+
+### Step 3: 测试验证
+编写单元测试和集成测试
+
+## 性能基准
+| 数据规模 | 耗时 | 内存 |
+|---------|------|------|
+| 1000 | 0.1s | 10MB |
+| 10000 | 1.2s | 50MB |
+| 100000 | 15s | 200MB |
+
+## 扩展思考
+如何将 并发编程 应用到分布式系统中？', '["https://zhuanlan.zhihu.com/"]', 98, '2026-07-20 17:33:07');
+INSERT INTO `sp_learning_resource` VALUES (17814526375452539, 17814526375447326, 'mind_map', 'RESTful API 知识体系思维导图', '# RESTful API 知识图谱
+
+## 🏗️ 基础知识
+```
+概念理解 → 原理掌握 → 动手实现
+```
+
+## 🔗 关联知识
+- 前置依赖：${pick(courses)}
+- 后续延伸：${pick(courses)}
+- 横向对比：${pick(courses)}
+
+## 📊 掌握度自评
+| 维度 | 掌握程度 | 下一步 |
+|------|---------|--------|
+| 概念 | ★★★★☆ | 阅读进阶文献 |
+| 实现 | ★★★☆☆ | 完成3个练习 |
+| 优化 | ★★☆☆☆ | 学习性能分析 |', '["https://stackoverflow.com/questions/"]', 89, '2026-03-15 00:26:23');
+INSERT INTO `sp_learning_resource` VALUES (17814526375455004, 17814526375447326, 'video_script', '分治策略 可视化讲解 - 视频脚本', '# 🎬 分治策略 视频脚本
+
+## 开场 (30秒)
+画面：动态标题 + 问题引入
+"你是否曾经好奇分治策略是如何工作的？今天我们用5分钟彻底搞懂它。"
+
+## 核心讲解 (3分钟)
+### 第一部分：概念可视化
+使用动画演示分治策略的核心流程
+
+### 第二部分：代码演示
+一边写代码一边讲解关键步骤
+
+### 第三部分：对比分析
+与其他方案的对比，突出分治策略的优势
+
+## 总结 (1分钟)
+回顾关键点 + 下期预告
+
+## 配套资源
+- 源码地址
+- 练习题目
+- 延伸阅读', '["https://leetcode.cn/problemset/all/","https://www.runoob.com/","https://stackoverflow.com/questions/"]', 93, '2026-05-04 13:38:10');
+INSERT INTO `sp_learning_resource` VALUES (17814526375453999, 17814526375447326, 'video_script', 'LRU缓存 可视化讲解 - 视频脚本', '# 🎬 LRU缓存 视频脚本
+
+## 开场 (30秒)
+画面：动态标题 + 问题引入
+"你是否曾经好奇LRU缓存是如何工作的？今天我们用5分钟彻底搞懂它。"
+
+## 核心讲解 (3分钟)
+### 第一部分：概念可视化
+使用动画演示LRU缓存的核心流程
+
+### 第二部分：代码演示
+一边写代码一边讲解关键步骤
+
+### 第三部分：对比分析
+与其他方案的对比，突出LRU缓存的优势
+
+## 总结 (1分钟)
+回顾关键点 + 下期预告
+
+## 配套资源
+- 源码地址
+- 练习题目
+- 延伸阅读', '["https://zhuanlan.zhihu.com/","https://github.com/topics/","https://spring.io/docs"]', 97, '2026-04-28 12:41:03');
+INSERT INTO `sp_learning_resource` VALUES (17814526375453474, 17814526375447326, 'mind_map', 'Redis缓存策略 知识体系思维导图', '# Redis缓存策略 知识图谱
+
+## 🏗️ 基础知识
+```
+概念理解 → 原理掌握 → 动手实现
+```
+
+## 🔗 关联知识
+- 前置依赖：${pick(courses)}
+- 后续延伸：${pick(courses)}
+- 横向对比：${pick(courses)}
+
+## 📊 掌握度自评
+| 维度 | 掌握程度 | 下一步 |
+|------|---------|--------|
+| 概念 | ★★★★☆ | 阅读进阶文献 |
+| 实现 | ★★★☆☆ | 完成3个练习 |
+| 优化 | ★★☆☆☆ | 学习性能分析 |', '["https://leetcode.cn/problemset/all/","https://www.runoob.com/","https://developer.mozilla.org/"]', 84, '2026-07-10 15:23:28');
+INSERT INTO `sp_learning_resource` VALUES (17814526375457472, 17814526375447326, 'video_script', 'Kubernetes编排 可视化讲解 - 视频脚本', '# 🎬 Kubernetes编排 视频脚本
+
+## 开场 (30秒)
+画面：动态标题 + 问题引入
+"你是否曾经好奇Kubernetes编排是如何工作的？今天我们用5分钟彻底搞懂它。"
+
+## 核心讲解 (3分钟)
+### 第一部分：概念可视化
+使用动画演示Kubernetes编排的核心流程
+
+### 第二部分：代码演示
+一边写代码一边讲解关键步骤
+
+### 第三部分：对比分析
+与其他方案的对比，突出Kubernetes编排的优势
+
+## 总结 (1分钟)
+回顾关键点 + 下期预告
+
+## 配套资源
+- 源码地址
+- 练习题目
+- 延伸阅读', '["https://docs.python.org/"]', 87, '2026-08-14 20:52:16');
+INSERT INTO `sp_learning_resource` VALUES (17814526375452537, 17814526375447326, 'video_script', '排序算法 可视化讲解 - 视频脚本', '# 🎬 排序算法 视频脚本
+
+## 开场 (30秒)
+画面：动态标题 + 问题引入
+"你是否曾经好奇排序算法是如何工作的？今天我们用5分钟彻底搞懂它。"
+
+## 核心讲解 (3分钟)
+### 第一部分：概念可视化
+使用动画演示排序算法的核心流程
+
+### 第二部分：代码演示
+一边写代码一边讲解关键步骤
+
+### 第三部分：对比分析
+与其他方案的对比，突出排序算法的优势
+
+## 总结 (1分钟)
+回顾关键点 + 下期预告
+
+## 配套资源
+- 源码地址
+- 练习题目
+- 延伸阅读', '["https://leetcode.cn/problemset/all/","https://zhuanlan.zhihu.com/"]', 87, '2026-03-28 22:01:29');
+INSERT INTO `sp_learning_resource` VALUES (17814526375458819, 17814526375447326, 'mind_map', 'CI/CD流水线 知识体系思维导图', '# CI/CD流水线 知识图谱
+
+## 🏗️ 基础知识
+```
+概念理解 → 原理掌握 → 动手实现
+```
+
+## 🔗 关联知识
+- 前置依赖：${pick(courses)}
+- 后续延伸：${pick(courses)}
+- 横向对比：${pick(courses)}
+
+## 📊 掌握度自评
+| 维度 | 掌握程度 | 下一步 |
+|------|---------|--------|
+| 概念 | ★★★★☆ | 阅读进阶文献 |
+| 实现 | ★★★☆☆ | 完成3个练习 |
+| 优化 | ★★☆☆☆ | 学习性能分析 |', '["https://docs.python.org/"]', 84, '2026-04-01 03:53:58');
+INSERT INTO `sp_learning_resource` VALUES (17814526375459136, 17814526375441082, 'syllabus', '代码重构 - 系统化学习讲义', '# 代码重构 学习指南
+
+## 为什么学习代码重构
+代码重构在当前技术栈中占据重要位置，掌握它能让你的技能体系更加完整。
+
+## 知识地图
+```
+基础概念 → 核心原理 → 实战应用 → 性能优化 → 架构设计
+```
+
+## 每阶段目标
+- 第1周：理解概念，完成Hello World
+- 第2周：掌握核心API/方法
+- 第3周：独立完成小项目
+- 第4周：优化与扩展
+
+## 常见问题
+1. Q: 如何开始学习？ A: 从官方文档和简单示例入手
+2. Q: 需要什么前置知识？ A: 基本的信息安全概念', '["https://docs.python.org/","https://www.runoob.com/","https://developer.mozilla.org/"]', 82, '2026-09-23 06:28:30');
+INSERT INTO `sp_learning_resource` VALUES (17814526375459346, 17814526375441082, 'practice', 'MySQL索引优化 - 分层练习题库', '## 📝 MySQL索引优化 分层练习
+
+### 🟢 基础题 (10题)
+1. MySQL索引优化的核心特性有哪些？
+2. 简述MySQL索引优化的基本工作流程。
+3. 以下哪个不属于MySQL索引优化的应用场景？
+   A. Web开发 B. 数据分析 C. 文字处理 D. 机器学习
+
+### 🟡 进阶题 (5题)
+4. 请实现一个简单的MySQL索引优化示例，要求包含错误处理。
+5. 分析MySQL索引优化在大规模数据下的性能瓶颈。
+
+### 🔴 挑战题 (3题)
+6. 设计一个基于MySQL索引优化的分布式系统，画架构图并说明。
+7. 优化给定代码的性能，从O(n²)降到O(n log n)。
+
+### ✅ 答案与解析
+（每题附详细解答）', '["https://developer.mozilla.org/","https://spring.io/docs","https://leetcode.cn/problemset/all/"]', 75, '2026-07-07 08:19:10');
+INSERT INTO `sp_learning_resource` VALUES (17814526375451362, 17814526375441082, 'practice', 'TypeScript类型系统 - 分层练习题库', '## 📝 TypeScript类型系统 分层练习
+
+### 🟢 基础题 (10题)
+1. TypeScript类型系统的核心特性有哪些？
+2. 简述TypeScript类型系统的基本工作流程。
+3. 以下哪个不属于TypeScript类型系统的应用场景？
+   A. Web开发 B. 数据分析 C. 文字处理 D. 机器学习
+
+### 🟡 进阶题 (5题)
+4. 请实现一个简单的TypeScript类型系统示例，要求包含错误处理。
+5. 分析TypeScript类型系统在大规模数据下的性能瓶颈。
+
+### 🔴 挑战题 (3题)
+6. 设计一个基于TypeScript类型系统的分布式系统，画架构图并说明。
+7. 优化给定代码的性能，从O(n²)降到O(n log n)。
+
+### ✅ 答案与解析
+（每题附详细解答）', '["https://stackoverflow.com/questions/","https://github.com/topics/"]', 81, '2026-04-07 23:19:23');
+INSERT INTO `sp_learning_resource` VALUES (17814526375458921, 17814526375441082, 'syllabus', '卷积神经网络 - 系统化学习讲义', '## 卷积神经网络核心概念
+
+### 1. 基础理论
+卷积神经网络是软件工程领域的基础，理解其核心原理对后续学习至关重要。
+
+### 2. 关键知识点
+- 定义与分类
+- 核心算法/方法
+- 应用场景分析
+- 常见误区
+
+### 3. 学习路径
+1. 先掌握基本概念
+2. 通过实例加深理解
+3. 完成配套练习
+4. 阅读进阶文献
+
+### 4. 推荐阅读
+- 《卷积神经网络实战》
+- 官方文档
+- 相关论文', '["https://spring.io/docs","https://developer.mozilla.org/","https://www.bilibili.com/video/"]', 96, '2026-09-08 19:06:20');
+INSERT INTO `sp_learning_resource` VALUES (17814526375451614, 17814526375441082, 'practice', '消息队列 - 分层练习题库', '## 📝 消息队列 分层练习
+
+### 🟢 基础题 (10题)
+1. 消息队列的核心特性有哪些？
+2. 简述消息队列的基本工作流程。
+3. 以下哪个不属于消息队列的应用场景？
+   A. Web开发 B. 数据分析 C. 文字处理 D. 机器学习
+
+### 🟡 进阶题 (5题)
+4. 请实现一个简单的消息队列示例，要求包含错误处理。
+5. 分析消息队列在大规模数据下的性能瓶颈。
+
+### 🔴 挑战题 (3题)
+6. 设计一个基于消息队列的分布式系统，画架构图并说明。
+7. 优化给定代码的性能，从O(n²)降到O(n log n)。
+
+### ✅ 答案与解析
+（每题附详细解答）', '["https://developer.mozilla.org/"]', 76, '2026-03-21 15:44:06');
+INSERT INTO `sp_learning_resource` VALUES (17814526375459256, 17814526375441082, 'mind_map', 'CI/CD流水线 知识体系思维导图', '# CI/CD流水线 知识体系
+
+## 基础层
+- 概念定义
+- 术语解释
+- 发展历程
+
+## 核心层
+- 算法原理 → 时间复杂度 → 空间复杂度
+- 数据结构 → 数组/链表/树/图
+- 设计模式 → 创建型/结构型/行为型
+
+## 应用层
+- 实际案例
+- 最佳实践
+- 常见陷阱
+
+## 进阶层
+- 性能优化
+- 源码分析
+- 架构演进', '["https://www.runoob.com/","https://github.com/topics/"]', 77, '2026-08-21 02:57:01');
+INSERT INTO `sp_learning_resource` VALUES (17814526375456313, 17814526375441082, 'code_lab', '异常检测 编程实战项目', '# 项目：异常检测 实战
+
+## 技术栈
+- Python / Java
+- Spring Boot / Flask
+- MySQL + Redis
+
+## 实现步骤
+
+### Step 1: 环境搭建
+配置开发环境，安装依赖
+
+### Step 2: 核心逻辑
+实现 异常检测 的核心算法，注意边界条件和异常处理
+
+### Step 3: 测试验证
+编写单元测试和集成测试
+
+## 性能基准
+| 数据规模 | 耗时 | 内存 |
+|---------|------|------|
+| 1000 | 0.1s | 10MB |
+| 10000 | 1.2s | 50MB |
+| 100000 | 15s | 200MB |
+
+## 扩展思考
+如何将 异常检测 应用到分布式系统中？', '["https://leetcode.cn/problemset/all/","https://www.runoob.com/"]', 94, '2026-04-18 17:33:17');
+INSERT INTO `sp_learning_resource` VALUES (17814526375459011, 17814526375444185, 'video_script', '排序算法 可视化讲解 - 视频脚本', '# 🎬 排序算法 视频脚本
+
+## 开场 (30秒)
+画面：动态标题 + 问题引入
+"你是否曾经好奇排序算法是如何工作的？今天我们用5分钟彻底搞懂它。"
+
+## 核心讲解 (3分钟)
+### 第一部分：概念可视化
+使用动画演示排序算法的核心流程
+
+### 第二部分：代码演示
+一边写代码一边讲解关键步骤
+
+### 第三部分：对比分析
+与其他方案的对比，突出排序算法的优势
+
+## 总结 (1分钟)
+回顾关键点 + 下期预告
+
+## 配套资源
+- 源码地址
+- 练习题目
+- 延伸阅读', '["https://stackoverflow.com/questions/","https://leetcode.cn/problemset/all/"]', 86, '2026-05-26 12:49:13');
+INSERT INTO `sp_learning_resource` VALUES (17814526375451095, 17814526375444185, 'video_script', '消息队列 可视化讲解 - 视频脚本', '# 🎬 消息队列 视频脚本
+
+## 开场 (30秒)
+画面：动态标题 + 问题引入
+"你是否曾经好奇消息队列是如何工作的？今天我们用5分钟彻底搞懂它。"
+
+## 核心讲解 (3分钟)
+### 第一部分：概念可视化
+使用动画演示消息队列的核心流程
+
+### 第二部分：代码演示
+一边写代码一边讲解关键步骤
+
+### 第三部分：对比分析
+与其他方案的对比，突出消息队列的优势
+
+## 总结 (1分钟)
+回顾关键点 + 下期预告
+
+## 配套资源
+- 源码地址
+- 练习题目
+- 延伸阅读', '["https://www.bilibili.com/video/","https://leetcode.cn/problemset/all/","https://www.runoob.com/"]', 78, '2026-03-18 05:56:45');
+INSERT INTO `sp_learning_resource` VALUES (17814526375458764, 17814526375444185, 'mind_map', '设计模式 知识体系思维导图', '# 设计模式 知识体系
+
+## 基础层
+- 概念定义
+- 术语解释
+- 发展历程
+
+## 核心层
+- 算法原理 → 时间复杂度 → 空间复杂度
+- 数据结构 → 数组/链表/树/图
+- 设计模式 → 创建型/结构型/行为型
+
+## 应用层
+- 实际案例
+- 最佳实践
+- 常见陷阱
+
+## 进阶层
+- 性能优化
+- 源码分析
+- 架构演进', '["https://leetcode.cn/problemset/all/","https://stackoverflow.com/questions/","https://zhuanlan.zhihu.com/"]', 96, '2026-06-06 11:53:42');
+INSERT INTO `sp_learning_resource` VALUES (17814526375458583, 17814526375444185, 'video_script', '排序算法 可视化讲解 - 视频脚本', '# 🎬 排序算法 视频脚本
+
+## 开场 (30秒)
+画面：动态标题 + 问题引入
+"你是否曾经好奇排序算法是如何工作的？今天我们用5分钟彻底搞懂它。"
+
+## 核心讲解 (3分钟)
+### 第一部分：概念可视化
+使用动画演示排序算法的核心流程
+
+### 第二部分：代码演示
+一边写代码一边讲解关键步骤
+
+### 第三部分：对比分析
+与其他方案的对比，突出排序算法的优势
+
+## 总结 (1分钟)
+回顾关键点 + 下期预告
+
+## 配套资源
+- 源码地址
+- 练习题目
+- 延伸阅读', '["https://leetcode.cn/problemset/all/","https://www.runoob.com/"]', 83, '2026-04-30 00:32:01');
+INSERT INTO `sp_learning_resource` VALUES (17814526375453831, 17814526375444185, 'mind_map', '计算机视觉 知识体系思维导图', '# 计算机视觉 知识图谱
+
+## 🏗️ 基础知识
+```
+概念理解 → 原理掌握 → 动手实现
+```
+
+## 🔗 关联知识
+- 前置依赖：${pick(courses)}
+- 后续延伸：${pick(courses)}
+- 横向对比：${pick(courses)}
+
+## 📊 掌握度自评
+| 维度 | 掌握程度 | 下一步 |
+|------|---------|--------|
+| 概念 | ★★★★☆ | 阅读进阶文献 |
+| 实现 | ★★★☆☆ | 完成3个练习 |
+| 优化 | ★★☆☆☆ | 学习性能分析 |', '["https://zhuanlan.zhihu.com/","https://www.bilibili.com/video/"]', 97, '2026-07-19 03:36:17');
+INSERT INTO `sp_learning_resource` VALUES (17814526375453427, 17814526375443087, 'practice', '函数式编程 - 分层练习题库', '## 📝 函数式编程 分层练习
+
+### 🟢 基础题 (10题)
+1. 函数式编程的核心特性有哪些？
+2. 简述函数式编程的基本工作流程。
+3. 以下哪个不属于函数式编程的应用场景？
+   A. Web开发 B. 数据分析 C. 文字处理 D. 机器学习
+
+### 🟡 进阶题 (5题)
+4. 请实现一个简单的函数式编程示例，要求包含错误处理。
+5. 分析函数式编程在大规模数据下的性能瓶颈。
+
+### 🔴 挑战题 (3题)
+6. 设计一个基于函数式编程的分布式系统，画架构图并说明。
+7. 优化给定代码的性能，从O(n²)降到O(n log n)。
+
+### ✅ 答案与解析
+（每题附详细解答）', '["https://spring.io/docs"]', 94, '2026-04-30 07:58:49');
+INSERT INTO `sp_learning_resource` VALUES (17814526375457847, 17814526375443087, 'practice', '并发编程 - 分层练习题库', '## 📝 并发编程 分层练习
+
+### 🟢 基础题 (10题)
+1. 并发编程的核心特性有哪些？
+2. 简述并发编程的基本工作流程。
+3. 以下哪个不属于并发编程的应用场景？
+   A. Web开发 B. 数据分析 C. 文字处理 D. 机器学习
+
+### 🟡 进阶题 (5题)
+4. 请实现一个简单的并发编程示例，要求包含错误处理。
+5. 分析并发编程在大规模数据下的性能瓶颈。
+
+### 🔴 挑战题 (3题)
+6. 设计一个基于并发编程的分布式系统，画架构图并说明。
+7. 优化给定代码的性能，从O(n²)降到O(n log n)。
+
+### ✅ 答案与解析
+（每题附详细解答）', '["https://github.com/topics/","https://docs.python.org/"]', 77, '2026-03-22 19:06:43');
+INSERT INTO `sp_learning_resource` VALUES (17814526375459347, 17814526375443087, 'practice', '并发编程 - 分层练习题库', '# 并发编程 实战题库
+
+## 选择题 (20题)
+1. 在并发编程中，时间复杂度最优的算法是？
+2. 并发编程与${pick(courses)}的主要区别是？
+
+## 编程题 (10题)
+3. 【简单】实现并发编程的基本版本
+4. 【中等】优化并发编程至O(n log n)
+5. 【困难】分布式并发编程系统设计
+
+## 综合应用题 (5题)
+6. 结合${pick(courses)}知识，解决实际问题
+
+## 详细解析
+每题包含：解题思路、代码示例、复杂度分析、易错点', '["https://docs.python.org/"]', 97, '2026-04-01 19:37:43');
+INSERT INTO `sp_learning_resource` VALUES (17814526375457554, 17814526375443087, 'syllabus', '推荐系统 - 系统化学习讲义', '## 推荐系统核心概念
+
+### 1. 基础理论
+推荐系统是网络工程领域的基础，理解其核心原理对后续学习至关重要。
+
+### 2. 关键知识点
+- 定义与分类
+- 核心算法/方法
+- 应用场景分析
+- 常见误区
+
+### 3. 学习路径
+1. 先掌握基本概念
+2. 通过实例加深理解
+3. 完成配套练习
+4. 阅读进阶文献
+
+### 4. 推荐阅读
+- 《推荐系统实战》
+- 官方文档
+- 相关论文', '["https://developer.mozilla.org/","https://www.runoob.com/","https://stackoverflow.com/questions/"]', 80, '2026-04-16 12:03:58');
+INSERT INTO `sp_learning_resource` VALUES (17814526375451213, 17814526375443087, 'mind_map', 'CI/CD流水线 知识体系思维导图', '# CI/CD流水线 知识体系
+
+## 基础层
+- 概念定义
+- 术语解释
+- 发展历程
+
+## 核心层
+- 算法原理 → 时间复杂度 → 空间复杂度
+- 数据结构 → 数组/链表/树/图
+- 设计模式 → 创建型/结构型/行为型
+
+## 应用层
+- 实际案例
+- 最佳实践
+- 常见陷阱
+
+## 进阶层
+- 性能优化
+- 源码分析
+- 架构演进', '["https://www.runoob.com/"]', 90, '2026-09-09 05:09:48');
+INSERT INTO `sp_learning_resource` VALUES (17814526375451375, 17814526375448690, 'syllabus', 'Docker容器化 - 系统化学习讲义', '# Docker容器化 学习指南
+
+## 为什么学习Docker容器化
+Docker容器化在当前技术栈中占据重要位置，掌握它能让你的技能体系更加完整。
+
+## 知识地图
+```
+基础概念 → 核心原理 → 实战应用 → 性能优化 → 架构设计
+```
+
+## 每阶段目标
+- 第1周：理解概念，完成Hello World
+- 第2周：掌握核心API/方法
+- 第3周：独立完成小项目
+- 第4周：优化与扩展
+
+## 常见问题
+1. Q: 如何开始学习？ A: 从官方文档和简单示例入手
+2. Q: 需要什么前置知识？ A: 基本的计算机科学与技术概念', '["https://developer.mozilla.org/","https://docs.python.org/"]', 83, '2026-07-23 03:15:44');
+INSERT INTO `sp_learning_resource` VALUES (17814526375459587, 17814526375448690, 'code_lab', 'RESTful API 编程实战项目', '# 项目：RESTful API 实战
+
+## 技术栈
+- Python / Java
+- Spring Boot / Flask
+- MySQL + Redis
+
+## 实现步骤
+
+### Step 1: 环境搭建
+配置开发环境，安装依赖
+
+### Step 2: 核心逻辑
+实现 RESTful API 的核心算法，注意边界条件和异常处理
+
+### Step 3: 测试验证
+编写单元测试和集成测试
+
+## 性能基准
+| 数据规模 | 耗时 | 内存 |
+|---------|------|------|
+| 1000 | 0.1s | 10MB |
+| 10000 | 1.2s | 50MB |
+| 100000 | 15s | 200MB |
+
+## 扩展思考
+如何将 RESTful API 应用到分布式系统中？', '["https://stackoverflow.com/questions/","https://github.com/topics/"]', 92, '2026-07-28 02:40:08');
+INSERT INTO `sp_learning_resource` VALUES (17814526375452815, 17814526375448690, 'code_lab', '排序算法 编程实战项目', '# 项目：排序算法 实战
+
+## 技术栈
+- Python / Java
+- Spring Boot / Flask
+- MySQL + Redis
+
+## 实现步骤
+
+### Step 1: 环境搭建
+配置开发环境，安装依赖
+
+### Step 2: 核心逻辑
+实现 排序算法 的核心算法，注意边界条件和异常处理
+
+### Step 3: 测试验证
+编写单元测试和集成测试
+
+## 性能基准
+| 数据规模 | 耗时 | 内存 |
+|---------|------|------|
+| 1000 | 0.1s | 10MB |
+| 10000 | 1.2s | 50MB |
+| 100000 | 15s | 200MB |
+
+## 扩展思考
+如何将 排序算法 应用到分布式系统中？', '["https://leetcode.cn/problemset/all/"]', 94, '2026-05-08 21:44:29');
+INSERT INTO `sp_learning_resource` VALUES (17814526375459608, 17814526375448690, 'mind_map', '强化学习 知识体系思维导图', '# 强化学习 知识图谱
+
+## 🏗️ 基础知识
+```
+概念理解 → 原理掌握 → 动手实现
+```
+
+## 🔗 关联知识
+- 前置依赖：${pick(courses)}
+- 后续延伸：${pick(courses)}
+- 横向对比：${pick(courses)}
+
+## 📊 掌握度自评
+| 维度 | 掌握程度 | 下一步 |
+|------|---------|--------|
+| 概念 | ★★★★☆ | 阅读进阶文献 |
+| 实现 | ★★★☆☆ | 完成3个练习 |
+| 优化 | ★★☆☆☆ | 学习性能分析 |', '["https://stackoverflow.com/questions/","https://spring.io/docs"]', 88, '2026-04-08 23:52:50');
+INSERT INTO `sp_learning_resource` VALUES (17814526375453773, 17814526375448690, 'mind_map', '并发编程 知识体系思维导图', '# 并发编程 知识体系
+
+## 基础层
+- 概念定义
+- 术语解释
+- 发展历程
+
+## 核心层
+- 算法原理 → 时间复杂度 → 空间复杂度
+- 数据结构 → 数组/链表/树/图
+- 设计模式 → 创建型/结构型/行为型
+
+## 应用层
+- 实际案例
+- 最佳实践
+- 常见陷阱
+
+## 进阶层
+- 性能优化
+- 源码分析
+- 架构演进', '["https://stackoverflow.com/questions/","https://leetcode.cn/problemset/all/","https://www.runoob.com/"]', 81, '2026-03-14 09:42:10');
+INSERT INTO `sp_learning_resource` VALUES (17814526375458289, 17814526375448690, 'syllabus', 'MySQL索引优化 - 系统化学习讲义', '## MySQL索引优化核心概念
+
+### 1. 基础理论
+MySQL索引优化是计算机科学与技术领域的基础，理解其核心原理对后续学习至关重要。
+
+### 2. 关键知识点
+- 定义与分类
+- 核心算法/方法
+- 应用场景分析
+- 常见误区
+
+### 3. 学习路径
+1. 先掌握基本概念
+2. 通过实例加深理解
+3. 完成配套练习
+4. 阅读进阶文献
+
+### 4. 推荐阅读
+- 《MySQL索引优化实战》
+- 官方文档
+- 相关论文', '["https://github.com/topics/"]', 89, '2026-03-21 19:14:22');
+INSERT INTO `sp_learning_resource` VALUES (17814526375456721, 17814526375448690, 'practice', '回溯法 - 分层练习题库', '# 回溯法 实战题库
+
+## 选择题 (20题)
+1. 在回溯法中，时间复杂度最优的算法是？
+2. 回溯法与${pick(courses)}的主要区别是？
+
+## 编程题 (10题)
+3. 【简单】实现回溯法的基本版本
+4. 【中等】优化回溯法至O(n log n)
+5. 【困难】分布式回溯法系统设计
+
+## 综合应用题 (5题)
+6. 结合${pick(courses)}知识，解决实际问题
+
+## 详细解析
+每题包含：解题思路、代码示例、复杂度分析、易错点', '["https://github.com/topics/","https://developer.mozilla.org/","https://docs.python.org/"]', 85, '2026-08-16 22:49:39');
+INSERT INTO `sp_learning_resource` VALUES (17814526375451212, 17814526375448690, 'code_lab', '特征工程 编程实战项目', '# 项目：特征工程 实战
+
+## 技术栈
+- Python / Java
+- Spring Boot / Flask
+- MySQL + Redis
+
+## 实现步骤
+
+### Step 1: 环境搭建
+配置开发环境，安装依赖
+
+### Step 2: 核心逻辑
+实现 特征工程 的核心算法，注意边界条件和异常处理
+
+### Step 3: 测试验证
+编写单元测试和集成测试
+
+## 性能基准
+| 数据规模 | 耗时 | 内存 |
+|---------|------|------|
+| 1000 | 0.1s | 10MB |
+| 10000 | 1.2s | 50MB |
+| 100000 | 15s | 200MB |
+
+## 扩展思考
+如何将 特征工程 应用到分布式系统中？', '["https://zhuanlan.zhihu.com/","https://www.runoob.com/","https://leetcode.cn/problemset/all/"]', 96, '2026-09-15 07:48:21');
+INSERT INTO `sp_learning_resource` VALUES (17814526375452164, 17814526375445312, 'mind_map', '循环神经网络 知识体系思维导图', '# 循环神经网络 知识图谱
+
+## 🏗️ 基础知识
+```
+概念理解 → 原理掌握 → 动手实现
+```
+
+## 🔗 关联知识
+- 前置依赖：${pick(courses)}
+- 后续延伸：${pick(courses)}
+- 横向对比：${pick(courses)}
+
+## 📊 掌握度自评
+| 维度 | 掌握程度 | 下一步 |
+|------|---------|--------|
+| 概念 | ★★★★☆ | 阅读进阶文献 |
+| 实现 | ★★★☆☆ | 完成3个练习 |
+| 优化 | ★★☆☆☆ | 学习性能分析 |', '["https://docs.python.org/"]', 81, '2026-05-18 19:48:26');
+INSERT INTO `sp_learning_resource` VALUES (17814526375451539, 17814526375445312, 'code_lab', '消息队列 编程实战项目', '# 项目：消息队列 实战
+
+## 技术栈
+- Python / Java
+- Spring Boot / Flask
+- MySQL + Redis
+
+## 实现步骤
+
+### Step 1: 环境搭建
+配置开发环境，安装依赖
+
+### Step 2: 核心逻辑
+实现 消息队列 的核心算法，注意边界条件和异常处理
+
+### Step 3: 测试验证
+编写单元测试和集成测试
+
+## 性能基准
+| 数据规模 | 耗时 | 内存 |
+|---------|------|------|
+| 1000 | 0.1s | 10MB |
+| 10000 | 1.2s | 50MB |
+| 100000 | 15s | 200MB |
+
+## 扩展思考
+如何将 消息队列 应用到分布式系统中？', '["https://www.runoob.com/","https://www.bilibili.com/video/","https://docs.python.org/"]', 80, '2026-03-29 10:02:03');
+INSERT INTO `sp_learning_resource` VALUES (17814526375454602, 17814526375445312, 'mind_map', 'TypeScript类型系统 知识体系思维导图', '# TypeScript类型系统 知识图谱
+
+## 🏗️ 基础知识
+```
+概念理解 → 原理掌握 → 动手实现
+```
+
+## 🔗 关联知识
+- 前置依赖：${pick(courses)}
+- 后续延伸：${pick(courses)}
+- 横向对比：${pick(courses)}
+
+## 📊 掌握度自评
+| 维度 | 掌握程度 | 下一步 |
+|------|---------|--------|
+| 概念 | ★★★★☆ | 阅读进阶文献 |
+| 实现 | ★★★☆☆ | 完成3个练习 |
+| 优化 | ★★☆☆☆ | 学习性能分析 |', '["https://leetcode.cn/problemset/all/","https://docs.python.org/","https://www.runoob.com/"]', 92, '2026-07-14 11:34:55');
+INSERT INTO `sp_learning_resource` VALUES (17814526375452231, 17814526375445312, 'practice', '消息队列 - 分层练习题库', '# 消息队列 实战题库
+
+## 选择题 (20题)
+1. 在消息队列中，时间复杂度最优的算法是？
+2. 消息队列与${pick(courses)}的主要区别是？
+
+## 编程题 (10题)
+3. 【简单】实现消息队列的基本版本
+4. 【中等】优化消息队列至O(n log n)
+5. 【困难】分布式消息队列系统设计
+
+## 综合应用题 (5题)
+6. 结合${pick(courses)}知识，解决实际问题
+
+## 详细解析
+每题包含：解题思路、代码示例、复杂度分析、易错点', '["https://leetcode.cn/problemset/all/","https://www.runoob.com/","https://docs.python.org/"]', 90, '2026-05-22 03:43:12');
+INSERT INTO `sp_learning_resource` VALUES (17814526375458407, 17814526375445312, 'code_lab', 'React Hooks 编程实战项目', '# 项目：React Hooks 实战
+
+## 技术栈
+- Python / Java
+- Spring Boot / Flask
+- MySQL + Redis
+
+## 实现步骤
+
+### Step 1: 环境搭建
+配置开发环境，安装依赖
+
+### Step 2: 核心逻辑
+实现 React Hooks 的核心算法，注意边界条件和异常处理
+
+### Step 3: 测试验证
+编写单元测试和集成测试
+
+## 性能基准
+| 数据规模 | 耗时 | 内存 |
+|---------|------|------|
+| 1000 | 0.1s | 10MB |
+| 10000 | 1.2s | 50MB |
+| 100000 | 15s | 200MB |
+
+## 扩展思考
+如何将 React Hooks 应用到分布式系统中？', '["https://zhuanlan.zhihu.com/","https://leetcode.cn/problemset/all/"]', 96, '2026-03-24 00:44:45');
+INSERT INTO `sp_learning_resource` VALUES (17814526375456312, 17814526375445312, 'mind_map', 'Transformer架构 知识体系思维导图', '# Transformer架构 知识图谱
+
+## 🏗️ 基础知识
+```
+概念理解 → 原理掌握 → 动手实现
+```
+
+## 🔗 关联知识
+- 前置依赖：${pick(courses)}
+- 后续延伸：${pick(courses)}
+- 横向对比：${pick(courses)}
+
+## 📊 掌握度自评
+| 维度 | 掌握程度 | 下一步 |
+|------|---------|--------|
+| 概念 | ★★★★☆ | 阅读进阶文献 |
+| 实现 | ★★★☆☆ | 完成3个练习 |
+| 优化 | ★★☆☆☆ | 学习性能分析 |', '["https://github.com/topics/","https://stackoverflow.com/questions/"]', 98, '2026-06-19 15:51:20');
+INSERT INTO `sp_learning_resource` VALUES (17814526375451530, 17814526375441816, 'mind_map', 'CI/CD流水线 知识体系思维导图', '# CI/CD流水线 知识体系
+
+## 基础层
+- 概念定义
+- 术语解释
+- 发展历程
+
+## 核心层
+- 算法原理 → 时间复杂度 → 空间复杂度
+- 数据结构 → 数组/链表/树/图
+- 设计模式 → 创建型/结构型/行为型
+
+## 应用层
+- 实际案例
+- 最佳实践
+- 常见陷阱
+
+## 进阶层
+- 性能优化
+- 源码分析
+- 架构演进', '["https://www.bilibili.com/video/"]', 80, '2026-03-18 12:21:35');
+INSERT INTO `sp_learning_resource` VALUES (17814526375454291, 17814526375441816, 'video_script', '并查集 可视化讲解 - 视频脚本', '# 🎬 并查集 视频脚本
+
+## 开场 (30秒)
+画面：动态标题 + 问题引入
+"你是否曾经好奇并查集是如何工作的？今天我们用5分钟彻底搞懂它。"
+
+## 核心讲解 (3分钟)
+### 第一部分：概念可视化
+使用动画演示并查集的核心流程
+
+### 第二部分：代码演示
+一边写代码一边讲解关键步骤
+
+### 第三部分：对比分析
+与其他方案的对比，突出并查集的优势
+
+## 总结 (1分钟)
+回顾关键点 + 下期预告
+
+## 配套资源
+- 源码地址
+- 练习题目
+- 延伸阅读', '["https://leetcode.cn/problemset/all/"]', 83, '2026-08-25 11:14:24');
+INSERT INTO `sp_learning_resource` VALUES (17814526375459961, 17814526375441816, 'video_script', '计算机视觉 可视化讲解 - 视频脚本', '# 🎬 计算机视觉 视频脚本
+
+## 开场 (30秒)
+画面：动态标题 + 问题引入
+"你是否曾经好奇计算机视觉是如何工作的？今天我们用5分钟彻底搞懂它。"
+
+## 核心讲解 (3分钟)
+### 第一部分：概念可视化
+使用动画演示计算机视觉的核心流程
+
+### 第二部分：代码演示
+一边写代码一边讲解关键步骤
+
+### 第三部分：对比分析
+与其他方案的对比，突出计算机视觉的优势
+
+## 总结 (1分钟)
+回顾关键点 + 下期预告
+
+## 配套资源
+- 源码地址
+- 练习题目
+- 延伸阅读', '["https://stackoverflow.com/questions/","https://developer.mozilla.org/","https://www.runoob.com/"]', 81, '2026-03-25 05:58:46');
+INSERT INTO `sp_learning_resource` VALUES (17814526375454902, 17814526375441816, 'video_script', '代码重构 可视化讲解 - 视频脚本', '# 🎬 代码重构 视频脚本
+
+## 开场 (30秒)
+画面：动态标题 + 问题引入
+"你是否曾经好奇代码重构是如何工作的？今天我们用5分钟彻底搞懂它。"
+
+## 核心讲解 (3分钟)
+### 第一部分：概念可视化
+使用动画演示代码重构的核心流程
+
+### 第二部分：代码演示
+一边写代码一边讲解关键步骤
+
+### 第三部分：对比分析
+与其他方案的对比，突出代码重构的优势
+
+## 总结 (1分钟)
+回顾关键点 + 下期预告
+
+## 配套资源
+- 源码地址
+- 练习题目
+- 延伸阅读', '["https://stackoverflow.com/questions/","https://github.com/topics/","https://spring.io/docs"]', 86, '2026-08-05 18:02:12');
+INSERT INTO `sp_learning_resource` VALUES (17814526375451398, 17814526375441816, 'syllabus', 'HTTPS原理 - 系统化学习讲义', '## HTTPS原理核心概念
+
+### 1. 基础理论
+HTTPS原理是计算机科学与技术领域的基础，理解其核心原理对后续学习至关重要。
+
+### 2. 关键知识点
+- 定义与分类
+- 核心算法/方法
+- 应用场景分析
+- 常见误区
+
+### 3. 学习路径
+1. 先掌握基本概念
+2. 通过实例加深理解
+3. 完成配套练习
+4. 阅读进阶文献
+
+### 4. 推荐阅读
+- 《HTTPS原理实战》
+- 官方文档
+- 相关论文', '["https://www.bilibili.com/video/","https://leetcode.cn/problemset/all/","https://zhuanlan.zhihu.com/"]', 95, '2026-05-14 12:38:36');
+INSERT INTO `sp_learning_resource` VALUES (17814526375455984, 17814526375441816, 'video_script', '神经网络基础 可视化讲解 - 视频脚本', '# 🎬 神经网络基础 视频脚本
+
+## 开场 (30秒)
+画面：动态标题 + 问题引入
+"你是否曾经好奇神经网络基础是如何工作的？今天我们用5分钟彻底搞懂它。"
+
+## 核心讲解 (3分钟)
+### 第一部分：概念可视化
+使用动画演示神经网络基础的核心流程
+
+### 第二部分：代码演示
+一边写代码一边讲解关键步骤
+
+### 第三部分：对比分析
+与其他方案的对比，突出神经网络基础的优势
+
+## 总结 (1分钟)
+回顾关键点 + 下期预告
+
+## 配套资源
+- 源码地址
+- 练习题目
+- 延伸阅读', '["https://docs.python.org/","https://www.runoob.com/"]', 85, '2026-09-25 12:04:47');
+INSERT INTO `sp_learning_resource` VALUES (17814526375452506, 17814526375441816, 'practice', 'Vue 3 Composition API - 分层练习题库', '## 📝 Vue 3 Composition API 分层练习
+
+### 🟢 基础题 (10题)
+1. Vue 3 Composition API的核心特性有哪些？
+2. 简述Vue 3 Composition API的基本工作流程。
+3. 以下哪个不属于Vue 3 Composition API的应用场景？
+   A. Web开发 B. 数据分析 C. 文字处理 D. 机器学习
+
+### 🟡 进阶题 (5题)
+4. 请实现一个简单的Vue 3 Composition API示例，要求包含错误处理。
+5. 分析Vue 3 Composition API在大规模数据下的性能瓶颈。
+
+### 🔴 挑战题 (3题)
+6. 设计一个基于Vue 3 Composition API的分布式系统，画架构图并说明。
+7. 优化给定代码的性能，从O(n²)降到O(n log n)。
+
+### ✅ 答案与解析
+（每题附详细解答）', '["https://leetcode.cn/problemset/all/"]', 85, '2026-05-03 13:29:08');
+INSERT INTO `sp_learning_resource` VALUES (17814526375455962, 17814526375441816, 'mind_map', 'CSS Grid布局 知识体系思维导图', '# CSS Grid布局 知识体系
+
+## 基础层
+- 概念定义
+- 术语解释
+- 发展历程
+
+## 核心层
+- 算法原理 → 时间复杂度 → 空间复杂度
+- 数据结构 → 数组/链表/树/图
+- 设计模式 → 创建型/结构型/行为型
+
+## 应用层
+- 实际案例
+- 最佳实践
+- 常见陷阱
+
+## 进阶层
+- 性能优化
+- 源码分析
+- 架构演进', '["https://github.com/topics/"]', 75, '2026-09-16 00:58:07');
+INSERT INTO `sp_learning_resource` VALUES (17814526375459197, 17814526375447814, 'syllabus', '二叉树遍历 - 系统化学习讲义', '# 二叉树遍历 学习指南
+
+## 为什么学习二叉树遍历
+二叉树遍历在当前技术栈中占据重要位置，掌握它能让你的技能体系更加完整。
+
+## 知识地图
+```
+基础概念 → 核心原理 → 实战应用 → 性能优化 → 架构设计
+```
+
+## 每阶段目标
+- 第1周：理解概念，完成Hello World
+- 第2周：掌握核心API/方法
+- 第3周：独立完成小项目
+- 第4周：优化与扩展
+
+## 常见问题
+1. Q: 如何开始学习？ A: 从官方文档和简单示例入手
+2. Q: 需要什么前置知识？ A: 基本的电子信息工程概念', '["https://docs.python.org/"]', 91, '2026-08-23 22:08:49');
+INSERT INTO `sp_learning_resource` VALUES (17814526375454070, 17814526375447814, 'practice', '自然语言处理 - 分层练习题库', '# 自然语言处理 实战题库
+
+## 选择题 (20题)
+1. 在自然语言处理中，时间复杂度最优的算法是？
+2. 自然语言处理与${pick(courses)}的主要区别是？
+
+## 编程题 (10题)
+3. 【简单】实现自然语言处理的基本版本
+4. 【中等】优化自然语言处理至O(n log n)
+5. 【困难】分布式自然语言处理系统设计
+
+## 综合应用题 (5题)
+6. 结合${pick(courses)}知识，解决实际问题
+
+## 详细解析
+每题包含：解题思路、代码示例、复杂度分析、易错点', '["https://zhuanlan.zhihu.com/","https://leetcode.cn/problemset/all/"]', 85, '2026-04-23 06:10:29');
+INSERT INTO `sp_learning_resource` VALUES (17814526375457964, 17814526375447814, 'video_script', 'MySQL索引优化 可视化讲解 - 视频脚本', '# 🎬 MySQL索引优化 视频脚本
+
+## 开场 (30秒)
+画面：动态标题 + 问题引入
+"你是否曾经好奇MySQL索引优化是如何工作的？今天我们用5分钟彻底搞懂它。"
+
+## 核心讲解 (3分钟)
+### 第一部分：概念可视化
+使用动画演示MySQL索引优化的核心流程
+
+### 第二部分：代码演示
+一边写代码一边讲解关键步骤
+
+### 第三部分：对比分析
+与其他方案的对比，突出MySQL索引优化的优势
+
+## 总结 (1分钟)
+回顾关键点 + 下期预告
+
+## 配套资源
+- 源码地址
+- 练习题目
+- 延伸阅读', '["https://stackoverflow.com/questions/","https://leetcode.cn/problemset/all/","https://spring.io/docs"]', 88, '2026-09-01 08:24:53');
+INSERT INTO `sp_learning_resource` VALUES (17814526375451806, 17814526375447814, 'code_lab', '最短路径 编程实战项目', '# 项目：最短路径 实战
+
+## 技术栈
+- Python / Java
+- Spring Boot / Flask
+- MySQL + Redis
+
+## 实现步骤
+
+### Step 1: 环境搭建
+配置开发环境，安装依赖
+
+### Step 2: 核心逻辑
+实现 最短路径 的核心算法，注意边界条件和异常处理
+
+### Step 3: 测试验证
+编写单元测试和集成测试
+
+## 性能基准
+| 数据规模 | 耗时 | 内存 |
+|---------|------|------|
+| 1000 | 0.1s | 10MB |
+| 10000 | 1.2s | 50MB |
+| 100000 | 15s | 200MB |
+
+## 扩展思考
+如何将 最短路径 应用到分布式系统中？', '["https://developer.mozilla.org/","https://www.runoob.com/","https://zhuanlan.zhihu.com/"]', 98, '2026-07-08 18:42:07');
+INSERT INTO `sp_learning_resource` VALUES (17814526375451703, 17814526375447814, 'practice', '并查集 - 分层练习题库', '# 并查集 实战题库
+
+## 选择题 (20题)
+1. 在并查集中，时间复杂度最优的算法是？
+2. 并查集与${pick(courses)}的主要区别是？
+
+## 编程题 (10题)
+3. 【简单】实现并查集的基本版本
+4. 【中等】优化并查集至O(n log n)
+5. 【困难】分布式并查集系统设计
+
+## 综合应用题 (5题)
+6. 结合${pick(courses)}知识，解决实际问题
+
+## 详细解析
+每题包含：解题思路、代码示例、复杂度分析、易错点', '["https://stackoverflow.com/questions/","https://docs.python.org/","https://leetcode.cn/problemset/all/"]', 77, '2026-04-06 02:23:43');
+INSERT INTO `sp_learning_resource` VALUES (17814526375452119, 17814526375447814, 'syllabus', '一致性哈希 - 系统化学习讲义', '## 一致性哈希核心概念
+
+### 1. 基础理论
+一致性哈希是网络工程领域的基础，理解其核心原理对后续学习至关重要。
+
+### 2. 关键知识点
+- 定义与分类
+- 核心算法/方法
+- 应用场景分析
+- 常见误区
+
+### 3. 学习路径
+1. 先掌握基本概念
+2. 通过实例加深理解
+3. 完成配套练习
+4. 阅读进阶文献
+
+### 4. 推荐阅读
+- 《一致性哈希实战》
+- 官方文档
+- 相关论文', '["https://stackoverflow.com/questions/"]', 88, '2026-09-05 09:53:14');
+INSERT INTO `sp_learning_resource` VALUES (17814526375459769, 17814526375443349, 'video_script', 'React Hooks 可视化讲解 - 视频脚本', '# 🎬 React Hooks 视频脚本
+
+## 开场 (30秒)
+画面：动态标题 + 问题引入
+"你是否曾经好奇React Hooks是如何工作的？今天我们用5分钟彻底搞懂它。"
+
+## 核心讲解 (3分钟)
+### 第一部分：概念可视化
+使用动画演示React Hooks的核心流程
+
+### 第二部分：代码演示
+一边写代码一边讲解关键步骤
+
+### 第三部分：对比分析
+与其他方案的对比，突出React Hooks的优势
+
+## 总结 (1分钟)
+回顾关键点 + 下期预告
+
+## 配套资源
+- 源码地址
+- 练习题目
+- 延伸阅读', '["https://spring.io/docs"]', 93, '2026-06-02 16:34:45');
+INSERT INTO `sp_learning_resource` VALUES (17814526375454985, 17814526375443349, 'video_script', 'HTTPS原理 可视化讲解 - 视频脚本', '# 🎬 HTTPS原理 视频脚本
+
+## 开场 (30秒)
+画面：动态标题 + 问题引入
+"你是否曾经好奇HTTPS原理是如何工作的？今天我们用5分钟彻底搞懂它。"
+
+## 核心讲解 (3分钟)
+### 第一部分：概念可视化
+使用动画演示HTTPS原理的核心流程
+
+### 第二部分：代码演示
+一边写代码一边讲解关键步骤
+
+### 第三部分：对比分析
+与其他方案的对比，突出HTTPS原理的优势
+
+## 总结 (1分钟)
+回顾关键点 + 下期预告
+
+## 配套资源
+- 源码地址
+- 练习题目
+- 延伸阅读', '["https://github.com/topics/","https://stackoverflow.com/questions/"]', 79, '2026-05-07 10:36:14');
+INSERT INTO `sp_learning_resource` VALUES (17814526375456352, 17814526375443349, 'code_lab', 'OAuth2.0认证 编程实战项目', '# 项目：OAuth2.0认证 实战
+
+## 技术栈
+- Python / Java
+- Spring Boot / Flask
+- MySQL + Redis
+
+## 实现步骤
+
+### Step 1: 环境搭建
+配置开发环境，安装依赖
+
+### Step 2: 核心逻辑
+实现 OAuth2.0认证 的核心算法，注意边界条件和异常处理
+
+### Step 3: 测试验证
+编写单元测试和集成测试
+
+## 性能基准
+| 数据规模 | 耗时 | 内存 |
+|---------|------|------|
+| 1000 | 0.1s | 10MB |
+| 10000 | 1.2s | 50MB |
+| 100000 | 15s | 200MB |
+
+## 扩展思考
+如何将 OAuth2.0认证 应用到分布式系统中？', '["https://leetcode.cn/problemset/all/"]', 89, '2026-04-25 13:21:27');
+INSERT INTO `sp_learning_resource` VALUES (17814526375454010, 17814526375443349, 'mind_map', '异步IO 知识体系思维导图', '# 异步IO 知识图谱
+
+## 🏗️ 基础知识
+```
+概念理解 → 原理掌握 → 动手实现
+```
+
+## 🔗 关联知识
+- 前置依赖：${pick(courses)}
+- 后续延伸：${pick(courses)}
+- 横向对比：${pick(courses)}
+
+## 📊 掌握度自评
+| 维度 | 掌握程度 | 下一步 |
+|------|---------|--------|
+| 概念 | ★★★★☆ | 阅读进阶文献 |
+| 实现 | ★★★☆☆ | 完成3个练习 |
+| 优化 | ★★☆☆☆ | 学习性能分析 |', '["https://developer.mozilla.org/","https://spring.io/docs","https://github.com/topics/"]', 94, '2026-03-28 19:06:25');
+INSERT INTO `sp_learning_resource` VALUES (17814526375458134, 17814526375443349, 'code_lab', '并发编程 编程实战项目', '# 项目：并发编程 实战
+
+## 技术栈
+- Python / Java
+- Spring Boot / Flask
+- MySQL + Redis
+
+## 实现步骤
+
+### Step 1: 环境搭建
+配置开发环境，安装依赖
+
+### Step 2: 核心逻辑
+实现 并发编程 的核心算法，注意边界条件和异常处理
+
+### Step 3: 测试验证
+编写单元测试和集成测试
+
+## 性能基准
+| 数据规模 | 耗时 | 内存 |
+|---------|------|------|
+| 1000 | 0.1s | 10MB |
+| 10000 | 1.2s | 50MB |
+| 100000 | 15s | 200MB |
+
+## 扩展思考
+如何将 并发编程 应用到分布式系统中？', '["https://www.runoob.com/","https://github.com/topics/"]', 94, '2026-06-15 17:42:33');
+INSERT INTO `sp_learning_resource` VALUES (17814526375452354, 17814526375443349, 'video_script', '消息队列 可视化讲解 - 视频脚本', '# 🎬 消息队列 视频脚本
+
+## 开场 (30秒)
+画面：动态标题 + 问题引入
+"你是否曾经好奇消息队列是如何工作的？今天我们用5分钟彻底搞懂它。"
+
+## 核心讲解 (3分钟)
+### 第一部分：概念可视化
+使用动画演示消息队列的核心流程
+
+### 第二部分：代码演示
+一边写代码一边讲解关键步骤
+
+### 第三部分：对比分析
+与其他方案的对比，突出消息队列的优势
+
+## 总结 (1分钟)
+回顾关键点 + 下期预告
+
+## 配套资源
+- 源码地址
+- 练习题目
+- 延伸阅读', '["https://stackoverflow.com/questions/","https://leetcode.cn/problemset/all/","https://www.runoob.com/"]', 84, '2026-07-26 13:40:38');
+INSERT INTO `sp_learning_resource` VALUES (17814526375454508, 17814526375443349, 'mind_map', '循环神经网络 知识体系思维导图', '# 循环神经网络 知识图谱
+
+## 🏗️ 基础知识
+```
+概念理解 → 原理掌握 → 动手实现
+```
+
+## 🔗 关联知识
+- 前置依赖：${pick(courses)}
+- 后续延伸：${pick(courses)}
+- 横向对比：${pick(courses)}
+
+## 📊 掌握度自评
+| 维度 | 掌握程度 | 下一步 |
+|------|---------|--------|
+| 概念 | ★★★★☆ | 阅读进阶文献 |
+| 实现 | ★★★☆☆ | 完成3个练习 |
+| 优化 | ★★☆☆☆ | 学习性能分析 |', '["https://leetcode.cn/problemset/all/","https://www.runoob.com/"]', 91, '2026-06-20 02:23:38');
+INSERT INTO `sp_learning_resource` VALUES (17814526375458340, 17814526375443628, 'practice', '模型部署 - 分层练习题库', '# 模型部署 实战题库
+
+## 选择题 (20题)
+1. 在模型部署中，时间复杂度最优的算法是？
+2. 模型部署与${pick(courses)}的主要区别是？
+
+## 编程题 (10题)
+3. 【简单】实现模型部署的基本版本
+4. 【中等】优化模型部署至O(n log n)
+5. 【困难】分布式模型部署系统设计
+
+## 综合应用题 (5题)
+6. 结合${pick(courses)}知识，解决实际问题
+
+## 详细解析
+每题包含：解题思路、代码示例、复杂度分析、易错点', '["https://spring.io/docs","https://www.bilibili.com/video/"]', 76, '2026-07-12 01:18:15');
+INSERT INTO `sp_learning_resource` VALUES (17814526375457210, 17814526375443628, 'practice', 'A/B测试 - 分层练习题库', '## 📝 A/B测试 分层练习
+
+### 🟢 基础题 (10题)
+1. A/B测试的核心特性有哪些？
+2. 简述A/B测试的基本工作流程。
+3. 以下哪个不属于A/B测试的应用场景？
+   A. Web开发 B. 数据分析 C. 文字处理 D. 机器学习
+
+### 🟡 进阶题 (5题)
+4. 请实现一个简单的A/B测试示例，要求包含错误处理。
+5. 分析A/B测试在大规模数据下的性能瓶颈。
+
+### 🔴 挑战题 (3题)
+6. 设计一个基于A/B测试的分布式系统，画架构图并说明。
+7. 优化给定代码的性能，从O(n²)降到O(n log n)。
+
+### ✅ 答案与解析
+（每题附详细解答）', '["https://stackoverflow.com/questions/","https://docs.python.org/","https://github.com/topics/"]', 98, '2026-04-23 22:58:31');
+INSERT INTO `sp_learning_resource` VALUES (17814526375459707, 17814526375443628, 'code_lab', 'CSS Grid布局 编程实战项目', '# 项目：CSS Grid布局 实战
+
+## 技术栈
+- Python / Java
+- Spring Boot / Flask
+- MySQL + Redis
+
+## 实现步骤
+
+### Step 1: 环境搭建
+配置开发环境，安装依赖
+
+### Step 2: 核心逻辑
+实现 CSS Grid布局 的核心算法，注意边界条件和异常处理
+
+### Step 3: 测试验证
+编写单元测试和集成测试
+
+## 性能基准
+| 数据规模 | 耗时 | 内存 |
+|---------|------|------|
+| 1000 | 0.1s | 10MB |
+| 10000 | 1.2s | 50MB |
+| 100000 | 15s | 200MB |
+
+## 扩展思考
+如何将 CSS Grid布局 应用到分布式系统中？', '["https://leetcode.cn/problemset/all/","https://www.runoob.com/","https://www.bilibili.com/video/"]', 97, '2026-06-30 09:16:06');
+INSERT INTO `sp_learning_resource` VALUES (17814526375459015, 17814526375443628, 'mind_map', 'OAuth2.0认证 知识体系思维导图', '# OAuth2.0认证 知识体系
+
+## 基础层
+- 概念定义
+- 术语解释
+- 发展历程
+
+## 核心层
+- 算法原理 → 时间复杂度 → 空间复杂度
+- 数据结构 → 数组/链表/树/图
+- 设计模式 → 创建型/结构型/行为型
+
+## 应用层
+- 实际案例
+- 最佳实践
+- 常见陷阱
+
+## 进阶层
+- 性能优化
+- 源码分析
+- 架构演进', '["https://docs.python.org/","https://zhuanlan.zhihu.com/"]', 86, '2026-04-28 17:54:12');
+INSERT INTO `sp_learning_resource` VALUES (17814526375454822, 17814526375443628, 'syllabus', '最短路径 - 系统化学习讲义', '# 最短路径 学习指南
+
+## 为什么学习最短路径
+最短路径在当前技术栈中占据重要位置，掌握它能让你的技能体系更加完整。
+
+## 知识地图
+```
+基础概念 → 核心原理 → 实战应用 → 性能优化 → 架构设计
+```
+
+## 每阶段目标
+- 第1周：理解概念，完成Hello World
+- 第2周：掌握核心API/方法
+- 第3周：独立完成小项目
+- 第4周：优化与扩展
+
+## 常见问题
+1. Q: 如何开始学习？ A: 从官方文档和简单示例入手
+2. Q: 需要什么前置知识？ A: 基本的电子信息工程概念', '["https://www.runoob.com/"]', 98, '2026-05-22 15:03:09');
+INSERT INTO `sp_learning_resource` VALUES (17814526375455696, 17814526375449793, 'video_script', 'HTTPS原理 可视化讲解 - 视频脚本', '# 🎬 HTTPS原理 视频脚本
+
+## 开场 (30秒)
+画面：动态标题 + 问题引入
+"你是否曾经好奇HTTPS原理是如何工作的？今天我们用5分钟彻底搞懂它。"
+
+## 核心讲解 (3分钟)
+### 第一部分：概念可视化
+使用动画演示HTTPS原理的核心流程
+
+### 第二部分：代码演示
+一边写代码一边讲解关键步骤
+
+### 第三部分：对比分析
+与其他方案的对比，突出HTTPS原理的优势
+
+## 总结 (1分钟)
+回顾关键点 + 下期预告
+
+## 配套资源
+- 源码地址
+- 练习题目
+- 延伸阅读', '["https://github.com/topics/"]', 91, '2026-06-28 05:24:59');
+INSERT INTO `sp_learning_resource` VALUES (17814526375459029, 17814526375449793, 'practice', '拓扑排序 - 分层练习题库', '## 📝 拓扑排序 分层练习
+
+### 🟢 基础题 (10题)
+1. 拓扑排序的核心特性有哪些？
+2. 简述拓扑排序的基本工作流程。
+3. 以下哪个不属于拓扑排序的应用场景？
+   A. Web开发 B. 数据分析 C. 文字处理 D. 机器学习
+
+### 🟡 进阶题 (5题)
+4. 请实现一个简单的拓扑排序示例，要求包含错误处理。
+5. 分析拓扑排序在大规模数据下的性能瓶颈。
+
+### 🔴 挑战题 (3题)
+6. 设计一个基于拓扑排序的分布式系统，画架构图并说明。
+7. 优化给定代码的性能，从O(n²)降到O(n log n)。
+
+### ✅ 答案与解析
+（每题附详细解答）', '["https://spring.io/docs","https://leetcode.cn/problemset/all/"]', 96, '2026-03-24 12:26:23');
+INSERT INTO `sp_learning_resource` VALUES (17814526375451404, 17814526375449793, 'code_lab', '并查集 编程实战项目', '# 项目：并查集 实战
+
+## 技术栈
+- Python / Java
+- Spring Boot / Flask
+- MySQL + Redis
+
+## 实现步骤
+
+### Step 1: 环境搭建
+配置开发环境，安装依赖
+
+### Step 2: 核心逻辑
+实现 并查集 的核心算法，注意边界条件和异常处理
+
+### Step 3: 测试验证
+编写单元测试和集成测试
+
+## 性能基准
+| 数据规模 | 耗时 | 内存 |
+|---------|------|------|
+| 1000 | 0.1s | 10MB |
+| 10000 | 1.2s | 50MB |
+| 100000 | 15s | 200MB |
+
+## 扩展思考
+如何将 并查集 应用到分布式系统中？', '["https://docs.python.org/","https://github.com/topics/"]', 79, '2026-04-08 23:39:55');
+INSERT INTO `sp_learning_resource` VALUES (17814526375454466, 17814526375449793, 'syllabus', '线程池 - 系统化学习讲义', '## 线程池核心概念
+
+### 1. 基础理论
+线程池是信息与计算科学领域的基础，理解其核心原理对后续学习至关重要。
+
+### 2. 关键知识点
+- 定义与分类
+- 核心算法/方法
+- 应用场景分析
+- 常见误区
+
+### 3. 学习路径
+1. 先掌握基本概念
+2. 通过实例加深理解
+3. 完成配套练习
+4. 阅读进阶文献
+
+### 4. 推荐阅读
+- 《线程池实战》
+- 官方文档
+- 相关论文', '["https://www.bilibili.com/video/","https://docs.python.org/","https://www.runoob.com/"]', 77, '2026-04-22 21:02:24');
+INSERT INTO `sp_learning_resource` VALUES (17814526375451850, 17814526375449793, 'syllabus', '模型部署 - 系统化学习讲义', '## 模型部署核心概念
+
+### 1. 基础理论
+模型部署是物联网工程领域的基础，理解其核心原理对后续学习至关重要。
+
+### 2. 关键知识点
+- 定义与分类
+- 核心算法/方法
+- 应用场景分析
+- 常见误区
+
+### 3. 学习路径
+1. 先掌握基本概念
+2. 通过实例加深理解
+3. 完成配套练习
+4. 阅读进阶文献
+
+### 4. 推荐阅读
+- 《模型部署实战》
+- 官方文档
+- 相关论文', '["https://github.com/topics/","https://spring.io/docs"]', 76, '2026-03-14 07:15:02');
+INSERT INTO `sp_learning_resource` VALUES (17814526375457531, 17814526375449793, 'code_lab', 'OAuth2.0认证 编程实战项目', '# 项目：OAuth2.0认证 实战
+
+## 技术栈
+- Python / Java
+- Spring Boot / Flask
+- MySQL + Redis
+
+## 实现步骤
+
+### Step 1: 环境搭建
+配置开发环境，安装依赖
+
+### Step 2: 核心逻辑
+实现 OAuth2.0认证 的核心算法，注意边界条件和异常处理
+
+### Step 3: 测试验证
+编写单元测试和集成测试
+
+## 性能基准
+| 数据规模 | 耗时 | 内存 |
+|---------|------|------|
+| 1000 | 0.1s | 10MB |
+| 10000 | 1.2s | 50MB |
+| 100000 | 15s | 200MB |
+
+## 扩展思考
+如何将 OAuth2.0认证 应用到分布式系统中？', '["https://github.com/topics/"]', 88, '2026-03-19 15:17:20');
+INSERT INTO `sp_learning_resource` VALUES (17814526375459813, 17814526375449793, 'practice', '最小生成树 - 分层练习题库', '# 最小生成树 实战题库
+
+## 选择题 (20题)
+1. 在最小生成树中，时间复杂度最优的算法是？
+2. 最小生成树与${pick(courses)}的主要区别是？
+
+## 编程题 (10题)
+3. 【简单】实现最小生成树的基本版本
+4. 【中等】优化最小生成树至O(n log n)
+5. 【困难】分布式最小生成树系统设计
+
+## 综合应用题 (5题)
+6. 结合${pick(courses)}知识，解决实际问题
+
+## 详细解析
+每题包含：解题思路、代码示例、复杂度分析、易错点', '["https://docs.python.org/"]', 76, '2026-04-07 01:25:26');
+INSERT INTO `sp_learning_resource` VALUES (17814526375454341, 17814526375444621, 'syllabus', '并查集 - 系统化学习讲义', '# 并查集 学习指南
+
+## 为什么学习并查集
+并查集在当前技术栈中占据重要位置，掌握它能让你的技能体系更加完整。
+
+## 知识地图
+```
+基础概念 → 核心原理 → 实战应用 → 性能优化 → 架构设计
+```
+
+## 每阶段目标
+- 第1周：理解概念，完成Hello World
+- 第2周：掌握核心API/方法
+- 第3周：独立完成小项目
+- 第4周：优化与扩展
+
+## 常见问题
+1. Q: 如何开始学习？ A: 从官方文档和简单示例入手
+2. Q: 需要什么前置知识？ A: 基本的信息与计算科学概念', '["https://stackoverflow.com/questions/","https://developer.mozilla.org/","https://github.com/topics/"]', 90, '2026-05-19 15:32:07');
+INSERT INTO `sp_learning_resource` VALUES (17814526375459669, 17814526375444621, 'practice', '并查集 - 分层练习题库', '# 并查集 实战题库
+
+## 选择题 (20题)
+1. 在并查集中，时间复杂度最优的算法是？
+2. 并查集与${pick(courses)}的主要区别是？
+
+## 编程题 (10题)
+3. 【简单】实现并查集的基本版本
+4. 【中等】优化并查集至O(n log n)
+5. 【困难】分布式并查集系统设计
+
+## 综合应用题 (5题)
+6. 结合${pick(courses)}知识，解决实际问题
+
+## 详细解析
+每题包含：解题思路、代码示例、复杂度分析、易错点', '["https://docs.python.org/","https://www.runoob.com/"]', 97, '2026-09-15 04:30:19');
+INSERT INTO `sp_learning_resource` VALUES (17814526375461519, 17814526375444621, 'syllabus', '设计模式 - 系统化学习讲义', '# 设计模式 学习指南
+
+## 为什么学习设计模式
+设计模式在当前技术栈中占据重要位置，掌握它能让你的技能体系更加完整。
+
+## 知识地图
+```
+基础概念 → 核心原理 → 实战应用 → 性能优化 → 架构设计
+```
+
+## 每阶段目标
+- 第1周：理解概念，完成Hello World
+- 第2周：掌握核心API/方法
+- 第3周：独立完成小项目
+- 第4周：优化与扩展
+
+## 常见问题
+1. Q: 如何开始学习？ A: 从官方文档和简单示例入手
+2. Q: 需要什么前置知识？ A: 基本的数学与应用数学概念', '["https://www.bilibili.com/video/","https://spring.io/docs","https://www.runoob.com/"]', 82, '2026-05-20 14:24:56');
+INSERT INTO `sp_learning_resource` VALUES (17814526375465093, 17814526375444621, 'video_script', 'React Hooks 可视化讲解 - 视频脚本', '# 🎬 React Hooks 视频脚本
+
+## 开场 (30秒)
+画面：动态标题 + 问题引入
+"你是否曾经好奇React Hooks是如何工作的？今天我们用5分钟彻底搞懂它。"
+
+## 核心讲解 (3分钟)
+### 第一部分：概念可视化
+使用动画演示React Hooks的核心流程
+
+### 第二部分：代码演示
+一边写代码一边讲解关键步骤
+
+### 第三部分：对比分析
+与其他方案的对比，突出React Hooks的优势
+
+## 总结 (1分钟)
+回顾关键点 + 下期预告
+
+## 配套资源
+- 源码地址
+- 练习题目
+- 延伸阅读', '["https://leetcode.cn/problemset/all/"]', 93, '2026-08-26 19:21:47');
+INSERT INTO `sp_learning_resource` VALUES (17814526375467960, 17814526375444621, 'code_lab', '异常检测 编程实战项目', '# 项目：异常检测 实战
+
+## 技术栈
+- Python / Java
+- Spring Boot / Flask
+- MySQL + Redis
+
+## 实现步骤
+
+### Step 1: 环境搭建
+配置开发环境，安装依赖
+
+### Step 2: 核心逻辑
+实现 异常检测 的核心算法，注意边界条件和异常处理
+
+### Step 3: 测试验证
+编写单元测试和集成测试
+
+## 性能基准
+| 数据规模 | 耗时 | 内存 |
+|---------|------|------|
+| 1000 | 0.1s | 10MB |
+| 10000 | 1.2s | 50MB |
+| 100000 | 15s | 200MB |
+
+## 扩展思考
+如何将 异常检测 应用到分布式系统中？', '["https://github.com/topics/","https://www.bilibili.com/video/"]', 87, '2026-08-05 03:24:39');
+INSERT INTO `sp_learning_resource` VALUES (17814526375461328, 17814526375444621, 'practice', '回溯法 - 分层练习题库', '## 📝 回溯法 分层练习
+
+### 🟢 基础题 (10题)
+1. 回溯法的核心特性有哪些？
+2. 简述回溯法的基本工作流程。
+3. 以下哪个不属于回溯法的应用场景？
+   A. Web开发 B. 数据分析 C. 文字处理 D. 机器学习
+
+### 🟡 进阶题 (5题)
+4. 请实现一个简单的回溯法示例，要求包含错误处理。
+5. 分析回溯法在大规模数据下的性能瓶颈。
+
+### 🔴 挑战题 (3题)
+6. 设计一个基于回溯法的分布式系统，画架构图并说明。
+7. 优化给定代码的性能，从O(n²)降到O(n log n)。
+
+### ✅ 答案与解析
+（每题附详细解答）', '["https://zhuanlan.zhihu.com/","https://stackoverflow.com/questions/"]', 77, '2026-06-28 18:01:07');

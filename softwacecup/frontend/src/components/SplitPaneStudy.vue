@@ -257,17 +257,20 @@
 </template>
 
 <script setup>
-import { ref, onMounted, nextTick, watch } from 'vue'
+import { ref, onMounted, onUnmounted, nextTick, watch } from 'vue'
 import { useRoute } from 'vue-router'
 import { marked } from 'marked'
 import DOMPurify from 'dompurify'
 import { ElMessage } from 'element-plus'
+import { useChatStore } from '../stores/chat'
 import { openTutorSSE } from '../api/sse'
+import { apiGetQaHistory } from '../api/qa'
 import KnowledgeMap from './KnowledgeMap.vue'
 import QuizComponent from './QuizComponent.vue'
 import axios from 'axios'
 
 const route = useRoute()
+const chatStore = useChatStore()
 
 // ==================== 分屏拖拽逻辑 ====================
 const leftWidth = ref(50) // 左侧宽度百分比
@@ -436,6 +439,7 @@ const messages = ref([
 const inputMessage = ref('')
 const isLoading = ref(false)
 const messagesContainer = ref(null)
+let currentSSE = null
 
 // 配置 marked 支持代码高亮和 LaTeX
 marked.setOptions({
@@ -475,11 +479,50 @@ const renderMarkdown = (text) => {
   return DOMPurify.sanitize(html)
 }
 
-// 初始化第一条消息的 HTML
-onMounted(() => {
-  messages.value[0].html = renderMarkdown(messages.value[0].text)
+// 初始化：加载历史 + 渲染欢迎消息
+onMounted(async () => {
+  // 从后端加载历史记录
+  try {
+    const res = await apiGetQaHistory(20)
+    const records = res?.data || res || []
+    if (Array.isArray(records) && records.length > 0) {
+      const sorted = [...records].reverse()
+      const historyMsgs = []
+      for (const r of sorted) {
+        historyMsgs.push({
+          role: 'user',
+          text: r.question,
+          html: '',
+          timestamp: r.createdAt ? r.createdAt.substring(11, 16) : ''
+        })
+        historyMsgs.push({
+          role: 'assistant',
+          text: r.answer,
+          html: renderMarkdown(r.answer),
+          citations: [],
+          timestamp: r.createdAt ? r.createdAt.substring(11, 16) : ''
+        })
+      }
+      if (records[0]?.sessionId) {
+        chatStore.sessionId = records[0].sessionId
+      }
+      messages.value = [...historyMsgs, {
+        role: 'assistant',
+        text: '你好！我是你的AI学习助手。继续提问吧！',
+        html: renderMarkdown('你好！我是你的AI学习助手。继续提问吧！'),
+        timestamp: getCurrentTime()
+      }]
+    }
+  } catch (e) {
+    console.warn('加载学习助手历史失败:', e)
+  }
 
-  // 检查 URL 参数，如果有 q 参数则自动提问
+  // 渲染欢迎消息
+  messages.value.forEach(m => {
+    if (!m.html && m.text) m.html = renderMarkdown(m.text)
+  })
+
+  // 检查 URL 参数
   const queryQuestion = route.query.q
   if (queryQuestion) {
     inputMessage.value = queryQuestion
@@ -547,7 +590,8 @@ const sendMessage = async () => {
     {
       question: userMessage,
       context: resourceType.value === 'doc' ? docContent.value : '',
-      answerMode: 'student-qa'
+      answerMode: 'student-qa',
+      sessionId: chatStore.sessionId
     },
     {
       onDelta(chunk) {
@@ -569,8 +613,6 @@ const sendMessage = async () => {
       onDone() {
         isLoading.value = false
         scrollToBottom()
-        // 保存问答历史到数据库
-        saveQaHistory(userMessage, accumulatedText)
       },
       onError(error) {
         isLoading.value = false
@@ -595,7 +637,7 @@ const saveQaHistory = async (question, answer) => {
       question,
       answer,
       summary,
-      sessionId: Date.now().toString()
+      sessionId: chatStore.sessionId
     }, {
       headers: { Authorization: `Bearer ${token}` }
     })

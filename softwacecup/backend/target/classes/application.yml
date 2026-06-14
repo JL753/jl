@@ -27,19 +27,19 @@ mybatis-plus:
 
 smartprep:
   jwt:
-    secret: ${JWT_SECRET:please-set-JWT_SECRET-env-var-before-production}
+    secret: ${JWT_SECRET:s7FpQ2xRm9LkW3vBn8HjYc5Ea1Dt6Gu0Io4JqXzPyeNfVbMhTwCkZrASdUO3l6gW}
     expire-hours: ${JWT_EXPIRE_HOURS:24}
   safety:
     blocked-words: ${BLOCKED_WORDS:作弊,违法,恐怖,色情,暴力}
   llm:
-    api-key: ${LLM_API_KEY:sk-912081da827543b4bda65d1456cdc989}
+    api-key: ${LLM_API_KEY:your_llm_api_key}
     base-url: ${LLM_BASE_URL:https://api.deepseek.com/v1}
     model: ${LLM_MODEL:deepseek-chat}
-    temperature: ${LLM_TEMPERATURE:0.7}
+    temperature: ${LLM_TEMPERATURE:0.4}
     max-tokens: ${LLM_MAX_TOKENS:4096}
   neo4j:
     uri: ${NEO4J_URI:bolt://localhost:7687}
     username: ${NEO4J_USERNAME:neo4j}
-    password: ${NEO4J_PASSWORD:password123}
+    password: ${NEO4J_PASSWORD:your_neo4j_password}
   baidu:
-    search-token: ${BAIDU_SEARCH_TOKEN:bce-v3/ALTAK-mLPz5Xlyy4jFzWStG65eC/e65ca1ed8a03d462cb0ae6fbfc8aaa905f2fef99}
+    search-token: ${BAIDU_SEARCH_TOKEN:your_baidu_search_token}

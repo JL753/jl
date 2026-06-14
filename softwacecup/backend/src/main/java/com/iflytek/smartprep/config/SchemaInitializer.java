@@ -169,7 +169,8 @@ public class SchemaInitializer {
         User exists = userMapper.selectOne(new LambdaQueryWrapper<User>().eq(User::getUsername, username).last("limit 1"));
         if (exists != null) {
             boolean changed = false;
-            if (!password.equals(exists.getPassword())) { exists.setPassword(password); changed = true; }
+            String hashedPw = com.iflytek.smartprep.service.impl.AuthServiceImpl.hashPassword(password);
+            if (!hashedPw.equals(exists.getPassword())) { exists.setPassword(hashedPw); changed = true; }
             if (!role.equals(exists.getRole())) { exists.setRole(role); changed = true; }
             if (!displayName.equals(exists.getDisplayName())) { exists.setDisplayName(displayName); changed = true; }
             String avatarUrl = defaultAvatar(role, displayName);
@@ -180,7 +181,7 @@ public class SchemaInitializer {
         User user = new User();
         user.setId(id);
         user.setUsername(username);
-        user.setPassword(password);
+        user.setPassword(com.iflytek.smartprep.service.impl.AuthServiceImpl.hashPassword(password));
         user.setRole(role);
         user.setDisplayName(displayName);
         user.setAvatarUrl(defaultAvatar(role, displayName));

@@ -15,10 +15,10 @@ import java.util.regex.Pattern;
 @Component
 public class DocumentChunker {
 
-    // 默认配置
-    private static final int DEFAULT_CHUNK_SIZE = 500;        // 每块字符数
-    private static final int DEFAULT_OVERLAP_SIZE = 100;      // 重叠字符数
-    private static final int MIN_CHUNK_SIZE = 100;            // 最小块大小
+    // 默认配置（优化后：更大块 + 更高重叠率，提升检索命中率）
+    private static final int DEFAULT_CHUNK_SIZE = 800;        // 每块字符数 (原 500)
+    private static final int DEFAULT_OVERLAP_SIZE = 250;      // 重叠字符数 (原 100, 重叠率 31%)
+    private static final int MIN_CHUNK_SIZE = 150;            // 最小块大小 (原 100)
 
     // 章节标题正则（匹配"第X章"、"Chapter X"、"一、"等）
     private static final Pattern CHAPTER_PATTERN = Pattern.compile(

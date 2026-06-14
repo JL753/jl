@@ -27,7 +27,7 @@
         </div>
 
         <div class="chat-messages" ref="messagesEl">
-          <div v-for="(msg, i) in messages" :key="i" :class="['msg', msg.role]">
+          <div v-for="(msg, i) in chatStore.messages" :key="i" :class="['msg', msg.role]">
             <div class="msg-avatar">{{ msg.role === 'user' ? '我' : 'AI' }}</div>
             <div class="msg-bubble" v-html="msg.html || msg.content"></div>
           </div>
@@ -59,24 +59,23 @@
 </template>
 
 <script setup>
-import { ref, nextTick } from 'vue'
+import { ref, nextTick, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 import { useAuthStore } from '../stores/auth'
+import { useChatStore } from '../stores/chat'
 import { apiAskTutor } from '../api/index'
 
 const router = useRouter()
 const auth = useAuthStore()
+const chatStore = useChatStore()
 const isOpen = ref(false)
 const inputText = ref('')
 const thinking = ref(false)
 const messagesEl = ref(null)
-const messages = ref([
-  {
-    role: 'assistant',
-    content: '你好！我是知域 AI 智能助手\n\n我可以回答学习问题，也可以帮你导航到对应页面。\n\n试试说：「跳转到课程平台」、「沉浸伴学」或直接提问！',
-    html: '你好！我是知域 AI 智能助手<br><br>我可以回答学习问题，也可以帮你导航到对应页面。<br><br>试试说：「跳转到课程平台」、「沉浸伴学」或直接提问！'
-  }
-])
+
+onMounted(() => {
+  chatStore.loadHistory()
+})
 
 // 导航关键词映射
 const navMap = [
@@ -120,7 +119,7 @@ const sendMessage = async () => {
   const text = inputText.value.trim()
   if (!text || thinking.value) return
 
-  messages.value.push({ role: 'user', content: text })
+  chatStore.addUserMessage(text)
   inputText.value = ''
   await scrollToBottom()
 
@@ -130,11 +129,10 @@ const sendMessage = async () => {
     thinking.value = true
     await new Promise(r => setTimeout(r, 600))
     thinking.value = false
-    messages.value.push({
-      role: 'assistant',
-      content: `好的，正在跳转到 ${navPath}...`,
-      html: `好的，正在跳转到 <code>${navPath}</code>...`
-    })
+    chatStore.addAssistantMessage(
+      `好的，正在跳转到 ${navPath}...`,
+      `好的，正在跳转到 <code>${navPath}</code>...`
+    )
     await scrollToBottom()
     setTimeout(() => router.push(navPath), 800)
     return
@@ -144,20 +142,12 @@ const sendMessage = async () => {
   thinking.value = true
   await scrollToBottom()
   try {
-    const history = messages.value.slice(-6).map(m => ({ role: m.role, content: m.content }))
-    const res = await apiAskTutor({ question: text, history })
+    const history = chatStore.recentContext
+    const res = await apiAskTutor({ question: text, history, sessionId: chatStore.sessionId })
     const answer = res?.data?.markdown || res?.data?.answer || res?.message || '抱歉，我暂时无法回答这个问题。'
-    messages.value.push({
-      role: 'assistant',
-      content: answer,
-      html: answer.replace(/\n/g, '<br>')
-    })
+    chatStore.addAssistantMessage(answer, answer.replace(/\n/g, '<br>'))
   } catch (e) {
-    messages.value.push({
-      role: 'assistant',
-      content: '网络异常，请稍后再试。',
-      html: '网络异常，请稍后再试。'
-    })
+    chatStore.addAssistantMessage('网络异常，请稍后再试。', '网络异常，请稍后再试。')
   } finally {
     thinking.value = false
     await scrollToBottom()

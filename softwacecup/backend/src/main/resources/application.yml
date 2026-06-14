@@ -27,7 +27,7 @@ mybatis-plus:
 
 smartprep:
   jwt:
-    secret: ${JWT_SECRET:please-set-JWT_SECRET-env-var-before-production}
+    secret: ${JWT_SECRET:s7FpQ2xRm9LkW3vBn8HjYc5Ea1Dt6Gu0Io4JqXzPyeNfVbMhTwCkZrASdUO3l6gW}
     expire-hours: ${JWT_EXPIRE_HOURS:24}
   safety:
     blocked-words: ${BLOCKED_WORDS:作弊,违法,恐怖,色情,暴力}
@@ -35,7 +35,7 @@ smartprep:
     api-key: ${LLM_API_KEY:your_llm_api_key}
     base-url: ${LLM_BASE_URL:https://api.deepseek.com/v1}
     model: ${LLM_MODEL:deepseek-chat}
-    temperature: ${LLM_TEMPERATURE:0.7}
+    temperature: ${LLM_TEMPERATURE:0.4}
     max-tokens: ${LLM_MAX_TOKENS:4096}
   neo4j:
     uri: ${NEO4J_URI:bolt://localhost:7687}

@@ -18,7 +18,7 @@ export const apiAnalyzeMistake = (payload) => http.post('/adaptive-quiz/analyze-
 
 // ==================== AI 虚拟人伴学 ====================
 /** 流式 AI 对话（SSE） */
-export const apiAgentChatStream = ({ question, history }) => {
+export const apiAgentChatStream = ({ question, history, sessionId }) => {
   const token = localStorage.getItem('sp_token') || ''
   return fetch('/api/agent/chat-stream', {
     method: 'POST',
@@ -26,7 +26,7 @@ export const apiAgentChatStream = ({ question, history }) => {
       'Content-Type': 'application/json',
       Authorization: `Bearer ${token}`
     },
-    body: JSON.stringify({ question, history: history || [] })
+    body: JSON.stringify({ question, history: history || [], sessionId: sessionId || '' })
   })
 }
 

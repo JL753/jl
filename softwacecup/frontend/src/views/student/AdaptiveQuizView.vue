@@ -543,9 +543,9 @@ onMounted(() => loadKnowledgePoints())
 }
 
 .quiz-main {
-  background: #fff;
+  background: rgba(255, 255, 255, 0.06); backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px); border: 1px solid rgba(255, 255, 255, 0.1); box-shadow: 0 8px 32px rgba(0, 0, 0, 0.35);
   border-radius: 16px;
-  box-shadow: 0 2px 12px rgba(0,0,0,0.06);
+  
   overflow-y: auto;
   padding: 24px;
 }
@@ -557,9 +557,9 @@ onMounted(() => loadKnowledgePoints())
 }
 
 .sidebar-card {
-  background: #fff;
+  background: rgba(255, 255, 255, 0.06); backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px); border: 1px solid rgba(255, 255, 255, 0.1); box-shadow: 0 8px 32px rgba(0, 0, 0, 0.35);
   border-radius: 16px;
-  box-shadow: 0 2px 12px rgba(0,0,0,0.06);
+  
   padding: 18px;
 
   h4 { margin: 0 0 14px; font-size: 15px; }
@@ -579,7 +579,7 @@ onMounted(() => loadKnowledgePoints())
 
   .start-icon { font-size: 72px; margin-bottom: 16px; }
   h3 { font-size: 22px; margin: 0 0 8px; }
-  p { color: #999; margin: 0 0 24px; }
+  p { color: rgba(255, 255, 255, 0.45); margin: 0 0 24px; }
 }
 
 .config-area {
@@ -616,14 +616,14 @@ onMounted(() => loadKnowledgePoints())
   font-weight: 600;
 
   &.basic { background: #e8f5e9; color: #2e7d32; }
-  &.medium { background: #fff3e0; color: #e65100; }
+  &.medium { background: rgba(245, 158, 11, 0.1); color: #e65100; }
   &.hard { background: #fce4ec; color: #c62828; }
   &.challenge { background: #e8eaf6; color: #283593; }
 }
 
 .question-card {
   padding: 20px;
-  border: 1px solid #f0f0f0;
+  border: 1px solid rgba(255, 255, 255, 0.08);
   border-radius: 14px;
   background: #fafbfc;
 }
@@ -664,8 +664,8 @@ onMounted(() => loadKnowledgePoints())
   &:hover { border-color: #667eea; background: #f8f7ff; }
 
   &.selected { border-color: #667eea; background: #eef0ff; }
-  &.correct { border-color: #10b981; background: #ecfdf5; }
-  &.wrong { border-color: #ef4444; background: #fef2f2; }
+  &.correct { border-color: #10b981; background: rgba(16, 185, 129, 0.1); }
+  &.wrong { border-color: #ef4444; background: rgba(239, 68, 68, 0.1); }
 
   .option-letter {
     width: 28px; height: 28px;
@@ -721,7 +721,7 @@ onMounted(() => loadKnowledgePoints())
     align-items: center;
     gap: 6px;
     margin-top: 8px;
-    .kp-label { font-size: 12px; color: #999; }
+    .kp-label { font-size: 12px; color: rgba(255, 255, 255, 0.45); }
   }
 }
 
@@ -731,7 +731,7 @@ onMounted(() => loadKnowledgePoints())
   padding: 10px 16px;
   margin-top: 16px;
   border-radius: 8px;
-  background: #fffbeb;
+  background: rgba(245, 158, 11, 0.1);
   font-size: 12px;
   color: #92400e;
 }
@@ -749,7 +749,7 @@ onMounted(() => loadKnowledgePoints())
   width: 100%;
 
   h3 { font-size: 20px; margin: 12px 0 4px; }
-  p { color: #999; margin: 0 0 20px; }
+  p { color: rgba(255, 255, 255, 0.45); margin: 0 0 20px; }
 }
 
 .score-circle {
@@ -768,12 +768,12 @@ onMounted(() => loadKnowledgePoints())
     content: '';
     position: absolute;
     inset: 8px;
-    background: #fff;
+    background: rgba(255, 255, 255, 0.06); backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px); border: 1px solid rgba(255, 255, 255, 0.1); box-shadow: 0 8px 32px rgba(0, 0, 0, 0.35);
     border-radius: 50%;
   }
 
   .score-num { font-size: 40px; font-weight: 800; color: #10b981; position: relative; z-index: 1; }
-  .score-unit { font-size: 14px; color: #999; position: relative; z-index: 1; }
+  .score-unit { font-size: 14px; color: rgba(255, 255, 255, 0.45); position: relative; z-index: 1; }
 }
 
 .result-stats {
@@ -782,7 +782,7 @@ onMounted(() => loadKnowledgePoints())
   margin: 20px 0;
   border-radius: 12px;
   overflow: hidden;
-  border: 1px solid #f0f0f0;
+  border: 1px solid rgba(255, 255, 255, 0.08);
 }
 
 .rs-item {
@@ -791,10 +791,10 @@ onMounted(() => loadKnowledgePoints())
   display: flex;
   flex-direction: column;
   align-items: center;
-  border-right: 1px solid #f0f0f0;
+  border-right: 1px solid rgba(255, 255, 255, 0.08);
   &:last-child { border-right: none; }
-  .rs-value { font-size: 20px; font-weight: 700; color: #333; }
-  .rs-label { font-size: 12px; color: #999; margin-top: 2px; }
+  .rs-value { font-size: 20px; font-weight: 700; color: #e2e8f0; }
+  .rs-label { font-size: 12px; color: rgba(255, 255, 255, 0.45); margin-top: 2px; }
 }
 
 .kp-analysis, .wrong-review {
@@ -818,12 +818,12 @@ onMounted(() => loadKnowledgePoints())
 
 .wrong-item {
   padding: 10px 0;
-  border-bottom: 1px solid #f0f0f0;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
   &:last-child { border-bottom: none; }
 
   .wrong-q { font-size: 13px; font-weight: 600; margin: 0 0 4px; }
   .wrong-a { font-size: 12px; color: #10b981; margin: 2px 0; }
-  .wrong-e { font-size: 12px; color: #666; margin: 2px 0; }
+  .wrong-e { font-size: 12px; color: rgba(255, 255, 255, 0.55); margin: 2px 0; }
 }
 
 .result-actions {
@@ -852,7 +852,7 @@ onMounted(() => loadKnowledgePoints())
   text-align: left;
   margin-top: 20px;
   padding: 16px;
-  background: #fef2f2;
+  background: rgba(239, 68, 68, 0.1);
   border: 1px solid #fecaca;
   border-radius: 12px;
 
@@ -891,8 +891,8 @@ onMounted(() => loadKnowledgePoints())
   align-items: center;
   font-size: 13px;
 
-  .engine-label { color: #999; }
-  .engine-value { font-weight: 600; color: #333; }
+  .engine-label { color: rgba(255, 255, 255, 0.45); }
+  .engine-value { font-weight: 600; color: #e2e8f0; }
   .engine-value.basic { color: #10b981; }
   .engine-value.medium { color: #f59e0b; }
   .engine-value.hard { color: #ef4444; }
@@ -932,6 +932,21 @@ onMounted(() => loadKnowledgePoints())
   .challenge-icon { font-size: 20px; }
   .challenge-name { font-size: 12px; margin: 0 0 4px; font-weight: 600; }
 }
+
+/* Element Plus 深色主题覆盖 */
+:deep(.el-select) { --el-fill-color-blank: rgba(255,255,255,0.06); }
+:deep(.el-input__wrapper) { background: rgba(255,255,255,0.06) !important; box-shadow: none !important; border: 1px solid rgba(255,255,255,0.1) !important; }
+:deep(.el-input__inner) { color: #e2e8f0 !important; }
+:deep(.el-select-dropdown) { background: rgba(15,23,42,0.95) !important; border: 1px solid rgba(255,255,255,0.1) !important; backdrop-filter: blur(16px); }
+:deep(.el-select-dropdown__item) { color: rgba(255,255,255,0.7) !important; }
+:deep(.el-select-dropdown__item.hover) { background: rgba(255,255,255,0.06) !important; }
+:deep(.el-progress-bar__outer) { background: rgba(255,255,255,0.08) !important; }
+:deep(.el-progress__text) { color: rgba(255,255,255,0.6) !important; }
+:deep(.el-tag) { background: rgba(255,255,255,0.06) !important; border-color: rgba(255,255,255,0.1) !important; color: rgba(255,255,255,0.7) !important; }
+:deep(.el-empty__description p) { color: rgba(255,255,255,0.4) !important; }
+
+/* 文字颜色修正 */
+.meter-labels { color: rgba(255,255,255,0.4); }
 
 @media (max-width: 1024px) {
   .quiz-content { grid-template-columns: 1fr; }

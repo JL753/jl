@@ -34,6 +34,7 @@ public class TutorController {
     public SseEmitter stream(@RequestParam String question,
                              @RequestParam(required = false) String context,
                              @RequestParam(required = false) String answerMode,
+                             @RequestParam(required = false) String sessionId,
                              @RequestHeader(value = "Authorization", required = false) String authHeader) {
         if (authHeader == null || authHeader.isBlank()) {
             SseEmitter err = new SseEmitter();
@@ -52,6 +53,7 @@ public class TutorController {
         request.setQuestion(question);
         request.setContext(context);
         request.setAnswerMode(answerMode);
+        request.setSessionId(sessionId);
         return tutorService.stream(uid, request);
     }
 }

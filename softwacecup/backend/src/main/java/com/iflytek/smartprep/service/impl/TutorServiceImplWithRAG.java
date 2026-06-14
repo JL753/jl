@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.iflytek.smartprep.config.JwtTokenProvider;
 import com.iflytek.smartprep.domain.KnowledgeDoc;
+import com.iflytek.smartprep.domain.QaHistory;
 import com.iflytek.smartprep.dto.*;
 import com.iflytek.smartprep.mapper.KnowledgeDocMapper;
 import com.iflytek.smartprep.rag.model.RetrievalResult;
@@ -40,7 +41,7 @@ public class TutorServiceImplWithRAG implements TutorService {
 
     // RAG 配置
     @Value("${smartprep.rag.enabled:true}") private Boolean ragEnabled;
-    @Value("${smartprep.rag.top-k:3}") private Integer ragTopK;
+    @Value("${smartprep.rag.top-k:5}") private Integer ragTopK;
 
     private final ObjectMapper objectMapper = new ObjectMapper();
     private final RestTemplate restTemplate = new RestTemplate();
@@ -52,10 +53,11 @@ public class TutorServiceImplWithRAG implements TutorService {
     private final AssessmentService assessmentService;
     private final KnowledgeDocMapper knowledgeDocMapper;
     private final RAGService ragService;
+    private final QaHistoryService qaHistoryService;
 
     public TutorServiceImplWithRAG(JwtTokenProvider jwtTokenProvider, ProfileService profileService, ResourceService resourceService,
                             StudyPathService studyPathService, AssessmentService assessmentService, KnowledgeDocMapper knowledgeDocMapper,
-                            RAGService ragService) {
+                            RAGService ragService, QaHistoryService qaHistoryService) {
         this.jwtTokenProvider = jwtTokenProvider;
         this.profileService = profileService;
         this.resourceService = resourceService;
@@ -63,6 +65,7 @@ public class TutorServiceImplWithRAG implements TutorService {
         this.assessmentService = assessmentService;
         this.knowledgeDocMapper = knowledgeDocMapper;
         this.ragService = ragService;
+        this.qaHistoryService = qaHistoryService;
     }
 
     @Override
@@ -99,6 +102,17 @@ public class TutorServiceImplWithRAG implements TutorService {
         if (markdown == null || markdown.isBlank()) {
             markdown = buildFallbackMarkdown(request.getQuestion());
         }
+        // 输出侧安全过滤
+        markdown = filterOutput(markdown, request.getQuestion());
+
+        // 自动保存问答历史
+        saveQaHistory(userId, request.getQuestion(), markdown, request.getSessionId());
+
+        // RAG 接地验证：检索到了资料但 LLM 未标注引用 → 添加"仅供参考"提醒
+        List<String> safetyTips = new ArrayList<>(List.of("已过滤敏感内容", "建议结合教师讲义进行二次确认", "复杂知识点可继续追问获得分步解释"));
+        if (retrievalResults != null && !retrievalResults.isEmpty() && !markdown.contains("参考资料")) {
+            safetyTips.add("⚠️ AI 回答未明确标注引用来源，建议核实关键信息");
+        }
 
         return TutorAnswer.builder()
                 .markdown(markdown)
@@ -106,7 +120,7 @@ public class TutorServiceImplWithRAG implements TutorService {
                 .shortVideoTips(List.of("3分钟速讲", "5分钟题型拆解", "案例动画讲解"))
                 .references(List.of("课程知识库", "教师讲义", "推荐公开课资源"))
                 .streamChunks(List.of("正在检索知识点...", "正在匹配画像偏好...", "正在生成图解与视频建议...", "已完成安全审查与答案汇总。"))
-                .safetyTips(List.of("已过滤敏感内容", "建议结合教师讲义进行二次确认", "复杂知识点可继续追问获得分步解释"))
+                .safetyTips(safetyTips)
                 .citations(citations)
                 .retrievedChunksCount(retrievalResults.size())
                 .build();
@@ -148,6 +162,7 @@ public class TutorServiceImplWithRAG implements TutorService {
                 if (llmResponse == null || llmResponse.isBlank()) {
                     llmResponse = buildFallbackMarkdown(request.getQuestion());
                 }
+                llmResponse = filterOutput(llmResponse, request.getQuestion());
 
                 // 4. 流式发送回答
                 List<String> chunks = splitMarkdown(llmResponse);
@@ -169,6 +184,9 @@ public class TutorServiceImplWithRAG implements TutorService {
                 // 6. 发送完成事件
                 send(emitter, "done", "回答完成");
                 emitter.complete();
+
+                // 7. 自动保存问答历史
+                saveQaHistory(userId, request.getQuestion(), llmResponse, request.getSessionId());
 
             } catch (Exception e) {
                 try {
@@ -229,7 +247,8 @@ public class TutorServiceImplWithRAG implements TutorService {
         return "你是高校智能教学平台中的AI助教。你会收到从知识库中检索到的相关文档片段作为参考资料。" +
                 "请基于这些参考资料回答用户问题，并在回答中标注引用来源（使用【参考资料X】的格式）。" +
                 "输出适合前端直接渲染的Markdown格式。回答要结构化，包含：问题识别、核心讲解、分步学习建议、易错点、延伸资源建议。" +
-                "不要输出多余寒暄，不要使用代码围栏包裹整段内容。";
+                "不要输出多余寒暄，不要使用代码围栏包裹整段内容。" +
+                "如果你不确定答案，或者参考资料中没有足够信息，请明确说'我不确定'或'我目前没有足够的信息回答这个问题'，不要猜测或编造内容。";
     }
 
     /**
@@ -301,6 +320,34 @@ public class TutorServiceImplWithRAG implements TutorService {
         } catch (InterruptedException ignored) {
             Thread.currentThread().interrupt();
         }
+    }
+
+    private void saveQaHistory(Long userId, String question, String answer, String sessionId) {
+        try {
+            QaHistory qa = new QaHistory();
+            qa.setUserId(userId);
+            qa.setQuestion(question);
+            qa.setAnswer(answer);
+            qa.setSummary(question.length() > 50 ? question.substring(0, 50) + "..." : question);
+            qa.setSessionId(sessionId);
+            qaHistoryService.save(qa);
+        } catch (Exception e) {
+            System.err.println("保存问答历史失败: " + e.getMessage());
+        }
+    }
+
+    /**
+     * 输出侧安全过滤：检查 LLM 回复是否包含敏感词，命中则替换为安全提示
+     */
+    private String filterOutput(String content, String question) {
+        if (content == null || content.isBlank()) return content;
+        for (String w : Arrays.stream(blockedWords.split(",")).toList()) {
+            if (content.contains(w)) {
+                System.err.println("LLM 输出命中敏感词: " + w);
+                return "### 安全提示\n\n您的提问「" + question + "」已收到，但系统检测到AI生成的回答中包含不适当内容，已被自动拦截。\n\n请尝试换个方式提问，或联系教师获取帮助。\n\n> 系统已记录本次事件。";
+            }
+        }
+        return content;
     }
 
     private String buildFallbackMarkdown(String question) {

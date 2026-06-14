@@ -56,7 +56,7 @@
         >
           <div v-if="msg.role === 'ai'" class="msg-avatar ai-avatar">AI</div>
           <div :class="['msg-bubble', msg.role]">
-            <div v-if="msg.role === 'ai'" class="msg-content" v-html="msg.html"></div>
+            <div v-if="msg.role === 'ai'" class="msg-content" v-html="msg.html || msg.content"></div>
             <div v-else class="msg-content">{{ msg.content }}</div>
           </div>
           <div v-if="msg.role === 'user'" class="msg-avatar user-avatar">我</div>
@@ -118,30 +118,28 @@
 </template>
 
 <script setup>
-import { ref, nextTick, onMounted, onBeforeUnmount } from 'vue'
+import { ref, computed, nextTick, onMounted, onBeforeUnmount } from 'vue'
 import { useRouter } from 'vue-router'
 import { ElMessage } from 'element-plus'
-import { apiAgentChatStream, apiTTS } from '../../api/index.js'
+import { useChatStore } from '../../stores/chat'
+import { apiAgentChatStream } from '../../api/index.js'
 import { marked } from 'marked'
 import DOMPurify from 'dompurify'
 
 const router = useRouter()
+const chatStore = useChatStore()
 
 const unityLoaded = ref(false)
 const unityLoadFailed = ref(false)
 const unityCanvasWidth = 360
 const unityCanvasHeight = 500
 let UnityIns = null
-let RecorderIns = null
 
 const messagesRef = ref(null)
-const messages = ref([
-  {
-    role: 'ai',
-    content: '你好！我是虚拟教学助手小慧，有什么可以帮你的吗？',
-    html: DOMPurify.sanitize(marked.parse('你好！我是虚拟教学助手小慧，有什么可以帮你的吗？'))
-  }
-])
+const messages = computed(() => chatStore.messages.map(m => ({
+  ...m,
+  role: m.role === 'assistant' ? 'ai' : m.role
+})))
 const input = ref('')
 const loading = ref(false)
 const isRecording = ref(false)
@@ -172,21 +170,30 @@ function handleNavigation(command) {
   const target = navCommands[command]
   const label = command.replace('打开', '')
   if (target) {
-    messages.value.push({
-      role: 'ai',
-      content: '好的，正在跳转到' + label + '...',
-      html: renderMarkdown('好的，正在跳转到 **' + label + '**...')
-    })
+    chatStore.addAssistantMessage(
+      '好的，正在跳转到' + label + '...',
+      renderMarkdown('好的，正在跳转到 **' + label + '**...')
+    )
     scrollToBottom()
     setTimeout(() => router.push(target), 800)
   } else {
-    messages.value.push({
-      role: 'ai',
-      content: '抱歉，我暂时无法执行"' + command + '"指令。',
-      html: renderMarkdown('抱歉，我暂时无法执行"' + command + '"指令。')
-    })
+    chatStore.addAssistantMessage(
+      '抱歉，我暂时无法执行"' + command + '"指令。',
+      renderMarkdown('抱歉，我暂时无法执行"' + command + '"指令。')
+    )
     scrollToBottom()
   }
+}
+
+function detectEmotion(text) {
+  if (!text) return '开心'
+  if (/哈哈|嘿嘿|好笑|有趣|笑|😄|😂|🤣|好玩/.test(text)) return '开心'
+  if (/难过|伤心|哭|😢|😭|遗憾|抱歉/.test(text)) return '难过'
+  if (/惊讶|天啊|居然|没想到|😲|😯|真的吗/.test(text)) return '惊讶'
+  if (/生气|愤怒|可恶|讨厌|😡/.test(text)) return '生气'
+  if (/困惑|不懂|为什么|什么意思|不明白/.test(text)) return '困惑'
+  if (/厉害|优秀|很棒|不错|赞|👍/.test(text)) return '有趣'
+  return '开心'
 }
 
 function parseStructuredReply(raw) {
@@ -207,6 +214,13 @@ function parseStructuredReply(raw) {
   if (!parts.text && raw) {
     parts.text = raw
   }
+  // LLM 未按结构化格式输出时，智能推断表情和动作
+  if (parts.emotion === '无') {
+    parts.emotion = detectEmotion(parts.text)
+  }
+  if (parts.action === '无') {
+    parts.action = '右手放胸前'
+  }
   return parts
 }
 
@@ -215,7 +229,7 @@ async function sendMessage() {
   if (!text || loading.value) return
 
   input.value = ''
-  messages.value.push({ role: 'user', content: text })
+  chatStore.addUserMessage(text)
   scrollToBottom()
   await sendToLLM(text)
 }
@@ -226,8 +240,9 @@ async function sendToLLM(text) {
   try {
     const response = await apiAgentChatStream({
       question: text,
-      history: messages.value.slice(-10).map(m => ({
-        role: m.role === 'ai' ? 'assistant' : 'user',
+      sessionId: chatStore.sessionId,
+      history: chatStore.messages.slice(-10).map(m => ({
+        role: m.role === 'assistant' ? 'assistant' : 'user',
         content: m.content
       }))
     })
@@ -260,123 +275,219 @@ async function sendToLLM(text) {
           if (parsed.delta) fullText += parsed.delta
           if (parsed.finish) {
             const parts = parseStructuredReply(fullText)
-            messages.value.push({
-              role: 'ai',
-              content: parts.text,
-              html: renderMarkdown(parts.text)
-            })
+            const text = parts.text || '小慧收到了你的消息，但暂时无法给出回复，请稍后再试。'
+            chatStore.addAssistantMessage(text, renderMarkdown(text))
             scrollToBottom()
+
+            console.log('[小慧] 回复解析:', 'emotion=' + parts.emotion, 'action=' + parts.action, 'text长度=' + parts.text.length)
 
             if (parts.command && parts.command !== '无') {
               handleNavigation(parts.command)
             }
 
-            if (UnityIns && unityLoaded.value) {
-              try {
-                UnityIns.SendMessage('ChatManager', 'PlayEmotion', parts.emotion)
-                UnityIns.SendMessage('ChatManager', 'PlayAction', parts.action)
-              } catch (e) { /* Unity 通信失败，静默降级 */ }
-            }
-
             if (parts.text) {
-              sendTTS(parts.text)
+              speakText(parts.text)
             }
           }
         } catch (e) { /* 跳过解析失败的行 */ }
       }
     }
   } catch (e) {
-    messages.value.push({
-      role: 'ai',
-      content: '小慧暂时不在线，请稍后重试。',
-      html: renderMarkdown('小慧暂时不在线，请稍后重试。')
-    })
+    chatStore.addAssistantMessage('小慧暂时不在线，请稍后重试。', renderMarkdown('小慧暂时不在线，请稍后重试。'))
     scrollToBottom()
   } finally {
     loading.value = false
   }
 }
 
-async function sendTTS(text) {
-  try {
-    const response = await apiTTS(text)
-    if (response.ok) {
-      const audioBlob = await response.blob()
-      const audioUrl = URL.createObjectURL(audioBlob)
-      const audio = new Audio(audioUrl)
-      audio.play().catch(() => { /* 自动播放被阻止 */ })
-      if (UnityIns && unityLoaded.value) {
-        try {
-          UnityIns.SendMessage('ChatManager', 'PlayAudio', audioUrl)
-        } catch (e) { /* 静默降级 */ }
+// ========== TTS 语音合成（Web Speech API 语音 + 模拟音频给 Unity 驱动口型） ==========
+
+/**
+ * 生成模拟语音振幅的 WAV 文件
+ * Unity 通过 AudioSource.GetOutputData 分析振幅来驱动口型 blend shape，
+ * 不需要真实语音内容，只需要振幅随时间变化即可。
+ */
+function buildLipSyncWav(text) {
+  const sampleRate = 16000
+  // 估算时长：中文约 4 字/秒，加 500ms 余量
+  const charsPerSec = 4.0
+  const durationMs = Math.max(2000, (text.length / charsPerSec) * 1000 + 500)
+  const totalSamples = Math.floor(sampleRate * durationMs / 1000)
+  const dataSize = totalSamples * 2  // 16-bit PCM = 2 bytes per sample
+  const fileSize = 44 + dataSize
+  const buf = new ArrayBuffer(fileSize)
+  const v = new DataView(buf)
+
+  // RIFF header
+  const writeStr = (off, s) => { for (let i = 0; i < s.length; i++) v.setUint8(off + i, s.charCodeAt(i)) }
+  writeStr(0, 'RIFF'); v.setUint32(4, fileSize - 8, true); writeStr(8, 'WAVE')
+  writeStr(12, 'fmt '); v.setUint32(16, 16, true); v.setUint16(20, 1, true)    // PCM
+  v.setUint16(22, 1, true)       // mono
+  v.setUint32(24, sampleRate, true)
+  v.setUint32(28, sampleRate * 2, true)  // byte rate
+  v.setUint16(32, 2, true)       // block align
+  v.setUint16(34, 16, true)      // bits per sample
+  writeStr(36, 'data'); v.setUint32(40, dataSize, true)
+
+  // 生成模拟语音振幅：以词为单位交替高低振幅
+  const totalMs = durationMs
+  const wordCount = Math.max(6, Math.floor(text.length / 2))
+  const words = []
+  for (let i = 0; i < wordCount; i++) {
+    const startMs = (totalMs / wordCount) * i
+    const endMs = startMs + (totalMs / wordCount) * (0.5 + Math.random() * 0.4)
+    words.push({ startMs, endMs })
+  }
+
+  for (let si = 0; si < totalSamples; si++) {
+    const tMs = (si / sampleRate) * 1000
+    let amplitude = 0.03  // 静音基线
+    for (const w of words) {
+      if (tMs >= w.startMs && tMs <= w.endMs) {
+        const localT = tMs - w.startMs
+        const wordLen = w.endMs - w.startMs
+        const envelope = Math.sin((localT / wordLen) * Math.PI)
+        // 振幅控制在可检测但较安静的范围，Web Speech API 朗读为主
+        amplitude = envelope * 0.35 * (1 + 0.6 * Math.sin(localT * 0.08) + 0.3 * Math.sin(localT * 0.17))
+        break
       }
     }
-  } catch (e) {
-    /* TTS 合成失败，静默模式 */
+    const sample = Math.floor(Math.max(-1, Math.min(1, amplitude)) * 32767)
+    v.setInt16(44 + si * 2, sample, true)
   }
+
+  return new Blob([buf], { type: 'audio/wav' })
+}
+
+function speakText(text) {
+  if (!text || typeof window === 'undefined') return
+  const synth = window.speechSynthesis
+  if (!synth) return
+
+  synth.cancel()
+
+  // 口型驱动：从 uLipSync 节点自身获取其 AudioContext（而非我们包装器截获的），
+  // 确保 source 与节点属于同一 AudioContext，避免 "cannot connect to a different audio context" 错误
+  const uLipSyncNode = window.__uLipSyncNode
+  if (uLipSyncNode) {
+    const ctx = uLipSyncNode.context
+    if (ctx && ctx.state !== 'closed') {
+      if (ctx.state === 'suspended') {
+        ctx.resume().catch(() => {})
+      }
+      try {
+        const wavBlob = buildLipSyncWav(text)
+        wavBlob.arrayBuffer().then(buf => {
+          ctx.decodeAudioData(buf, (audioBuffer) => {
+            const source = ctx.createBufferSource()
+            source.buffer = audioBuffer
+            source.connect(uLipSyncNode)
+            source.start()
+          }, (err) => {
+            console.warn('[小慧口型] 音频解码失败:', err)
+          })
+        }).catch(e => console.warn('[小慧口型] WAV 读取失败:', e))
+      } catch (e) {
+        console.warn('[小慧口型] 口型注入失败:', e)
+      }
+    }
+  }
+
+  // Web Speech API 朗读（用户听到的声音）
+  const utter = new SpeechSynthesisUtterance(text)
+  utter.lang = 'zh-CN'
+  utter.rate = 1.1
+  utter.pitch = 1.05
+  utter.volume = 0.9
+
+  const voices = synth.getVoices()
+  const preferred = voices.find(v => v.lang === 'zh-CN' && v.name.includes('Tingting'))
+    || voices.find(v => v.lang.startsWith('zh'))
+    || voices.find(v => v.lang.startsWith('en'))
+  if (preferred) utter.voice = preferred
+
+  synth.speak(utter)
+}
+
+// 确保 voices 加载完毕（Chrome 需要异步）
+if (typeof window !== 'undefined' && window.speechSynthesis) {
+  window.speechSynthesis.getVoices()
+  window.speechSynthesis.onvoiceschanged = () => { window.speechSynthesis.getVoices() }
+}
+
+// ========== STT 语音识别（Web Speech API） ==========
+let recognition = null
+let preRecordingInput = ''  // 录音前输入框已有内容
+
+function initSpeechRecognition() {
+  const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition
+  if (!SpeechRecognition) return null
+
+  const rec = new SpeechRecognition()
+  rec.lang = 'zh-CN'
+  rec.interimResults = true
+  rec.maxAlternatives = 1
+  rec.continuous = true
+
+  rec.onresult = (event) => {
+    let interim = ''
+    let finalText = ''
+    for (let i = event.resultIndex; i < event.results.length; i++) {
+      const transcript = event.results[i][0].transcript
+      if (event.results[i].isFinal) {
+        finalText += transcript
+      } else {
+        interim += transcript
+      }
+    }
+    // 保留录音前的手动输入，追加识别结果。不删除空格
+    input.value = preRecordingInput + finalText + interim
+  }
+
+  rec.onerror = (event) => {
+    console.warn('语音识别错误:', event.error)
+    if (event.error === 'no-speech' || event.error === 'aborted') {
+      // 正常情况，忽略
+    } else {
+      ElMessage.error('语音识别出错：' + event.error)
+    }
+    isRecording.value = false
+  }
+
+  rec.onend = () => {
+    isRecording.value = false
+  }
+
+  return rec
 }
 
 function startRecording() {
-  if (!RecorderIns) {
-    initRecorder()
+  if (!recognition) {
+    recognition = initSpeechRecognition()
+  }
+  if (!recognition) {
+    ElMessage.warning('当前浏览器不支持语音识别，请使用 Chrome')
+    return
   }
   try {
-    RecorderIns.recStart()
+    preRecordingInput = input.value  // 保存录音前用户已输入的内容
+    recognition.start()
     isRecording.value = true
   } catch (e) {
-    ElMessage.error('录音启动失败')
+    // 可能已经在运行
+    isRecording.value = false
   }
 }
 
 function stopRecording() {
-  isRecording.value = false
-  RecorderIns.recStop()
-}
-
-function initRecorder() {
-  const defaultOpt = {
-    serviceCode: 'asr_aword',
-    audioFormat: 'wav',
-    sampleRate: 16000,
-    sampleBit: 16,
-    audioChannels: 1,
-    bitRate: 96000,
-    audioData: null,
-    punctuation: 'true',
-    model: null,
-    intermediateResult: null,
-    maxStartSilence: null,
-    maxEndSilence: null,
+  if (recognition) {
+    try { recognition.stop() } catch (e) {}
   }
-
-  RecorderIns = Recorder({
-    type: 'wav',
-    sampleRate: defaultOpt.sampleRate,
-    bitRate: parseInt(defaultOpt.bitRate / 1000) || 16,
-    onProcess(buffers, powerLevel, bufferDuration, bufferSampleRate) {
-      const LEN = 59 * 1000
-      if (bufferDuration > LEN) {
-        RecorderIns.recStop()
-      }
-    },
-  })
-
-  RecorderIns.open(
-    () => { /* 麦克风就绪 */ },
-    (msg, isUserNotAllow) => {
-      console.log((isUserNotAllow ? '用户拒绝授权：' : '') + msg)
-    }
-  )
+  isRecording.value = false
 }
 
 function clearConversation() {
-  messages.value = [
-    {
-      role: 'ai',
-      content: '你好！我是虚拟教学助手小慧，有什么可以帮你的吗？',
-      html: renderMarkdown('你好！我是虚拟教学助手小慧，有什么可以帮你的吗？')
-    }
-  ]
+  chatStore.newSession()
 }
 
 // ========== Unity WebGL 初始化 ==========
@@ -406,7 +517,7 @@ function retryUnity() {
   initUnity()
 }
 
-function initUnity() {
+async function initUnity() {
   container = document.querySelector('#unity-container')
   canvas = document.querySelector('#unity-canvas')
   loadingBar = document.querySelector('#unity-loading-bar')
@@ -433,6 +544,31 @@ function initUnity() {
     canvas.style.height = unityCanvasHeight + 'px'
   }
 
+  // 策略：标记 uLipSync 的 ScriptProcessorNode → 截获 connect() 捕获该节点 → speakText 时把音频直接注入它
+  const OrigAudioContext = window.AudioContext || window.webkitAudioContext
+  if (OrigAudioContext) {
+    // 1. 拦截 createScriptProcessor：直接捕获 uLipSync 节点（它是在 Unity AudioContext 上创建的第一个 ScriptProcessorNode）
+    const origCSP = OrigAudioContext.prototype.createScriptProcessor
+    OrigAudioContext.prototype.createScriptProcessor = function () {
+      const node = origCSP.apply(this, arguments)
+      if (!window.__uLipSyncNode && this === window.__unityAudioCtx) {
+        window.__uLipSyncNode = node
+      }
+      return node
+    }
+
+    // 2. 拦截 AudioContext 构造函数，捕获 Unity 的音频上下文
+    window.AudioContext = function () {
+      const ctx = new OrigAudioContext(...arguments)
+      window.__unityAudioCtx = ctx
+      return ctx
+    }
+    window.AudioContext.prototype = OrigAudioContext.prototype
+    if (window.webkitAudioContext) {
+      window.webkitAudioContext = window.AudioContext
+    }
+  }
+
   unityLoadTimer = setTimeout(() => {
     if (!unityLoaded.value) {
       unityLoadFailed.value = true
@@ -453,7 +589,6 @@ function initUnity() {
       }
       UnityIns = unityInstance
       unityLoaded.value = true
-      initRecorder()
     }).catch((message) => {
       clearTimeout(unityLoadTimer)
       unityLoadFailed.value = true
@@ -468,15 +603,21 @@ function initUnity() {
   document.body.appendChild(script)
 }
 
-onMounted(() => {
+onMounted(async () => {
+  await chatStore.loadHistory()
+  // 无历史记录时使用伴学专用欢迎语
+  chatStore.replaceWelcome(
+    '你好！我是虚拟教学助手小慧，有什么可以帮你的吗？',
+    renderMarkdown('你好！我是虚拟教学助手小慧，有什么可以帮你的吗？')
+  )
   initUnity()
   scrollToBottom()
 })
 
 onBeforeUnmount(() => {
   clearTimeout(unityLoadTimer)
-  if (RecorderIns) {
-    try { RecorderIns.close() } catch (e) { /* ignore */ }
+  if (recognition) {
+    try { recognition.abort() } catch (e) { /* ignore */ }
   }
 })
 </script>

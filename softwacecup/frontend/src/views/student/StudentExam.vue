@@ -480,7 +480,7 @@ watch(showExamModal, (val) => {
 }
 .exam-modal-content {
   width: min(820px, 92vw); max-height: 88vh;
-  background: white; border-radius: 18px;
+  background: rgba(255, 255, 255, 0.06); backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px); border: 1px solid rgba(255, 255, 255, 0.1); box-shadow: 0 8px 32px rgba(0, 0, 0, 0.35); border-radius: 18px;
   box-shadow: 0 24px 64px rgba(0,0,0,.25);
   display: flex; flex-direction: column; overflow: hidden;
 }
@@ -494,7 +494,7 @@ watch(showExamModal, (val) => {
 .confirm-dialog h4 { margin: 0 0 14px; font-size: 15px; color: #475569; font-weight: 500; }
 .exam-rules { padding: 0 0 0 20px; margin: 12px 0; text-align: left; line-height: 2; font-size: 13.5px; color: #475569; }
 .exam-rules li { margin-bottom: 6px; padding-left: 6px; list-style-type: decimal inside; }
-.system-warning { margin-top: 16px; padding: 10px 14px; background: #fef2f2; border-radius: 10px; color: #dc2626; font-size: 13px; border: 1px solid #fecaca; }
+.system-warning { margin-top: 16px; padding: 10px 14px; background: rgba(239, 68, 68, 0.1); border-radius: 10px; color: #f87171; font-size: 13px; border: 1px solid rgba(239, 68, 68, 0.2); }
 .confirm-actions { display: flex; gap: 12px; justify-content: center; margin-top: 20px; }
 
 /* Exam taking view */
@@ -523,7 +523,7 @@ watch(showExamModal, (val) => {
   border-radius: 10px; border: 1.5px solid #e2e8f0; cursor: pointer;
   font-size: 13.5px; color: #475569; transition: all .15s ease;
 }
-.option-label:hover { background: #f0fdf4; border-color: #86efac; }
+.option-label:hover { background: rgba(16, 185, 129, 0.1); border-color: rgba(16, 185, 129, 0.3); }
 .option-label.selected { background: #eff6ff; border-color: #3b82f6; }
 .option-label.selected.correct { background: #dcfce7; border-color: #22c55e; }
 .option-label input { accent-color: #3b82f6; }
@@ -532,12 +532,12 @@ watch(showExamModal, (val) => {
 .q-options textarea { width: 100%; border: 1.5px solid #d1d5db; border-radius: 10px; padding: 10px; font-size: 13.5px; resize: vertical; outline: none; font-family: inherit; }
 .q-options textarea:focus { border-color: #93c5fd; box-shadow: 0 0 0 3px rgba(147,203,253,.15); }
 
-.reference-area { margin-top: 12px; padding: 12px 16px; background: #f0fdf4; border-radius: 10px; border: 1px solid #bbf7d0; }
+.reference-area { margin-top: 12px; padding: 12px 16px; background: rgba(16, 185, 129, 0.1); border-radius: 10px; border: 1px solid rgba(16, 185, 129, 0.15); }
 .reference-area h5 { margin: 0 0 6px; font-size: 13px; color: #166534; }
 
 .exam-actions {
   padding: 14px 20px; display: flex; gap: 10px; justify-content: flex-end;
-  border-top: 1px solid #edf2f8; background: #fafbff;
+  border-top: 1px solid rgba(255, 255, 255, 0.08); background: rgba(255, 255, 255, 0.04);
 }
 .status-dot { display: inline-block; width: 8px; height: 8px; border-radius: 50%; margin-right: 4px; }
 .status-dot.active { background: #22c55e; box-shadow: 0 0 0 3px rgba(34,197,94,.25); }
@@ -545,7 +545,7 @@ watch(showExamModal, (val) => {
 .status-dot.finished { background: #059669; }
 
 .exam-btn {
-  background: #fff;
+  background: rgba(255, 255, 255, 0.06);
   color: #3b82f6;
   border: 1px solid #3b82f6;
   border-radius: 6px;

@@ -1,7 +1,10 @@
 package com.iflytek.smartprep.controller;
 
+import com.iflytek.smartprep.config.JwtTokenProvider;
 import com.iflytek.smartprep.config.LoginUserHolder;
+import com.iflytek.smartprep.domain.QaHistory;
 import com.iflytek.smartprep.service.AgentService;
+import com.iflytek.smartprep.service.QaHistoryService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -22,6 +25,8 @@ import java.util.*;
 public class AgentController {
 
     private final AgentService agentService;
+    private final JwtTokenProvider jwtTokenProvider;
+    private final QaHistoryService qaHistoryService;
 
     /** 课程推荐智能体 */
     @PostMapping("/course-recommend")
@@ -64,13 +69,28 @@ public class AgentController {
         SseEmitter emitter = new SseEmitter(60000L);
 
         String question = (String) request.getOrDefault("question", "");
+        String sessionId = (String) request.getOrDefault("sessionId", null);
         @SuppressWarnings("unchecked")
         List<Map<String, String>> history = (List<Map<String, String>>) request.getOrDefault("history", Collections.emptyList());
 
+        // 从 JWT 提取 userId
+        Long userId = null;
+        try {
+            if (authHeader != null && authHeader.startsWith("Bearer ")) {
+                String token = authHeader.substring(7);
+                String uidStr = jwtTokenProvider.parse(token).get("uid").toString();
+                userId = Long.valueOf(uidStr);
+            }
+        } catch (Exception ignored) {}
+
+        final Long finalUserId = userId;
+
         new Thread(() -> {
             try {
+                boolean[] chunked = {false};
                 String result = agentService.chatStreamWithCompanion(question, history, chunk -> {
                     try {
+                        chunked[0] = true;
                         Map<String, Object> data = new HashMap<>();
                         data.put("delta", chunk);
                         data.put("finish", false);
@@ -80,11 +100,34 @@ public class AgentController {
                     }
                 });
 
+                // 若 LLM 未流式输出（如 fallback），将完整结果作为一个 delta 发送
+                if (!chunked[0] && result != null && !result.isBlank()) {
+                    Map<String, Object> fallback = new HashMap<>();
+                    fallback.put("delta", result);
+                    fallback.put("finish", false);
+                    emitter.send(SseEmitter.event().name("message").data(fallback));
+                }
+
                 Map<String, Object> done = new HashMap<>();
                 done.put("delta", "");
                 done.put("finish", true);
                 emitter.send(SseEmitter.event().name("message").data(done));
                 emitter.complete();
+
+                // 自动保存问答历史
+                if (finalUserId != null && result != null && !result.isBlank()) {
+                    try {
+                        QaHistory qa = new QaHistory();
+                        qa.setUserId(finalUserId);
+                        qa.setQuestion(question);
+                        qa.setAnswer(result);
+                        qa.setSummary(question.length() > 50 ? question.substring(0, 50) + "..." : question);
+                        qa.setSessionId(sessionId);
+                        qaHistoryService.save(qa);
+                    } catch (Exception e) {
+                        System.err.println("保存Agent问答历史失败: " + e.getMessage());
+                    }
+                }
             } catch (Exception e) {
                 emitter.completeWithError(e);
             }

@@ -12,8 +12,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
 import java.util.stream.Collectors;
 
 /**
@@ -96,24 +95,118 @@ public class RAGService {
      * @return 检索结果列表
      */
     public List<RetrievalResult> retrieveRelevantDocuments(String question, String course, int topK) {
-        log.info("检索相关文档，问题: {}, 课程: {}, topK: {}", question, course, topK);
+        log.info("RAG 检索: question='{}', course='{}', topK={}", question, course, topK);
 
+        List<RetrievalResult> results = new ArrayList<>();
+
+        // 路径 1：向量语义检索（Chroma）
         try {
             List<DocumentChunk> chunks = vectorStoreService.searchSimilarChunks(question, topK, course);
+            if (chunks != null) {
+                for (int i = 0; i < chunks.size(); i++) {
+                    results.add(new RetrievalResult(chunks.get(i), 0.0, i + 1));
+                }
+            }
+        } catch (Exception e) {
+            log.warn("Chroma 向量检索失败，降级为关键词检索: {}", e.getMessage());
+        }
 
-            // 转换 DocumentChunk 为 RetrievalResult
-            List<RetrievalResult> results = new ArrayList<>();
-            for (int i = 0; i < chunks.size(); i++) {
-                DocumentChunk chunk = chunks.get(i);
-                results.add(new RetrievalResult(chunk, 0.0, i + 1));
+        // 路径 2：关键词兜底检索（当 Chroma 无结果或不可用时）
+        if (results.isEmpty()) {
+            log.info("向量检索无结果，启用关键词兜底检索");
+            results = keywordFallbackRetrieval(question, course, topK);
+        }
+
+        log.info("RAG 检索完成，共 {} 个结果 (向量: {}, 关键词: {})",
+                results.size(), results.size(), results.size());
+        return results;
+    }
+
+    /**
+     * 关键词兜底检索：提取问题中的关键词，从 MySQL 全文匹配
+     */
+    private List<RetrievalResult> keywordFallbackRetrieval(String question, String course, int topK) {
+        List<RetrievalResult> results = new ArrayList<>();
+        try {
+            // 提取关键词：取长度 >= 2 的中文词
+            Set<String> keywords = extractKeywords(question);
+            log.info("提取关键词: {}", keywords);
+
+            List<KnowledgeDoc> allDocs;
+            if (course != null && !course.isEmpty()) {
+                allDocs = knowledgeDocMapper.selectList(
+                    new com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper<KnowledgeDoc>()
+                        .eq(KnowledgeDoc::getCourse, course)
+                );
+            } else {
+                allDocs = knowledgeDocMapper.selectList(null);
             }
 
-            log.info("检索完成，找到 {} 个相关文档块", results.size());
-            return results;
+            if (allDocs == null || allDocs.isEmpty()) return results;
+
+            // 按关键词匹配数量排序
+            List<KnowledgeDoc> scored = new ArrayList<>();
+            for (KnowledgeDoc doc : allDocs) {
+                int score = 0;
+                String content = (doc.getTitle() + " " + (doc.getContent() != null ? doc.getContent() : "")).toLowerCase();
+                for (String kw : keywords) {
+                    if (content.contains(kw.toLowerCase())) score++;
+                }
+                if (score > 0) scored.add(doc);
+            }
+            scored.sort((a, b) -> {
+                int sa = countKeywords((a.getTitle() + a.getContent()), keywords);
+                int sb = countKeywords((b.getTitle() + b.getContent()), keywords);
+                return Integer.compare(sb, sa);
+            });
+
+            int count = 0;
+            for (KnowledgeDoc doc : scored) {
+                if (count >= topK) break;
+                DocumentChunk chunk = DocumentChunk.builder()
+                    .documentId(doc.getId())
+                    .documentTitle(doc.getTitle())
+                    .course(doc.getCourse())
+                    .content(doc.getContent())
+                    .tag(doc.getTag())
+                    .chunkIndex(0)
+                    .createdAt(System.currentTimeMillis())
+                    .build();
+                results.add(new RetrievalResult(chunk, 0.0, count + 1));
+                count++;
+            }
+            log.info("关键词检索命中 {} 条", results.size());
         } catch (Exception e) {
-            log.error("检索文档失败", e);
-            return new ArrayList<>();
+            log.error("关键词检索失败", e);
         }
+        return results;
+    }
+
+    private Set<String> extractKeywords(String text) {
+        Set<String> keywords = new LinkedHashSet<>();
+        // 按中文分词简单策略：2-5 字滑动窗口
+        for (int len = 5; len >= 2; len--) {
+            for (int i = 0; i <= text.length() - len; i++) {
+                String sub = text.substring(i, i + len);
+                if (sub.matches("[一-龥a-zA-Z]{" + len + "}")) {
+                    keywords.add(sub);
+                }
+            }
+        }
+        // 也添加英文单词
+        for (String word : text.split("[^a-zA-Z]+")) {
+            if (word.length() >= 3) keywords.add(word.toLowerCase());
+        }
+        return keywords;
+    }
+
+    private int countKeywords(String text, Set<String> keywords) {
+        int count = 0;
+        String lower = text.toLowerCase();
+        for (String kw : keywords) {
+            if (lower.contains(kw.toLowerCase())) count++;
+        }
+        return count;
     }
 
     /**

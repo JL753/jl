@@ -7,4 +7,5 @@ public class TutorAskRequest {
     private String question;
     private String context;
     private String answerMode;
+    private String sessionId;
 }

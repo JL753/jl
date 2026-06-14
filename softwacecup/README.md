@@ -159,7 +159,7 @@
 执行数据库初始化：
 
 ```sql
-source sql/init.sql;
+source sql/smartprep.sql;
 ```
 
 #### 6.2 启动后端
